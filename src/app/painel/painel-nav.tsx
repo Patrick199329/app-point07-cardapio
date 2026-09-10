@@ -7,13 +7,14 @@ import { cn } from "@/lib/utils";
 
 const ITEMS = [
   { href: "/painel", label: "Visão geral", exact: true },
+  { href: "/painel/cardapio", label: "Cardápio" },
   { href: "/painel/usuarios", label: "Usuários" },
   { href: "/painel/mesas", label: "Mesas" },
 ];
 
-const EM_BREVE = ["Cardápio", "Painel gerencial", "Eventos"];
+const EM_BREVE = ["Painel gerencial", "Eventos"];
 
-export function PainelNav() {
+export function PainelNav({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
 
   return (
@@ -26,9 +27,10 @@ export function PainelNav() {
           <Link
             key={item.href}
             href={item.href}
+            onClick={onNavigate}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "rounded-md px-3 py-2 text-sm transition-colors",
+              "rounded-md px-3 py-2.5 text-sm transition-colors md:py-2",
               active
                 ? "bg-secondary font-medium text-secondary-foreground"
                 : "text-muted-foreground hover:bg-secondary/60",
@@ -45,7 +47,7 @@ export function PainelNav() {
       {EM_BREVE.map((label) => (
         <span
           key={label}
-          className="cursor-not-allowed rounded-md px-3 py-2 text-sm text-muted-foreground/40"
+          className="cursor-not-allowed rounded-md px-3 py-2.5 text-sm text-muted-foreground/40 md:py-2"
         >
           {label}
         </span>

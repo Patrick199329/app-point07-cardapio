@@ -12,7 +12,7 @@ export function NativeSelect({ className, ...props }: ComponentProps<"select">) 
     <select
       data-slot="native-select"
       className={cn(
-        "flex h-8 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm outline-none transition-colors",
+        "flex h-10 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-base outline-none transition-colors md:h-9 md:text-sm",
         "focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
         "disabled:cursor-not-allowed disabled:opacity-50",
         "dark:bg-input/30",

@@ -63,3 +63,40 @@ insert into public.mesas (identificador, apelido, area) values
   ('Mesa 04', 'Mesa do canto', 'interna'),
   ('Externa 01', 'Varanda',    'externa'),
   ('Externa 02', 'Calçada',    'externa');
+
+-- ---------------------------------------------------------------------------
+-- Cardápio de exemplo (Fase 2) — dados fictícios, a migração real vem depois
+-- ---------------------------------------------------------------------------
+do $$
+declare
+  cat_bebidas uuid;
+  cat_entradas uuid;
+  cat_porcoes uuid;
+  cat_tabuas uuid;
+begin
+  insert into public.categorias (nome, ordem) values ('Bebidas', 0) returning id into cat_bebidas;
+  insert into public.categorias (nome, ordem) values ('Entradas', 1) returning id into cat_entradas;
+  insert into public.categorias (nome, ordem) values ('Porções', 2) returning id into cat_porcoes;
+  insert into public.categorias (nome, ordem) values ('Tábuas Especiais', 3) returning id into cat_tabuas;
+
+  -- Modelo A — item simples
+  insert into public.produtos (categoria_id, nome, descricao, modelo, preco, ordem) values
+    (cat_bebidas, 'Chope Pilsen 300ml', 'Puro malte, bem gelado', 'simples', 8.50, 0),
+    (cat_bebidas, 'Refrigerante lata', 'Coca-Cola, Guaraná ou Sprite', 'simples', 6.00, 1),
+    (cat_bebidas, 'Água mineral 500ml', null, 'simples', 5.50, 2);
+
+  -- Modelo B — item com tamanhos (médio / grande)
+  insert into public.produtos (categoria_id, nome, descricao, modelo, preco_medio, preco_grande, ordem) values
+    (cat_entradas, 'Bolinho de bacalhau', 'Porção com 6 ou 12 unidades', 'tamanhos', 34.00, 58.00, 0),
+    (cat_porcoes, 'Batata frita', 'Crocante, com alecrim', 'tamanhos', 29.00, 45.00, 0),
+    (cat_porcoes, 'Calabresa acebolada', null, 'tamanhos', 39.00, 62.00, 1);
+
+  -- Modelo C — item para compartilhar
+  insert into public.produtos (categoria_id, nome, descricao, modelo, preco, serve_ate, ordem) values
+    (cat_tabuas, 'Tábua de frios', 'Queijos, embutidos, azeitonas e pães', 'compartilhar', 129.00, 4, 0),
+    (cat_tabuas, 'Tábua da casa', 'Seleção especial do chef', 'compartilhar', 219.00, 6, 1);
+end $$;
+
+insert into public.avisos (texto, ordem) values
+  ('Taxa de embalagem para pedidos "para viagem": R$ 2,00.', 0),
+  ('Couvert artístico: R$ 10,00 por pessoa quando houver música ao vivo.', 1);

@@ -118,12 +118,12 @@ enabled = true
 # The maximum file size allowed (e.g. "5MB", "500KB").
 file_size_limit = "50MiB"
 
-# Uncomment to configure local storage buckets
-# [storage.buckets.images]
-# public = false
-# file_size_limit = "50MiB"
-# allowed_mime_types = ["image/png", "image/jpeg"]
-# objects_path = "./images"
+# Imagens do cardápio (Módulo 1). Upload já convertido para WebP pelo servidor
+# (src/lib/imagem.ts); leitura pública para o Cardápio Público (Módulo 2).
+[storage.buckets.cardapio]
+public = true
+file_size_limit = "5MiB"
+allowed_mime_types = ["image/webp"]
 
 # Allow connections via S3 compatible clients
 [storage.s3_protocol]
@@ -203,11 +203,12 @@ sms_sent = 30
 # Number of anonymous sign-ins that can be made per hour per IP address. Requires enable_anonymous_sign_ins = true.
 anonymous_users = 30
 # Number of sessions that can be refreshed in a 5 minute interval per IP address.
-token_refresh = 150
+token_refresh = 1000
 # Number of sign up and sign-in requests that can be made in a 5 minute interval per IP address (excludes anonymous users).
-sign_in_sign_ups = 30
+# Elevado só para o ambiente local (scripts de verificação fazem muitos logins). Produção usa a config da nuvem.
+sign_in_sign_ups = 500
 # Number of OTP / Magic link verifications that can be made in a 5 minute interval per IP address.
-token_verifications = 30
+token_verifications = 500
 # Number of Web3 logins that can be made in a 5 minute interval per IP address.
 web3 = 30
 

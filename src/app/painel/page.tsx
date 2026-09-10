@@ -14,37 +14,45 @@ export const metadata = { title: "Visão geral — Point07" };
 export default async function PainelHome() {
   const supabase = await createClient();
 
-  const [usuarios, garconsAtivos, mesas, mesasAtivas] = await Promise.all([
-    supabase.from("profiles").select("*", { count: "exact", head: true }),
-    supabase
-      .from("profiles")
-      .select("*", { count: "exact", head: true })
-      .eq("role", "garcom")
-      .eq("ativo", true),
-    supabase.from("mesas").select("*", { count: "exact", head: true }),
-    supabase
-      .from("mesas")
-      .select("*", { count: "exact", head: true })
-      .eq("ativo", true),
-  ]);
+  const [usuarios, garconsAtivos, mesasAtivas, categoriasAtivas, produtosAtivos] =
+    await Promise.all([
+      supabase.from("profiles").select("*", { count: "exact", head: true }),
+      supabase
+        .from("profiles")
+        .select("*", { count: "exact", head: true })
+        .eq("role", "garcom")
+        .eq("ativo", true),
+      supabase
+        .from("mesas")
+        .select("*", { count: "exact", head: true })
+        .eq("ativo", true),
+      supabase
+        .from("categorias")
+        .select("*", { count: "exact", head: true })
+        .eq("ativo", true),
+      supabase
+        .from("produtos")
+        .select("*", { count: "exact", head: true })
+        .eq("ativo", true),
+    ]);
 
   const cards = [
     {
+      titulo: "Cardápio",
+      valor: produtosAtivos.count ?? 0,
+      descricao: `${categoriasAtivas.count ?? 0} categoria(s) · produtos ativos`,
+      href: "/painel/cardapio",
+    },
+    {
       titulo: "Usuários",
       valor: usuarios.count ?? 0,
-      descricao: "Administradores e garçons cadastrados",
+      descricao: `${garconsAtivos.count ?? 0} garçom(ns) ativo(s)`,
       href: "/painel/usuarios",
     },
     {
-      titulo: "Garçons ativos",
-      valor: garconsAtivos.count ?? 0,
-      descricao: "Contas de garçom habilitadas",
-      href: "/painel/usuarios",
-    },
-    {
-      titulo: "Mesas",
-      valor: mesas.count ?? 0,
-      descricao: `${mesasAtivas.count ?? 0} ativa(s)`,
+      titulo: "Mesas ativas",
+      valor: mesasAtivas.count ?? 0,
+      descricao: "Disponíveis para o QR por mesa",
       href: "/painel/mesas",
     },
   ];

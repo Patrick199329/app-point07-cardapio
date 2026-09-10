@@ -34,6 +34,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      avisos: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          id: string
+          ordem: number
+          texto: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          id?: string
+          ordem?: number
+          texto: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          id?: string
+          ordem?: number
+          texto?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      categorias: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          id: string
+          nome: string
+          ordem: number
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          id?: string
+          nome: string
+          ordem?: number
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          id?: string
+          nome?: string
+          ordem?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       mesas: {
         Row: {
           apelido: string | null
@@ -66,6 +120,65 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      produtos: {
+        Row: {
+          ativo: boolean
+          categoria_id: string
+          created_at: string
+          descricao: string | null
+          id: string
+          imagem_path: string | null
+          modelo: Database["public"]["Enums"]["produto_modelo"]
+          nome: string
+          ordem: number
+          preco: number | null
+          preco_grande: number | null
+          preco_medio: number | null
+          serve_ate: number | null
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          categoria_id: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          imagem_path?: string | null
+          modelo?: Database["public"]["Enums"]["produto_modelo"]
+          nome: string
+          ordem?: number
+          preco?: number | null
+          preco_grande?: number | null
+          preco_medio?: number | null
+          serve_ate?: number | null
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          categoria_id?: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          imagem_path?: string | null
+          modelo?: Database["public"]["Enums"]["produto_modelo"]
+          nome?: string
+          ordem?: number
+          preco?: number | null
+          preco_grande?: number | null
+          preco_medio?: number | null
+          serve_ate?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "produtos_categoria_id_fkey"
+            columns: ["categoria_id"]
+            isOneToOne: false
+            referencedRelation: "categorias"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -106,6 +219,7 @@ export type Database = {
     }
     Enums: {
       mesa_area: "interna" | "externa"
+      produto_modelo: "simples" | "tamanhos" | "compartilhar"
       user_role: "admin" | "garcom"
     }
     CompositeTypes: {
@@ -238,6 +352,7 @@ export const Constants = {
   public: {
     Enums: {
       mesa_area: ["interna", "externa"],
+      produto_modelo: ["simples", "tamanhos", "compartilhar"],
       user_role: ["admin", "garcom"],
     },
   },
