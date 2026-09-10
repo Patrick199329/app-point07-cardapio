@@ -13,23 +13,30 @@ declare
   g1_id    uuid := '00000000-0000-0000-0000-0000000000b1';
   g2_id    uuid := '00000000-0000-0000-0000-0000000000b2';
 begin
+  -- confirmation_token, recovery_token, email_change_token_new e email_change
+  -- não têm DEFAULT em auth.users e o GoTrue quebra se ficarem NULL
+  -- ("Database error querying schema" no login) — por isso setamos '' explicitamente.
   insert into auth.users (
     instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
-    raw_app_meta_data, raw_user_meta_data, created_at, updated_at
+    raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
+    confirmation_token, recovery_token, email_change_token_new, email_change
   )
   values
     ('00000000-0000-0000-0000-000000000000', admin_id, 'authenticated', 'authenticated',
      'admin@point07.local', extensions.crypt('point07dev', extensions.gen_salt('bf')), now(),
      '{"provider":"email","providers":["email"]}',
-     '{"nome":"Administrador Point07","role":"admin"}', now(), now()),
+     '{"nome":"Administrador Point07","role":"admin"}', now(), now(),
+     '', '', '', ''),
     ('00000000-0000-0000-0000-000000000000', g1_id, 'authenticated', 'authenticated',
      'joao@point07.local', extensions.crypt('point07dev', extensions.gen_salt('bf')), now(),
      '{"provider":"email","providers":["email"]}',
-     '{"nome":"João (garçom)","role":"garcom"}', now(), now()),
+     '{"nome":"João (garçom)","role":"garcom"}', now(), now(),
+     '', '', '', ''),
     ('00000000-0000-0000-0000-000000000000', g2_id, 'authenticated', 'authenticated',
      'maria@point07.local', extensions.crypt('point07dev', extensions.gen_salt('bf')), now(),
      '{"provider":"email","providers":["email"]}',
-     '{"nome":"Maria (garçom)","role":"garcom"}', now(), now());
+     '{"nome":"Maria (garçom)","role":"garcom"}', now(), now(),
+     '', '', '', '');
 
   insert into auth.identities (
     id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at
