@@ -88,6 +88,60 @@ export type Database = {
         }
         Relationships: []
       }
+      chamados: {
+        Row: {
+          aceito_em: string | null
+          cancelado_em: string | null
+          created_at: string
+          criado_em: string
+          garcom_id: string | null
+          id: string
+          mesa_id: string
+          origem_token: string
+          status: Database["public"]["Enums"]["chamado_status"]
+          updated_at: string
+        }
+        Insert: {
+          aceito_em?: string | null
+          cancelado_em?: string | null
+          created_at?: string
+          criado_em?: string
+          garcom_id?: string | null
+          id?: string
+          mesa_id: string
+          origem_token?: string
+          status?: Database["public"]["Enums"]["chamado_status"]
+          updated_at?: string
+        }
+        Update: {
+          aceito_em?: string | null
+          cancelado_em?: string | null
+          created_at?: string
+          criado_em?: string
+          garcom_id?: string | null
+          id?: string
+          mesa_id?: string
+          origem_token?: string
+          status?: Database["public"]["Enums"]["chamado_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chamados_garcom_id_fkey"
+            columns: ["garcom_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chamados_mesa_id_fkey"
+            columns: ["mesa_id"]
+            isOneToOne: false
+            referencedRelation: "mesas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mesas: {
         Row: {
           apelido: string | null
@@ -215,9 +269,46 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      aceitar_chamado: {
+        Args: { p_id: string }
+        Returns: {
+          motivo: string
+          ok: boolean
+        }[]
+      }
+      cancelar_chamado: {
+        Args: { p_id: string; p_origem_token: string }
+        Returns: boolean
+      }
+      criar_chamado: {
+        Args: { p_token: string }
+        Returns: {
+          chamado_id: string
+          ja_existia: boolean
+          origem_token: string
+          status: Database["public"]["Enums"]["chamado_status"]
+        }[]
+      }
       is_admin: { Args: never; Returns: boolean }
+      is_garcom: { Args: never; Returns: boolean }
+      mesa_por_token: {
+        Args: { p_token: string }
+        Returns: {
+          id: string
+          identificador: string
+        }[]
+      }
+      status_chamado: {
+        Args: { p_id: string; p_origem_token: string }
+        Returns: {
+          aceito_em: string
+          garcom_nome: string
+          status: Database["public"]["Enums"]["chamado_status"]
+        }[]
+      }
     }
     Enums: {
+      chamado_status: "pendente" | "aceito" | "cancelado"
       mesa_area: "interna" | "externa"
       produto_modelo: "simples" | "tamanhos" | "compartilhar"
       user_role: "admin" | "garcom"
@@ -351,6 +442,7 @@ export const Constants = {
   },
   public: {
     Enums: {
+      chamado_status: ["pendente", "aceito", "cancelado"],
       mesa_area: ["interna", "externa"],
       produto_modelo: ["simples", "tamanhos", "compartilhar"],
       user_role: ["admin", "garcom"],

@@ -1,5 +1,7 @@
+import Link from "next/link";
+
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -66,10 +68,18 @@ export default async function MesasPage() {
         <div>
           <h1 className="text-xl font-semibold">Mesas</h1>
           <p className="text-sm text-muted-foreground">
-            Cadastro de mesas do salão. Base para o QR por mesa (Fase 3).
+            Cadastro de mesas do salão. Cada mesa tem um QR próprio.
           </p>
         </div>
-        <MesaDialog trigger={<Button>Nova mesa</Button>} />
+        <div className="flex gap-2">
+          <Link
+            href="/painel/mesas/impressao"
+            className={buttonVariants({ variant: "outline" })}
+          >
+            Imprimir QR
+          </Link>
+          <MesaDialog trigger={<Button>Nova mesa</Button>} />
+        </div>
       </div>
 
       {lista.length === 0 ? (

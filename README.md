@@ -32,6 +32,8 @@ npm run db:start
 
 # 2. Copie as chaves impressas para o .env.local
 cp .env.example .env.local
+#   NEXT_PUBLIC_SITE_URL       = base dos QR das mesas (http://localhost:3000 em dev;
+#                                 o domínio real do cliente entra na Fase 6/7)
 #   NEXT_PUBLIC_SUPABASE_URL   = API URL              (http://127.0.0.1:55521)
 #   NEXT_PUBLIC_SUPABASE_ANON_KEY   = anon key
 #   SUPABASE_SERVICE_ROLE_KEY  = service_role key     (npm run db:status mostra de novo)
@@ -68,22 +70,33 @@ Portas do Supabase local do Point07 (dedicadas, para não colidir com outros pro
 | `joao@point07.local` | Garçom |
 | `maria@point07.local` | Garçom |
 
-## Estado atual — Fase 1 (fundação)
+## Estado atual
 
-Implementado:
+Implementado (Fases 1–3 do desenvolvimento local):
 
-- Autenticação com login individual e dois perfis (**Administrador**, **Garçom**)
-- Proteção de rotas por perfil (`src/proxy.ts` + `src/lib/auth.ts`)
-- **Painel do Administrador** (`/painel`): visão geral, gestão de **usuários** e de **mesas**
-- **Área do Garçom** (`/fila`): placeholder (a fila em tempo real entra na Fase 2)
-- Schema com RLS em todas as tabelas (`profiles`, `mesas`)
+- Autenticação com login individual e dois perfis (**Administrador**, **Garçom**), rotas
+  protegidas por perfil (`src/proxy.ts` + `src/lib/auth.ts`)
+- **Painel do Administrador** (`/painel`): usuários, mesas, cardápio (categorias/produtos/
+  avisos), eventos, geração de QR para impressão — tudo mobile-first (nav em drawer no
+  celular)
+- **Cardápio Público** (`/cardapio` e `/mesa/[token]`): mobile-first, sem login, reflete o
+  painel sem publicação manual
+- **Chamada de Garçom** (Módulo 3): QR por mesa, botão "Chamar garçom" no cardápio (RPCs
+  `criar_chamado`/`status_chamado`/`cancelar_chamado`, com dedup de 90s), fila do garçom em
+  **`/fila`** com Supabase Realtime e aceite exclusivo (`aceitar_chamado`, atômico)
+- **Registro de Eventos** (Módulo 4): histórico em `/painel/eventos` com filtros
+- **Gerador de QR** (`/painel/mesas/impressao`): cartão por mesa no estilo Point07 (logo,
+  QR, tagline), pronto para imprimir em A4
+- Schema com RLS em todas as tabelas (`profiles`, `mesas`, `categorias`, `produtos`,
+  `avisos`, `chamados`) + funções `SECURITY DEFINER` (`is_admin`, `is_garcom` e as RPCs do
+  Módulo 3)
 
-Próximas fases (ver [`docs/03-backlog-de-tarefas.md`](docs/03-backlog-de-tarefas.md)):
-Cardápio (Módulos 1–2), Chamada de Garçom e Registro de Eventos (Módulos 3–4),
-Painel Gerencial (Módulo 5), migração do cardápio atual, deploy.
+Próximo (ver [`docs/03-backlog-de-tarefas.md`](docs/03-backlog-de-tarefas.md)): **Painel
+Gerencial** (Módulo 5 — métricas de atendimento), migração do cardápio atual do WordPress,
+domínio real no QR (Fase 6/7).
 
-Itens do padrão de engenharia adiados nesta leva: testes automatizados (Vitest/Playwright),
-botão de reportar erro, feature flags, diagramas UML. Retomar antes do deploy.
+Itens do padrão de engenharia adiados: testes automatizados (Vitest/Playwright), botão de
+reportar erro, feature flags, diagramas UML. Retomar antes do deploy.
 
 ## Scripts
 

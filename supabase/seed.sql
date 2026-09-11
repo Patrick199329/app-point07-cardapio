@@ -100,3 +100,30 @@ end $$;
 insert into public.avisos (texto, ordem) values
   ('Taxa de embalagem para pedidos "para viagem": R$ 2,00.', 0),
   ('Couvert artístico: R$ 10,00 por pessoa quando houver música ao vivo.', 1);
+
+-- ---------------------------------------------------------------------------
+-- Chamados de exemplo (Fase 3) — para ver a fila e o histórico já populados
+-- ---------------------------------------------------------------------------
+do $$
+declare
+  m_02 uuid;
+  m_ext01 uuid;
+  m_03 uuid;
+  g_joao uuid := '00000000-0000-0000-0000-0000000000b1';
+begin
+  select id into m_02 from public.mesas where identificador = 'Mesa 02';
+  select id into m_ext01 from public.mesas where identificador = 'Externa 01';
+  select id into m_03 from public.mesas where identificador = 'Mesa 03';
+
+  -- pendente (aparece na fila do garçom)
+  insert into public.chamados (mesa_id, criado_em)
+  values (m_02, now() - interval '2 minutes');
+
+  -- aceito (histórico — Módulo 4)
+  insert into public.chamados (mesa_id, status, criado_em, aceito_em, garcom_id)
+  values (m_03, 'aceito', now() - interval '40 minutes', now() - interval '38 minutes', g_joao);
+
+  -- cancelado pelo cliente
+  insert into public.chamados (mesa_id, status, criado_em, cancelado_em)
+  values (m_ext01, 'cancelado', now() - interval '1 hour', now() - interval '58 minutes');
+end $$;

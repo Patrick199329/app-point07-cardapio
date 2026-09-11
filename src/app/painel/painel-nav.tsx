@@ -8,11 +8,12 @@ import { cn } from "@/lib/utils";
 const ITEMS = [
   { href: "/painel", label: "Visão geral", exact: true },
   { href: "/painel/cardapio", label: "Cardápio" },
+  { href: "/painel/eventos", label: "Eventos" },
   { href: "/painel/usuarios", label: "Usuários" },
   { href: "/painel/mesas", label: "Mesas" },
 ];
 
-const EM_BREVE = ["Painel gerencial", "Eventos"];
+const EM_BREVE = ["Painel gerencial"];
 
 export function PainelNav({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
