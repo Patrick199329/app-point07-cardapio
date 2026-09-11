@@ -19,6 +19,7 @@ export type ProdutoPublico = {
   preco_grande: number | null;
   serve_ate: number | null;
   imagem_path: string | null;
+  imagem_layout: "miniatura" | "grande";
   grupos: GrupoOpcoesPublico[];
 };
 
@@ -46,7 +47,7 @@ export async function carregarCardapioPublico(): Promise<CardapioPublicoData> {
     supabase
       .from("categorias")
       .select(
-        "id, nome, produtos(id, nome, descricao, modelo, preco, preco_medio, preco_grande, serve_ate, imagem_path, produto_grupos_opcoes(id, titulo, observacao, produto_opcoes(id, nome)))",
+        "id, nome, produtos(id, nome, descricao, modelo, preco, preco_medio, preco_grande, serve_ate, imagem_path, imagem_layout, produto_grupos_opcoes(id, titulo, observacao, produto_opcoes(id, nome)))",
       )
       .order("ordem", { ascending: true })
       .order("ordem", { ascending: true, referencedTable: "produtos" })

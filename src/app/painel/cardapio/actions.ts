@@ -9,10 +9,12 @@ import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/types/database";
 
 type ProdutoModelo = Database["public"]["Enums"]["produto_modelo"];
+type ProdutoImagemLayout = Database["public"]["Enums"]["produto_imagem_layout"];
 
 export type CardapioState = { error: string | null; ok: boolean };
 
 const MODELOS: ProdutoModelo[] = ["simples", "tamanhos", "compartilhar"];
+const IMAGEM_LAYOUTS: ProdutoImagemLayout[] = ["miniatura", "grande"];
 
 function revalidarCardapio() {
   revalidatePath("/painel/cardapio", "layout");
@@ -108,6 +110,7 @@ type ProdutoData = {
   preco_medio: number | null;
   preco_grande: number | null;
   serve_ate: number | null;
+  imagem_layout: ProdutoImagemLayout;
 };
 
 type Parse<T> = { ok: false; error: string } | { ok: true; data: T };
@@ -122,6 +125,13 @@ function parseProdutoForm(formData: FormData): Parse<ProdutoData> {
   const descricao = String(formData.get("descricao") ?? "").trim() || null;
   const modelo = String(formData.get("modelo") ?? "simples") as ProdutoModelo;
 
+  const imagemLayoutRaw = String(formData.get("imagem_layout") ?? "miniatura");
+  const imagem_layout = (
+    IMAGEM_LAYOUTS.includes(imagemLayoutRaw as ProdutoImagemLayout)
+      ? imagemLayoutRaw
+      : "miniatura"
+  ) as ProdutoImagemLayout;
+
   if (!categoria_id) return { ok: false, error: "Categoria não identificada." };
   if (!nome) return { ok: false, error: "Informe o nome do produto." };
   if (!MODELOS.includes(modelo)) return { ok: false, error: "Modelo inválido." };
@@ -135,6 +145,7 @@ function parseProdutoForm(formData: FormData): Parse<ProdutoData> {
     preco_medio: null,
     preco_grande: null,
     serve_ate: null,
+    imagem_layout,
   };
 
   if (modelo === "simples" || modelo === "compartilhar") {

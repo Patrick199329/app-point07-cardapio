@@ -252,6 +252,7 @@ export type Database = {
           created_at: string
           descricao: string | null
           id: string
+          imagem_layout: Database["public"]["Enums"]["produto_imagem_layout"]
           imagem_path: string | null
           modelo: Database["public"]["Enums"]["produto_modelo"]
           nome: string
@@ -268,6 +269,7 @@ export type Database = {
           created_at?: string
           descricao?: string | null
           id?: string
+          imagem_layout?: Database["public"]["Enums"]["produto_imagem_layout"]
           imagem_path?: string | null
           modelo?: Database["public"]["Enums"]["produto_modelo"]
           nome: string
@@ -284,6 +286,7 @@ export type Database = {
           created_at?: string
           descricao?: string | null
           id?: string
+          imagem_layout?: Database["public"]["Enums"]["produto_imagem_layout"]
           imagem_path?: string | null
           modelo?: Database["public"]["Enums"]["produto_modelo"]
           nome?: string
@@ -380,6 +383,7 @@ export type Database = {
     Enums: {
       chamado_status: "pendente" | "aceito" | "cancelado"
       mesa_area: "interna" | "externa"
+      produto_imagem_layout: "miniatura" | "grande"
       produto_modelo: "simples" | "tamanhos" | "compartilhar"
       user_role: "admin" | "garcom"
     }
@@ -514,6 +518,7 @@ export const Constants = {
     Enums: {
       chamado_status: ["pendente", "aceito", "cancelado"],
       mesa_area: ["interna", "externa"],
+      produto_imagem_layout: ["miniatura", "grande"],
       produto_modelo: ["simples", "tamanhos", "compartilhar"],
       user_role: ["admin", "garcom"],
     },

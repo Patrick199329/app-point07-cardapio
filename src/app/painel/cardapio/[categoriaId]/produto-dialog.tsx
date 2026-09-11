@@ -43,6 +43,7 @@ export type ProdutoForm = {
   preco_grande: number | null;
   serve_ate: number | null;
   imagemUrl: string | null;
+  imagemLayout: "miniatura" | "grande";
 };
 
 const INITIAL: CardapioState = { error: null, ok: false };
@@ -243,6 +244,19 @@ export function ProdutoDialog({
             <p className="text-xs text-muted-foreground">
               A imagem é convertida automaticamente para WebP.
             </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="imagem_layout">Tamanho da imagem no cardápio</Label>
+            <NativeSelect
+              id="imagem_layout"
+              name="imagem_layout"
+              defaultValue={produto?.imagemLayout ?? "miniatura"}
+              className={INPUT}
+            >
+              <option value="miniatura">Pequena, à esquerda</option>
+              <option value="grande">Grande, centralizada</option>
+            </NativeSelect>
           </div>
 
           {state.error ? (

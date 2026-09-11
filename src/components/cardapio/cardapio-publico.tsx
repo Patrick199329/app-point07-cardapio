@@ -1,4 +1,5 @@
 import { ChamarGarcomButton } from "@/app/cardapio/chamar-garcom-button";
+import { ImagemProduto } from "@/components/cardapio/imagem-produto";
 import type {
   CardapioPublicoData,
   GrupoOpcoesPublico,
@@ -64,6 +65,64 @@ function Precos({ produto }: { produto: ProdutoPublico }) {
   );
 }
 
+function ProdutoCard({ produto }: { produto: ProdutoPublico }) {
+  const img = urlImagemProduto(produto.imagem_path);
+  const serveAte =
+    produto.modelo === "compartilhar" && produto.serve_ate ? (
+      <p className="mt-0.5 text-xs text-muted-foreground">
+        Serve até {produto.serve_ate} pessoas
+      </p>
+    ) : null;
+
+  if (img && produto.imagem_layout === "grande") {
+    return (
+      <>
+        <div className="flex flex-col items-center text-center">
+          <ImagemProduto
+            src={img}
+            alt={produto.nome}
+            className="mx-auto aspect-square w-full max-w-56 sm:max-w-64"
+          />
+          <p className="mt-3 font-medium">{produto.nome}</p>
+          {produto.descricao ? (
+            <p className="text-sm text-muted-foreground">
+              {produto.descricao}
+            </p>
+          ) : null}
+          {serveAte}
+          <div className="mt-1">
+            <Precos produto={produto} />
+          </div>
+        </div>
+        <GruposOpcoes grupos={produto.grupos} />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <div className="flex gap-3">
+        {img ? (
+          <ImagemProduto src={img} alt={produto.nome} className="size-16" />
+        ) : null}
+        <div className="flex min-w-0 flex-1 justify-between gap-3">
+          <div className="min-w-0">
+            <p className="font-medium">{produto.nome}</p>
+            {produto.descricao ? (
+              <p className="text-sm text-muted-foreground">
+                {produto.descricao}
+              </p>
+            ) : null}
+            {serveAte}
+          </div>
+          <Precos produto={produto} />
+        </div>
+      </div>
+      <GruposOpcoes grupos={produto.grupos} />
+    </>
+  );
+}
+
 export function CardapioPublico({
   categorias,
   avisos,
@@ -113,42 +172,11 @@ export function CardapioPublico({
             >
               <h2 className="mb-3 text-base font-semibold">{categoria.nome}</h2>
               <ul className="space-y-4">
-                {categoria.produtos.map((produto) => {
-                  const img = urlImagemProduto(produto.imagem_path);
-                  return (
-                    <li key={produto.id}>
-                      <div className="flex gap-3">
-                        {img ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={img}
-                            alt=""
-                            loading="lazy"
-                            className="size-16 shrink-0 rounded-lg border object-cover"
-                          />
-                        ) : null}
-                        <div className="flex min-w-0 flex-1 justify-between gap-3">
-                          <div className="min-w-0">
-                            <p className="font-medium">{produto.nome}</p>
-                            {produto.descricao ? (
-                              <p className="text-sm text-muted-foreground">
-                                {produto.descricao}
-                              </p>
-                            ) : null}
-                            {produto.modelo === "compartilhar" &&
-                            produto.serve_ate ? (
-                              <p className="mt-0.5 text-xs text-muted-foreground">
-                                Serve até {produto.serve_ate} pessoas
-                              </p>
-                            ) : null}
-                          </div>
-                          <Precos produto={produto} />
-                        </div>
-                      </div>
-                      <GruposOpcoes grupos={produto.grupos} />
-                    </li>
-                  );
-                })}
+                {categoria.produtos.map((produto) => (
+                  <li key={produto.id}>
+                    <ProdutoCard produto={produto} />
+                  </li>
+                ))}
               </ul>
             </section>
           ))}
