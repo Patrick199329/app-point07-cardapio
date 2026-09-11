@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { formatarPreco } from "@/lib/formato";
 import { urlImagemProduto } from "@/lib/imagem";
 import { createClient } from "@/lib/supabase/server";
@@ -68,7 +68,7 @@ export default async function CategoriaProdutosPage({
   const { data: produtos } = await supabase
     .from("produtos")
     .select(
-      "id, nome, descricao, modelo, preco, preco_medio, preco_grande, serve_ate, imagem_path, ativo, ordem",
+      "id, nome, descricao, modelo, preco, preco_medio, preco_grande, serve_ate, imagem_path, ativo, ordem, produto_grupos_opcoes(count)",
     )
     .eq("categoria_id", categoriaId)
     .order("ordem", { ascending: true });
@@ -155,7 +155,7 @@ export default async function CategoriaProdutosPage({
                     {precoResumo(produto)}
                   </p>
 
-                  <div className="mt-2 flex gap-2">
+                  <div className="mt-2 flex flex-wrap gap-2">
                     <ProdutoDialog
                       categoriaId={categoriaId}
                       produto={form}
@@ -165,6 +165,18 @@ export default async function CategoriaProdutosPage({
                         </Button>
                       }
                     />
+                    <Link
+                      href={`/painel/cardapio/produtos/${produto.id}/opcoes`}
+                      className={buttonVariants({
+                        variant: "outline",
+                        size: "sm",
+                      })}
+                    >
+                      Opções
+                      {(produto.produto_grupos_opcoes?.[0]?.count ?? 0) > 0
+                        ? ` (${produto.produto_grupos_opcoes![0].count})`
+                        : ""}
+                    </Link>
                     <form action={definirStatusProduto}>
                       <input type="hidden" name="id" value={produto.id} />
                       <input

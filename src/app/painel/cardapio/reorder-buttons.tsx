@@ -8,12 +8,14 @@ export function ReorderButtons({
   tabela,
   id,
   categoriaId,
+  produtoId,
   primeiro,
   ultimo,
 }: {
-  tabela: "categorias" | "produtos" | "avisos";
+  tabela: "categorias" | "produtos" | "avisos" | "produto_grupos_opcoes";
   id: string;
   categoriaId?: string;
+  produtoId?: string;
   primeiro: boolean;
   ultimo: boolean;
 }) {
@@ -25,6 +27,9 @@ export function ReorderButtons({
           <input type="hidden" name="id" value={id} />
           {categoriaId ? (
             <input type="hidden" name="categoria_id" value={categoriaId} />
+          ) : null}
+          {produtoId ? (
+            <input type="hidden" name="produto_id" value={produtoId} />
           ) : null}
           <input type="hidden" name="direcao" value={direcao} />
           <Button

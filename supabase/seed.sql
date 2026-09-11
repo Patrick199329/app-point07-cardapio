@@ -102,6 +102,46 @@ insert into public.avisos (texto, ordem) values
   ('Couvert artístico: R$ 10,00 por pessoa quando houver música ao vivo.', 1);
 
 -- ---------------------------------------------------------------------------
+-- Produto de exemplo com grupos de opções (Modelo A + acompanhamentos/escolhas
+-- informativas) — mesmo padrão do "Batata Recheada" do cardápio atual.
+-- ---------------------------------------------------------------------------
+do $$
+declare
+  cat_porcoes uuid;
+  prod_batata uuid;
+  g_acompanha uuid;
+  g_carne uuid;
+  g_complemento uuid;
+begin
+  select id into cat_porcoes from public.categorias where nome = 'Porções';
+
+  insert into public.produtos (categoria_id, nome, modelo, preco, ordem)
+  values (cat_porcoes, 'Batata Recheada', 'simples', 29.90, 2)
+  returning id into prod_batata;
+
+  insert into public.produto_grupos_opcoes (produto_id, titulo, ordem)
+  values (prod_batata, 'Todas Acompanham', 0) returning id into g_acompanha;
+  insert into public.produto_opcoes (grupo_id, nome, ordem) values
+    (g_acompanha, 'Batata', 0), (g_acompanha, 'Mussarela', 1), (g_acompanha, 'Catupiry', 2);
+
+  insert into public.produto_grupos_opcoes (produto_id, titulo, observacao, ordem)
+  values (prod_batata, 'Escolha 1 Carne', 'Será cobrado R$ 9,00 por acréscimo de carne', 1)
+  returning id into g_carne;
+  insert into public.produto_opcoes (grupo_id, nome, ordem) values
+    (g_carne, 'Frango', 0), (g_carne, 'Calabresa', 1), (g_carne, 'Lombo', 2),
+    (g_carne, 'Presunto', 3), (g_carne, 'Atum', 4), (g_carne, 'Contrafilé', 5), (g_carne, 'Bacon', 6);
+
+  insert into public.produto_grupos_opcoes (produto_id, titulo, observacao, ordem)
+  values (prod_batata, 'Escolha 2 Complementos', 'Será cobrado R$ 4,99 por cada acréscimo de complemento', 2)
+  returning id into g_complemento;
+  insert into public.produto_opcoes (grupo_id, nome, ordem) values
+    (g_complemento, 'Milho', 0), (g_complemento, 'Tomate', 1), (g_complemento, 'Alho', 2),
+    (g_complemento, 'Provolone', 3), (g_complemento, 'Pimentão', 4), (g_complemento, 'Ervilha', 5),
+    (g_complemento, 'Cebola', 6), (g_complemento, 'Cheddar', 7), (g_complemento, 'Parmesão', 8),
+    (g_complemento, 'Brócolis', 9), (g_complemento, 'Azeitona', 10);
+end $$;
+
+-- ---------------------------------------------------------------------------
 -- Chamados de exemplo (Fase 3) — para ver a fila e o histórico já populados
 -- ---------------------------------------------------------------------------
 do $$

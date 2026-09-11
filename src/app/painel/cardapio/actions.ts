@@ -322,7 +322,12 @@ export async function definirStatusAviso(formData: FormData): Promise<void> {
 // Reordenação (↑/↓) — comum às três listas
 // ===========================================================================
 
-const ORDENAVEIS = ["categorias", "produtos", "avisos"] as const;
+const ORDENAVEIS = [
+  "categorias",
+  "produtos",
+  "avisos",
+  "produto_grupos_opcoes",
+] as const;
 type Ordenavel = (typeof ORDENAVEIS)[number];
 
 /**
@@ -337,22 +342,34 @@ export async function moverItem(formData: FormData): Promise<void> {
   const categoriaId = formData.get("categoria_id")
     ? String(formData.get("categoria_id"))
     : null;
+  const produtoId = formData.get("produto_id")
+    ? String(formData.get("produto_id"))
+    : null;
 
   if (!ORDENAVEIS.includes(tabela) || !id) return;
   if (direcao !== "cima" && direcao !== "baixo") return;
 
   const supabase = await createClient();
-  const { data: irmaos } =
-    tabela === "produtos" && categoriaId
-      ? await supabase
-          .from("produtos")
-          .select("id, ordem")
-          .eq("categoria_id", categoriaId)
-          .order("ordem", { ascending: true })
-      : await supabase
-          .from(tabela)
-          .select("id, ordem")
-          .order("ordem", { ascending: true });
+  let irmaos: { id: string; ordem: number }[] | null;
+
+  if (tabela === "produtos" && categoriaId) {
+    ({ data: irmaos } = await supabase
+      .from("produtos")
+      .select("id, ordem")
+      .eq("categoria_id", categoriaId)
+      .order("ordem", { ascending: true }));
+  } else if (tabela === "produto_grupos_opcoes" && produtoId) {
+    ({ data: irmaos } = await supabase
+      .from("produto_grupos_opcoes")
+      .select("id, ordem")
+      .eq("produto_id", produtoId)
+      .order("ordem", { ascending: true }));
+  } else {
+    ({ data: irmaos } = await supabase
+      .from(tabela)
+      .select("id, ordem")
+      .order("ordem", { ascending: true }));
+  }
   if (!irmaos) return;
 
   const i = irmaos.findIndex((x) => x.id === id);

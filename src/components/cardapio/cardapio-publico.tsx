@@ -1,7 +1,46 @@
 import { ChamarGarcomButton } from "@/app/cardapio/chamar-garcom-button";
-import type { CardapioPublicoData, ProdutoPublico } from "@/lib/cardapio";
+import type {
+  CardapioPublicoData,
+  GrupoOpcoesPublico,
+  ProdutoPublico,
+} from "@/lib/cardapio";
 import { formatarPreco } from "@/lib/formato";
 import { urlImagemProduto } from "@/lib/imagem";
+
+/**
+ * Grupos de opções são só informativos — o cliente lê pra saber o que pedir
+ * verbalmente com o garçom, sem seleção nem total calculado (o cardápio é
+ * somente para consulta).
+ */
+function GruposOpcoes({ grupos }: { grupos: GrupoOpcoesPublico[] }) {
+  if (grupos.length === 0) return null;
+  return (
+    <div className="mt-2 space-y-2 border-t pt-2">
+      {grupos.map((grupo) => (
+        <div key={grupo.id}>
+          <p className="text-xs font-semibold text-primary">{grupo.titulo}</p>
+          {grupo.opcoes.length > 0 ? (
+            <div className="mt-1 flex flex-wrap gap-1.5">
+              {grupo.opcoes.map((opcao) => (
+                <span
+                  key={opcao.id}
+                  className="rounded-full bg-secondary px-2.5 py-0.5 text-xs"
+                >
+                  {opcao.nome}
+                </span>
+              ))}
+            </div>
+          ) : null}
+          {grupo.observacao ? (
+            <p className="mt-1 text-xs text-muted-foreground">
+              {grupo.observacao}
+            </p>
+          ) : null}
+        </div>
+      ))}
+    </div>
+  );
+}
 
 function Precos({ produto }: { produto: ProdutoPublico }) {
   if (produto.modelo === "tamanhos") {
@@ -77,33 +116,36 @@ export function CardapioPublico({
                 {categoria.produtos.map((produto) => {
                   const img = urlImagemProduto(produto.imagem_path);
                   return (
-                    <li key={produto.id} className="flex gap-3">
-                      {img ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={img}
-                          alt=""
-                          loading="lazy"
-                          className="size-16 shrink-0 rounded-lg border object-cover"
-                        />
-                      ) : null}
-                      <div className="flex min-w-0 flex-1 justify-between gap-3">
-                        <div className="min-w-0">
-                          <p className="font-medium">{produto.nome}</p>
-                          {produto.descricao ? (
-                            <p className="text-sm text-muted-foreground">
-                              {produto.descricao}
-                            </p>
-                          ) : null}
-                          {produto.modelo === "compartilhar" &&
-                          produto.serve_ate ? (
-                            <p className="mt-0.5 text-xs text-muted-foreground">
-                              Serve até {produto.serve_ate} pessoas
-                            </p>
-                          ) : null}
+                    <li key={produto.id}>
+                      <div className="flex gap-3">
+                        {img ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={img}
+                            alt=""
+                            loading="lazy"
+                            className="size-16 shrink-0 rounded-lg border object-cover"
+                          />
+                        ) : null}
+                        <div className="flex min-w-0 flex-1 justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="font-medium">{produto.nome}</p>
+                            {produto.descricao ? (
+                              <p className="text-sm text-muted-foreground">
+                                {produto.descricao}
+                              </p>
+                            ) : null}
+                            {produto.modelo === "compartilhar" &&
+                            produto.serve_ate ? (
+                              <p className="mt-0.5 text-xs text-muted-foreground">
+                                Serve até {produto.serve_ate} pessoas
+                              </p>
+                            ) : null}
+                          </div>
+                          <Precos produto={produto} />
                         </div>
-                        <Precos produto={produto} />
                       </div>
+                      <GruposOpcoes grupos={produto.grupos} />
                     </li>
                   );
                 })}
