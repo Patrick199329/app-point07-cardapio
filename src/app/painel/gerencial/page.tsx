@@ -47,7 +47,12 @@ export default async function PainelGerencialPage({
   ];
 
   const maxGarcom = Math.max(1, ...dados.porGarcom.map((g) => g.aceitos));
-  const maxMesa = Math.max(1, ...dados.mesasComEspera.map((m) => m.tempoMedioMs));
+  const maxTempoGarcom = Math.max(1, ...dados.porGarcom.map((g) => g.tempoMedioMs));
+  const maxMesaEspera = Math.max(1, ...dados.mesasComEspera.map((m) => m.tempoMedioMs));
+  const maxMesaAtendimentos = Math.max(
+    1,
+    ...dados.mesasPorAtendimentos.map((m) => m.aceitos),
+  );
 
   return (
     <div style={VIZ_VARS} className="space-y-6">
@@ -109,11 +114,64 @@ export default async function PainelGerencialPage({
 
       <Card>
         <CardHeader>
+          <CardTitle className="text-base">
+            Tempo médio de atendimento por garçom
+          </CardTitle>
+          <CardDescription>
+            Média entre o chamado e o aceite, por garçom.
+          </CardDescription>
+        </CardHeader>
+        <div className="space-y-3 px-6 pb-6">
+          {dados.porGarcom.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              Nenhum chamado aceito no período.
+            </p>
+          ) : (
+            dados.porGarcom.map((g) => (
+              <Barra
+                key={g.nome}
+                rotulo={g.nome}
+                valor={g.tempoMedioMs}
+                maximo={maxTempoGarcom}
+                exibirValor={formatarDuracaoMs(g.tempoMedioMs)}
+              />
+            ))
+          )}
+        </div>
+      </Card>
+
+      <Card>
+        <CardHeader>
           <CardTitle className="text-base">Atendimentos por dia</CardTitle>
           <CardDescription>Todos os chamados recebidos, por dia.</CardDescription>
         </CardHeader>
         <div className="px-6 pb-6">
           <ColunasDia pontos={dados.porDia} />
+        </div>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Atendimentos por mesa</CardTitle>
+          <CardDescription>
+            Quantidade de chamados aceitos, por mesa (top 5).
+          </CardDescription>
+        </CardHeader>
+        <div className="space-y-3 px-6 pb-6">
+          {dados.mesasPorAtendimentos.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              Nenhum chamado aceito no período.
+            </p>
+          ) : (
+            dados.mesasPorAtendimentos.map((m) => (
+              <Barra
+                key={m.identificador}
+                rotulo={m.identificador}
+                valor={m.aceitos}
+                maximo={maxMesaAtendimentos}
+              />
+            ))
+          )}
         </div>
       </Card>
 
@@ -135,7 +193,7 @@ export default async function PainelGerencialPage({
                 key={m.identificador}
                 rotulo={m.identificador}
                 valor={m.tempoMedioMs}
-                maximo={maxMesa}
+                maximo={maxMesaEspera}
                 exibirValor={formatarDuracaoMs(m.tempoMedioMs)}
               />
             ))

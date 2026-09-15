@@ -9,9 +9,10 @@ export type IndicadoresGerenciais = {
   totalAceitos: number;
   pendentesAgora: number;
   tempoMedioMs: number | null;
-  porGarcom: { nome: string; aceitos: number }[];
+  porGarcom: { nome: string; aceitos: number; tempoMedioMs: number }[];
   porDia: { dia: string; rotulo: string; valor: number }[];
   mesasComEspera: { identificador: string; tempoMedioMs: number; amostras: number }[];
+  mesasPorAtendimentos: { identificador: string; aceitos: number }[];
   /** Poucos chamados aceitos no período — os números podem não ser confiáveis. */
   dadosSuficientes: boolean;
 };
@@ -111,13 +112,17 @@ export async function carregarIndicadores(
         ) / aceitos.length
       : null;
 
-  const porGarcomMap = new Map<string, number>();
+  const porGarcomMap = new Map<string, { aceitos: number; somaMs: number }>();
   for (const c of aceitos) {
     const nome = c.profiles?.nome ?? "—";
-    porGarcomMap.set(nome, (porGarcomMap.get(nome) ?? 0) + 1);
+    const ms = new Date(c.aceito_em).getTime() - new Date(c.criado_em).getTime();
+    const atual = porGarcomMap.get(nome) ?? { aceitos: 0, somaMs: 0 };
+    atual.aceitos += 1;
+    atual.somaMs += ms;
+    porGarcomMap.set(nome, atual);
   }
   const porGarcom = [...porGarcomMap.entries()]
-    .map(([nome, qtd]) => ({ nome, aceitos: qtd }))
+    .map(([nome, g]) => ({ nome, aceitos: g.aceitos, tempoMedioMs: g.somaMs / g.aceitos }))
     .sort((a, b) => b.aceitos - a.aceitos);
 
   const mesaMap = new Map<string, { somaMs: number; amostras: number }>();
@@ -138,6 +143,10 @@ export async function carregarIndicadores(
     }))
     .sort((a, b) => b.tempoMedioMs - a.tempoMedioMs)
     .slice(0, 5);
+  const mesasPorAtendimentos = [...mesaMap.entries()]
+    .map(([identificador, m]) => ({ identificador, aceitos: m.amostras }))
+    .sort((a, b) => b.aceitos - a.aceitos)
+    .slice(0, 5);
 
   return {
     totalChamados: chamados.length,
@@ -147,6 +156,7 @@ export async function carregarIndicadores(
     porGarcom,
     porDia: construirSeriePorDia(chamados, desde),
     mesasComEspera,
+    mesasPorAtendimentos,
     dadosSuficientes: aceitos.length >= LIMIAR_DADOS_SUFICIENTES,
   };
 }
