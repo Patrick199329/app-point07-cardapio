@@ -1,5 +1,6 @@
 import { SignOutButton } from "@/components/sign-out-button";
 import { requireRole } from "@/lib/auth";
+import { carregarLogoSistema } from "@/lib/sistema";
 import { createClient } from "@/lib/supabase/server";
 
 import { type ChamadoFila, FilaRealtime } from "./fila-realtime";
@@ -14,7 +15,7 @@ export default async function FilaPage() {
   const inicioHoje = new Date();
   inicioHoje.setHours(0, 0, 0, 0);
 
-  const [pendentes, mesasRes, meusHoje] = await Promise.all([
+  const [pendentes, mesasRes, meusHoje, logoUrl] = await Promise.all([
     supabase
       .from("chamados")
       .select("id, mesa_id, criado_em")
@@ -27,6 +28,7 @@ export default async function FilaPage() {
       .eq("garcom_id", user.id)
       .eq("status", "aceito")
       .gte("aceito_em", inicioHoje.toISOString()),
+    carregarLogoSistema(),
   ]);
 
   const mesas: Record<string, string> = {};
@@ -41,12 +43,20 @@ export default async function FilaPage() {
 
   return (
     <main className="mx-auto flex min-h-svh w-full max-w-lg flex-col">
-      <header className="flex items-center justify-between border-b px-4 py-3">
-        <div className="text-sm">
+      <header className="border-b bg-muted/30">
+        <div className="flex items-center justify-between px-4 py-3">
+          {logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={logoUrl} alt="Point07" className="h-8 w-auto object-contain" />
+          ) : (
+            <span className="text-base font-semibold">Point07</span>
+          )}
+          <SignOutButton />
+        </div>
+        <div className="px-4 pb-3 text-sm">
           <span className="font-medium">{profile.nome}</span>
           <span className="ml-2 text-muted-foreground">Garçom</span>
         </div>
-        <SignOutButton />
       </header>
 
       <div className="flex-1 p-4">

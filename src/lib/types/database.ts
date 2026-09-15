@@ -391,6 +391,24 @@ export type Database = {
         }
         Relationships: []
       }
+      sistema_config: {
+        Row: {
+          id: number
+          logo_path: string | null
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          logo_path?: string | null
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          logo_path?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

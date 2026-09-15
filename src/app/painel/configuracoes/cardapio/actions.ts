@@ -127,7 +127,7 @@ export async function salvarAparencia(
     .eq("id", 1);
   if (error) return { error: "Não foi possível salvar a aparência.", ok: false };
 
-  revalidatePath("/painel/cardapio/aparencia");
+  revalidatePath("/painel/configuracoes/cardapio");
   revalidatePath("/cardapio");
   return { error: null, ok: true };
 }

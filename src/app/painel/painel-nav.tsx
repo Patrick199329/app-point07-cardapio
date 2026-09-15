@@ -11,6 +11,7 @@ const ITEMS = [
   { href: "/painel/eventos", label: "Eventos" },
   { href: "/painel/usuarios", label: "Usuários" },
   { href: "/painel/mesas", label: "Mesas" },
+  { href: "/painel/configuracoes", label: "Configurações" },
 ];
 
 const EM_BREVE = ["Painel gerencial"];

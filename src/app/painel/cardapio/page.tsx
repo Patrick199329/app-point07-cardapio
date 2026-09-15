@@ -31,12 +31,6 @@ export default async function CardapioPage() {
         </div>
         <div className="flex flex-wrap gap-2">
           <Link
-            href="/painel/cardapio/aparencia"
-            className={buttonVariants({ variant: "outline" })}
-          >
-            Aparência
-          </Link>
-          <Link
             href="/painel/cardapio/avisos"
             className={buttonVariants({ variant: "outline" })}
           >

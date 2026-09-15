@@ -75,6 +75,24 @@ export async function salvarLogoCardapio(file: File): Promise<ResultadoImagem> {
   return { ok: true, path };
 }
 
+/**
+ * Logo interna do sistema (`sistema_config.logo_path`) — tela de login,
+ * sidebar do painel e cabeçalho do garçom. Path fixo, upsert.
+ */
+export async function salvarLogoSistema(file: File): Promise<ResultadoImagem> {
+  const convertido = await converterParaWebp(file, 480);
+  if (!convertido.ok) return convertido;
+
+  const path = "marca/logo-sistema.webp";
+  const supabase = createAdminClient();
+  const { error } = await supabase.storage
+    .from(BUCKET)
+    .upload(path, convertido.buffer, { contentType: "image/webp", upsert: true });
+  if (error) return { ok: false, error: "Falha ao enviar a logo." };
+
+  return { ok: true, path };
+}
+
 /** Remove um objeto do bucket `cardapio` (ignora se não existir). */
 export async function removerImagemProduto(path: string): Promise<void> {
   if (!path) return;

@@ -16,13 +16,23 @@ import {
 
 import { PainelNav } from "./painel-nav";
 
+function Marca({ logoUrl, className }: { logoUrl: string | null; className?: string }) {
+  if (logoUrl) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img src={logoUrl} alt="Point07" className={`w-auto object-contain ${className ?? "h-7"}`} />;
+  }
+  return <span className="text-base font-semibold">Point07</span>;
+}
+
 export function PainelShell({
   nome,
   perfil,
+  logoUrl,
   children,
 }: {
   nome: string;
   perfil: string;
+  logoUrl: string | null;
   children: ReactNode;
 }) {
   const [navOpen, setNavOpen] = useState(false);
@@ -31,12 +41,14 @@ export function PainelShell({
     <div className="flex min-h-svh flex-col md:flex-row">
       {/* Sidebar — desktop */}
       <aside className="hidden shrink-0 border-r p-4 md:block md:w-60">
-        <div className="mb-4 px-3 text-base font-semibold">Point07</div>
+        <div className="mb-4 px-3">
+          <Marca logoUrl={logoUrl} className="h-8" />
+        </div>
         <PainelNav />
       </aside>
 
       {/* Barra superior — mobile */}
-      <header className="flex items-center gap-1 border-b px-2 py-2 md:hidden">
+      <header className="flex items-center gap-2 border-b px-2 py-2 md:hidden">
         <Button
           variant="ghost"
           size="icon"
@@ -46,7 +58,7 @@ export function PainelShell({
         >
           <Menu className="size-5" />
         </Button>
-        <span className="font-semibold">Point07</span>
+        <Marca logoUrl={logoUrl} className="h-7" />
         <div className="ml-auto">
           <SignOutButton />
         </div>
@@ -55,7 +67,9 @@ export function PainelShell({
       <Sheet open={navOpen} onOpenChange={setNavOpen}>
         <SheetContent side="left" className="p-0">
           <SheetHeader className="border-b">
-            <SheetTitle>Point07</SheetTitle>
+            <SheetTitle className="flex items-center">
+              <Marca logoUrl={logoUrl} className="h-7" />
+            </SheetTitle>
             <SheetDescription>
               {nome} · {perfil}
             </SheetDescription>

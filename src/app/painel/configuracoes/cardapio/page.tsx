@@ -5,9 +5,9 @@ import { createClient } from "@/lib/supabase/server";
 
 import { AparenciaForm } from "./aparencia-form";
 
-export const metadata = { title: "Aparência — Cardápio — Point07" };
+export const metadata = { title: "Aparência do Cardápio — Point07" };
 
-export default async function AparenciaPage() {
+export default async function AparenciaCardapioPage() {
   const supabase = await createClient();
   const { data: config } = await supabase
     .from("cardapio_config")
@@ -19,10 +19,10 @@ export default async function AparenciaPage() {
     <div className="space-y-6">
       <div>
         <Link
-          href="/painel/cardapio"
+          href="/painel/configuracoes"
           className="text-sm text-muted-foreground hover:text-foreground"
         >
-          ← Cardápio
+          ← Configurações
         </Link>
         <h1 className="mt-2 text-xl font-semibold">Aparência do cardápio</h1>
         <p className="text-sm text-muted-foreground">
