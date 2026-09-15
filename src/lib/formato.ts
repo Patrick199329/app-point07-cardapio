@@ -34,6 +34,17 @@ export function formatarDataHora(iso: string | null): string {
   return DATA_HORA.format(new Date(iso));
 }
 
+const HORA_COMPLETA = new Intl.DateTimeFormat("pt-BR", {
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+});
+
+/** "21:30:05" */
+export function formatarHora(iso: string): string {
+  return HORA_COMPLETA.format(new Date(iso));
+}
+
 /** Duração curta a partir de milissegundos: "3 min", "1 h 12 min", "12 s". */
 export function formatarDuracaoMs(ms: number): string {
   const s = Math.max(0, Math.round(ms / 1000));

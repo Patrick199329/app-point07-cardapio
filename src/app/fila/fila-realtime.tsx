@@ -12,6 +12,7 @@ import { BellRing, Check, Volume2, VolumeX } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { formatarHora } from "@/lib/formato";
 import { createClient } from "@/lib/supabase/client";
 
 export type ChamadoFila = {
@@ -206,6 +207,9 @@ export function FilaRealtime({
                   <p className="text-lg font-semibold">
                     {i === 0 ? "→ " : ""}
                     {chamado.identificador}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Chamou às {formatarHora(chamado.criadoEm)}
                   </p>
                   <p
                     className={
