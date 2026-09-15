@@ -22,10 +22,12 @@ function precoResumo(p: {
   preco: number | null;
   preco_medio: number | null;
   preco_grande: number | null;
+  preco_medio_label: string | null;
+  preco_grande_label: string | null;
   serve_ate: number | null;
 }) {
   if (p.modelo === "tamanhos") {
-    return `M ${formatarPreco(p.preco_medio)} · G ${formatarPreco(p.preco_grande)}`;
+    return `${p.preco_medio_label} ${formatarPreco(p.preco_medio)} · ${p.preco_grande_label} ${formatarPreco(p.preco_grande)}`;
   }
   if (p.modelo === "compartilhar") {
     return p.serve_ate
@@ -68,7 +70,7 @@ export default async function CategoriaProdutosPage({
   const { data: produtos } = await supabase
     .from("produtos")
     .select(
-      "id, nome, descricao, modelo, preco, preco_medio, preco_grande, serve_ate, imagem_path, imagem_layout, ativo, ordem, produto_grupos_opcoes(count)",
+      "id, nome, descricao, modelo, preco, preco_medio, preco_grande, preco_medio_label, preco_grande_label, serve_ate, imagem_path, imagem_layout, ativo, ordem, produto_grupos_opcoes(count)",
     )
     .eq("categoria_id", categoriaId)
     .order("ordem", { ascending: true });
@@ -111,6 +113,8 @@ export default async function CategoriaProdutosPage({
               preco: produto.preco,
               preco_medio: produto.preco_medio,
               preco_grande: produto.preco_grande,
+              preco_medio_label: produto.preco_medio_label,
+              preco_grande_label: produto.preco_grande_label,
               serve_ate: produto.serve_ate,
               imagemUrl: urlImagemProduto(produto.imagem_path),
               imagemLayout: produto.imagem_layout,

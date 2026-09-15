@@ -86,10 +86,10 @@ begin
     (cat_bebidas, 'Água mineral 500ml', null, 'simples', 5.50, 2);
 
   -- Modelo B — item com tamanhos (médio / grande)
-  insert into public.produtos (categoria_id, nome, descricao, modelo, preco_medio, preco_grande, ordem) values
-    (cat_entradas, 'Bolinho de bacalhau', 'Porção com 6 ou 12 unidades', 'tamanhos', 34.00, 58.00, 0),
-    (cat_porcoes, 'Batata frita', 'Crocante, com alecrim', 'tamanhos', 29.00, 45.00, 0),
-    (cat_porcoes, 'Calabresa acebolada', null, 'tamanhos', 39.00, 62.00, 1);
+  insert into public.produtos (categoria_id, nome, descricao, modelo, preco_medio, preco_grande, preco_medio_label, preco_grande_label, ordem) values
+    (cat_entradas, 'Bolinho de bacalhau', 'Porção com 6 ou 12 unidades', 'tamanhos', 34.00, 58.00, 'Médio', 'Grande', 0),
+    (cat_porcoes, 'Batata frita', 'Crocante, com alecrim', 'tamanhos', 29.00, 45.00, 'Médio', 'Grande', 0),
+    (cat_porcoes, 'Calabresa acebolada', null, 'tamanhos', 39.00, 62.00, 'Médio', 'Grande', 1);
 
   -- Modelo C — item para compartilhar
   insert into public.produtos (categoria_id, nome, descricao, modelo, preco, serve_ate, ordem) values

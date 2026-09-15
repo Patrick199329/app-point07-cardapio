@@ -41,6 +41,8 @@ export type ProdutoForm = {
   preco: number | null;
   preco_medio: number | null;
   preco_grande: number | null;
+  preco_medio_label: string | null;
+  preco_grande_label: string | null;
   serve_ate: number | null;
   imagemUrl: string | null;
   imagemLayout: "miniatura" | "grande";
@@ -144,36 +146,62 @@ export function ProdutoDialog({
               className={INPUT}
             >
               <option value="simples">Simples — preço único</option>
-              <option value="tamanhos">Tamanhos — médio e grande</option>
+              <option value="tamanhos">Duas opções — com rótulos (ex.: Médio/Grande, Taça/Garrafa)</option>
               <option value="compartilhar">Para compartilhar</option>
             </NativeSelect>
           </div>
 
           {modelo === "tamanhos" ? (
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Label htmlFor="preco_medio">Preço médio</Label>
-                <Input
-                  id="preco_medio"
-                  name="preco_medio"
-                  inputMode="decimal"
-                  defaultValue={money(produto?.preco_medio ?? null)}
-                  placeholder="0,00"
-                  required
-                  className={INPUT}
-                />
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="preco_medio_label">Rótulo do 1º preço</Label>
+                  <Input
+                    id="preco_medio_label"
+                    name="preco_medio_label"
+                    defaultValue={produto?.preco_medio_label ?? "Médio"}
+                    placeholder="Médio"
+                    required
+                    className={INPUT}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="preco_medio">Preço</Label>
+                  <Input
+                    id="preco_medio"
+                    name="preco_medio"
+                    inputMode="decimal"
+                    defaultValue={money(produto?.preco_medio ?? null)}
+                    placeholder="0,00"
+                    required
+                    className={INPUT}
+                  />
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="preco_grande">Preço grande</Label>
-                <Input
-                  id="preco_grande"
-                  name="preco_grande"
-                  inputMode="decimal"
-                  defaultValue={money(produto?.preco_grande ?? null)}
-                  placeholder="0,00"
-                  required
-                  className={INPUT}
-                />
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="preco_grande_label">Rótulo do 2º preço</Label>
+                  <Input
+                    id="preco_grande_label"
+                    name="preco_grande_label"
+                    defaultValue={produto?.preco_grande_label ?? "Grande"}
+                    placeholder="Grande"
+                    required
+                    className={INPUT}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="preco_grande">Preço</Label>
+                  <Input
+                    id="preco_grande"
+                    name="preco_grande"
+                    inputMode="decimal"
+                    defaultValue={money(produto?.preco_grande ?? null)}
+                    placeholder="0,00"
+                    required
+                    className={INPUT}
+                  />
+                </div>
               </div>
             </div>
           ) : (

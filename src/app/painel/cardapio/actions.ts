@@ -109,6 +109,8 @@ type ProdutoData = {
   preco: number | null;
   preco_medio: number | null;
   preco_grande: number | null;
+  preco_medio_label: string | null;
+  preco_grande_label: string | null;
   serve_ate: number | null;
   imagem_layout: ProdutoImagemLayout;
 };
@@ -144,6 +146,8 @@ function parseProdutoForm(formData: FormData): Parse<ProdutoData> {
     preco: null,
     preco_medio: null,
     preco_grande: null,
+    preco_medio_label: null,
+    preco_grande_label: null,
     serve_ate: null,
     imagem_layout,
   };
@@ -157,11 +161,18 @@ function parseProdutoForm(formData: FormData): Parse<ProdutoData> {
   if (modelo === "tamanhos") {
     const medio = parsePreco(formData.get("preco_medio"));
     const grande = parsePreco(formData.get("preco_grande"));
+    const medioLabel = String(formData.get("preco_medio_label") ?? "").trim();
+    const grandeLabel = String(formData.get("preco_grande_label") ?? "").trim();
     if (!precoValido(medio) || !precoValido(grande)) {
-      return { ok: false, error: "Informe os preços Médio e Grande." };
+      return { ok: false, error: "Informe os dois preços." };
+    }
+    if (!medioLabel || !grandeLabel) {
+      return { ok: false, error: "Informe o rótulo dos dois preços." };
     }
     base.preco_medio = medio;
     base.preco_grande = grande;
+    base.preco_medio_label = medioLabel;
+    base.preco_grande_label = grandeLabel;
   }
 
   if (modelo === "compartilhar") {

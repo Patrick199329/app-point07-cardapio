@@ -55,11 +55,11 @@ function Precos({ produto }: { produto: ProdutoPublico }) {
     return (
       <div className="shrink-0 text-right text-sm tabular-nums">
         <div>
-          <span className="text-muted-foreground">M </span>
+          <span className="text-muted-foreground">{produto.preco_medio_label} </span>
           <span className={preco}>{formatarPreco(produto.preco_medio)}</span>
         </div>
         <div>
-          <span className="text-muted-foreground">G </span>
+          <span className="text-muted-foreground">{produto.preco_grande_label} </span>
           <span className={preco}>{formatarPreco(produto.preco_grande)}</span>
         </div>
       </div>

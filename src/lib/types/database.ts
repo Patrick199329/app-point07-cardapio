@@ -331,7 +331,9 @@ export type Database = {
           ordem: number
           preco: number | null
           preco_grande: number | null
+          preco_grande_label: string | null
           preco_medio: number | null
+          preco_medio_label: string | null
           serve_ate: number | null
           updated_at: string
         }
@@ -348,7 +350,9 @@ export type Database = {
           ordem?: number
           preco?: number | null
           preco_grande?: number | null
+          preco_grande_label?: string | null
           preco_medio?: number | null
+          preco_medio_label?: string | null
           serve_ate?: number | null
           updated_at?: string
         }
@@ -365,7 +369,9 @@ export type Database = {
           ordem?: number
           preco?: number | null
           preco_grande?: number | null
+          preco_grande_label?: string | null
           preco_medio?: number | null
+          preco_medio_label?: string | null
           serve_ate?: number | null
           updated_at?: string
         }
