@@ -12,6 +12,7 @@ import {
   formatarDuracao,
   formatarDuracaoMs,
 } from "@/lib/formato";
+import { desdeQuando } from "@/lib/periodo";
 import { createClient } from "@/lib/supabase/server";
 
 import { EventosFiltros } from "./eventos-filtros";
@@ -27,17 +28,6 @@ const STATUS: Record<
   aceito: { label: "Aceito", variant: "default" },
   cancelado: { label: "Cancelado", variant: "secondary" },
 };
-
-function desdeQuando(periodo: string): string | null {
-  const agora = new Date();
-  if (periodo === "hoje") {
-    agora.setHours(0, 0, 0, 0);
-    return agora.toISOString();
-  }
-  if (periodo === "7d") return new Date(Date.now() - 7 * 864e5).toISOString();
-  if (periodo === "30d") return new Date(Date.now() - 30 * 864e5).toISOString();
-  return null;
-}
 
 type Chamado = {
   id: string;
