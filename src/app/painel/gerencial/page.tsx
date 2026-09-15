@@ -154,7 +154,8 @@ export default async function PainelGerencialPage({
         <CardHeader>
           <CardTitle className="text-base">Atendimentos por mesa</CardTitle>
           <CardDescription>
-            Quantidade de chamados aceitos, por mesa (top 5).
+            Quantidade de chamados aceitos, por mesa — todas as mesas com pelo
+            menos um aceite no período.
           </CardDescription>
         </CardHeader>
         <div className="space-y-3 px-6 pb-6">
@@ -177,9 +178,10 @@ export default async function PainelGerencialPage({
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Mesas com maior espera</CardTitle>
+          <CardTitle className="text-base">Tempo de espera por mesa</CardTitle>
           <CardDescription>
-            Tempo médio entre o chamado e o aceite, por mesa (top 5).
+            Tempo médio entre o chamado e o aceite, por mesa — da maior para a
+            menor espera, todas as mesas com pelo menos um aceite no período.
           </CardDescription>
         </CardHeader>
         <div className="space-y-3 px-6 pb-6">

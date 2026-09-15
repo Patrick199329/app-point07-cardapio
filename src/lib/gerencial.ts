@@ -141,12 +141,10 @@ export async function carregarIndicadores(
       tempoMedioMs: m.somaMs / m.amostras,
       amostras: m.amostras,
     }))
-    .sort((a, b) => b.tempoMedioMs - a.tempoMedioMs)
-    .slice(0, 5);
+    .sort((a, b) => b.tempoMedioMs - a.tempoMedioMs);
   const mesasPorAtendimentos = [...mesaMap.entries()]
     .map(([identificador, m]) => ({ identificador, aceitos: m.amostras }))
-    .sort((a, b) => b.aceitos - a.aceitos)
-    .slice(0, 5);
+    .sort((a, b) => b.aceitos - a.aceitos);
 
   return {
     totalChamados: chamados.length,
