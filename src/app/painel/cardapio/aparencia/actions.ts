@@ -1,0 +1,108 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+
+import { requireRole } from "@/lib/auth";
+import { corValida } from "@/lib/cardapio-tema";
+import { removerImagemProduto, salvarLogoCardapio } from "@/lib/imagem";
+import { createClient } from "@/lib/supabase/server";
+import type { Database } from "@/lib/types/database";
+
+type Arredondamento = Database["public"]["Enums"]["cardapio_arredondamento"];
+const ARREDONDAMENTOS: Arredondamento[] = [
+  "nenhum",
+  "pequeno",
+  "medio",
+  "grande",
+];
+
+export type AparenciaState = { error: string | null; ok: boolean };
+
+export async function salvarAparencia(
+  _prev: AparenciaState,
+  formData: FormData,
+): Promise<AparenciaState> {
+  await requireRole("admin");
+
+  const nome_estabelecimento = String(
+    formData.get("nome_estabelecimento") ?? "",
+  ).trim();
+  const cor_fundo = String(formData.get("cor_fundo") ?? "");
+  const cor_fundo_cabecalho = String(formData.get("cor_fundo_cabecalho") ?? "");
+  const cor_bloco = String(formData.get("cor_bloco") ?? "");
+  const cor_destaque = String(formData.get("cor_destaque") ?? "");
+  const sombra = formData.get("sombra") === "true";
+  const categorias_centralizadas =
+    formData.get("categorias_centralizadas") === "true";
+  const mostrar_nome_com_logo = formData.get("mostrar_nome_com_logo") === "true";
+  const arredondamento = String(
+    formData.get("arredondamento") ?? "medio",
+  ) as Arredondamento;
+
+  if (!nome_estabelecimento) {
+    return { error: "Informe o nome do estabelecimento.", ok: false };
+  }
+  const cores: [string, string][] = [
+    [cor_fundo, "Cor de fundo do cardápio"],
+    [cor_fundo_cabecalho, "Cor de fundo do cabeçalho"],
+    [cor_bloco, "Cor dos blocos de produto"],
+    [cor_destaque, "Cor de destaque"],
+  ];
+  for (const [cor, rotulo] of cores) {
+    if (!corValida(cor)) return { error: `${rotulo}: cor inválida.`, ok: false };
+  }
+  if (!ARREDONDAMENTOS.includes(arredondamento)) {
+    return { error: "Arredondamento inválido.", ok: false };
+  }
+
+  const supabase = await createClient();
+  const update: {
+    nome_estabelecimento: string;
+    cor_fundo: string;
+    cor_fundo_cabecalho: string;
+    cor_bloco: string;
+    cor_destaque: string;
+    sombra: boolean;
+    categorias_centralizadas: boolean;
+    mostrar_nome_com_logo: boolean;
+    arredondamento: Arredondamento;
+    logo_path?: string | null;
+  } = {
+    nome_estabelecimento,
+    cor_fundo,
+    cor_fundo_cabecalho,
+    cor_bloco,
+    cor_destaque,
+    sombra,
+    categorias_centralizadas,
+    mostrar_nome_com_logo,
+    arredondamento,
+  };
+
+  if (formData.get("remover_logo") === "true") {
+    const { data } = await supabase
+      .from("cardapio_config")
+      .select("logo_path")
+      .eq("id", 1)
+      .single();
+    if (data?.logo_path) await removerImagemProduto(data.logo_path);
+    update.logo_path = null;
+  } else {
+    const file = formData.get("logo");
+    if (file instanceof File && file.size > 0) {
+      const res = await salvarLogoCardapio(file);
+      if (!res.ok) return { error: res.error, ok: false };
+      update.logo_path = res.path;
+    }
+  }
+
+  const { error } = await supabase
+    .from("cardapio_config")
+    .update(update)
+    .eq("id", 1);
+  if (error) return { error: "Não foi possível salvar a aparência.", ok: false };
+
+  revalidatePath("/painel/cardapio/aparencia");
+  revalidatePath("/cardapio");
+  return { error: null, ok: true };
+}

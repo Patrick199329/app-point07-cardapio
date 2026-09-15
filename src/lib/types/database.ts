@@ -61,6 +61,51 @@ export type Database = {
         }
         Relationships: []
       }
+      cardapio_config: {
+        Row: {
+          arredondamento: Database["public"]["Enums"]["cardapio_arredondamento"]
+          categorias_centralizadas: boolean
+          cor_bloco: string
+          cor_destaque: string
+          cor_fundo: string
+          cor_fundo_cabecalho: string
+          id: number
+          logo_path: string | null
+          mostrar_nome_com_logo: boolean
+          nome_estabelecimento: string
+          sombra: boolean
+          updated_at: string
+        }
+        Insert: {
+          arredondamento?: Database["public"]["Enums"]["cardapio_arredondamento"]
+          categorias_centralizadas?: boolean
+          cor_bloco?: string
+          cor_destaque?: string
+          cor_fundo?: string
+          cor_fundo_cabecalho?: string
+          id?: number
+          logo_path?: string | null
+          mostrar_nome_com_logo?: boolean
+          nome_estabelecimento?: string
+          sombra?: boolean
+          updated_at?: string
+        }
+        Update: {
+          arredondamento?: Database["public"]["Enums"]["cardapio_arredondamento"]
+          categorias_centralizadas?: boolean
+          cor_bloco?: string
+          cor_destaque?: string
+          cor_fundo?: string
+          cor_fundo_cabecalho?: string
+          id?: number
+          logo_path?: string | null
+          mostrar_nome_com_logo?: boolean
+          nome_estabelecimento?: string
+          sombra?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       categorias: {
         Row: {
           ativo: boolean
@@ -381,6 +426,7 @@ export type Database = {
       }
     }
     Enums: {
+      cardapio_arredondamento: "nenhum" | "pequeno" | "medio" | "grande"
       chamado_status: "pendente" | "aceito" | "cancelado"
       mesa_area: "interna" | "externa"
       produto_imagem_layout: "miniatura" | "grande"
@@ -516,6 +562,7 @@ export const Constants = {
   },
   public: {
     Enums: {
+      cardapio_arredondamento: ["nenhum", "pequeno", "medio", "grande"],
       chamado_status: ["pendente", "aceito", "cancelado"],
       mesa_area: ["interna", "externa"],
       produto_imagem_layout: ["miniatura", "grande"],

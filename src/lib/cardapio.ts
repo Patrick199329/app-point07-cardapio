@@ -1,4 +1,19 @@
 import { createClient } from "@/lib/supabase/server";
+import type { Arredondamento } from "@/lib/cardapio-tema";
+
+export type CardapioConfig = {
+  nome_estabelecimento: string;
+  logo_path: string | null;
+  mostrar_nome_com_logo: boolean;
+  cor_fundo: string;
+  cor_fundo_cabecalho: string;
+  cor_bloco: string;
+  cor_destaque: string;
+  sombra: boolean;
+  arredondamento: Arredondamento;
+  categorias_centralizadas: boolean;
+  updated_at: string;
+};
 
 export type OpcaoPublica = { id: string; nome: string };
 
@@ -32,38 +47,56 @@ export type CategoriaPublica = {
 export type CardapioPublicoData = {
   categorias: CategoriaPublica[];
   avisos: { id: string; texto: string }[];
+  config: CardapioConfig;
+};
+
+const CONFIG_PADRAO: CardapioConfig = {
+  nome_estabelecimento: "Point07",
+  logo_path: null,
+  mostrar_nome_com_logo: true,
+  cor_fundo: "#f5f5f4",
+  cor_fundo_cabecalho: "#ffffff",
+  cor_bloco: "#ffffff",
+  cor_destaque: "#f07e22",
+  sombra: true,
+  arredondamento: "medio",
+  categorias_centralizadas: false,
+  updated_at: new Date(0).toISOString(),
 };
 
 /**
  * Carrega o cardápio visível ao público. Sem sessão, roda como `anon` — a RLS
- * (migrations 20260909130000 e 20260911120000) já entrega só categorias,
- * produtos, grupos de opções e avisos ativos. Categorias sem produtos ativos
- * são descartadas.
+ * (migrations 20260909130000, 20260911120000 e 20260914120000) já entrega só
+ * categorias, produtos, grupos de opções e avisos ativos, mais a aparência
+ * (linha única de `cardapio_config`, leitura pública). Categorias sem
+ * produtos ativos são descartadas.
  */
 export async function carregarCardapioPublico(): Promise<CardapioPublicoData> {
   const supabase = await createClient();
 
-  const [{ data: categoriasRaw }, { data: avisos }] = await Promise.all([
-    supabase
-      .from("categorias")
-      .select(
-        "id, nome, produtos(id, nome, descricao, modelo, preco, preco_medio, preco_grande, serve_ate, imagem_path, imagem_layout, produto_grupos_opcoes(id, titulo, observacao, produto_opcoes(id, nome)))",
-      )
-      .order("ordem", { ascending: true })
-      .order("ordem", { ascending: true, referencedTable: "produtos" })
-      .order("ordem", {
-        ascending: true,
-        referencedTable: "produtos.produto_grupos_opcoes",
-      })
-      .order("ordem", {
-        ascending: true,
-        referencedTable: "produtos.produto_grupos_opcoes.produto_opcoes",
-      }),
-    supabase
-      .from("avisos")
-      .select("id, texto")
-      .order("ordem", { ascending: true }),
-  ]);
+  const [{ data: categoriasRaw }, { data: avisos }, { data: config }] =
+    await Promise.all([
+      supabase
+        .from("categorias")
+        .select(
+          "id, nome, produtos(id, nome, descricao, modelo, preco, preco_medio, preco_grande, serve_ate, imagem_path, imagem_layout, produto_grupos_opcoes(id, titulo, observacao, produto_opcoes(id, nome)))",
+        )
+        .order("ordem", { ascending: true })
+        .order("ordem", { ascending: true, referencedTable: "produtos" })
+        .order("ordem", {
+          ascending: true,
+          referencedTable: "produtos.produto_grupos_opcoes",
+        })
+        .order("ordem", {
+          ascending: true,
+          referencedTable: "produtos.produto_grupos_opcoes.produto_opcoes",
+        }),
+      supabase
+        .from("avisos")
+        .select("id, texto")
+        .order("ordem", { ascending: true }),
+      supabase.from("cardapio_config").select("*").eq("id", 1).single(),
+    ]);
 
   const categorias = (categoriasRaw ?? [])
     .map((c) => ({
@@ -81,5 +114,5 @@ export async function carregarCardapioPublico(): Promise<CardapioPublicoData> {
     }))
     .filter((c) => c.produtos.length > 0);
 
-  return { categorias, avisos: avisos ?? [] };
+  return { categorias, avisos: avisos ?? [], config: config ?? CONFIG_PADRAO };
 }

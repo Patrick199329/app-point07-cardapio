@@ -17,7 +17,14 @@ type Estado = "idle" | "enviando" | "pendente" | "aceito" | "erro";
  * Sem persistência local: o dedup de 90s da RPC criar_chamado já devolve o mesmo
  * chamado pendente se o cliente recarregar e tocar de novo.
  */
-export function ChamarGarcomButton({ mesaToken }: { mesaToken: string | null }) {
+export function ChamarGarcomButton({
+  mesaToken,
+  corDestaque,
+}: {
+  mesaToken: string | null;
+  /** Cor de marca (`cardapio_config.cor_destaque`) — mesma usada no resto do cardápio. */
+  corDestaque?: string;
+}) {
   const supabase = useMemo(() => createClient(), []);
   const [estado, setEstado] = useState<Estado>("idle");
   const [garcom, setGarcom] = useState<string | null>(null);
@@ -102,7 +109,7 @@ export function ChamarGarcomButton({ mesaToken }: { mesaToken: string | null }) 
         ) : estado === "pendente" ? (
           <div className="flex items-center justify-between gap-3">
             <p className="flex items-center gap-2 text-sm font-medium">
-              <BellRing className="size-4 text-primary" />
+              <BellRing className="size-4" style={{ color: corDestaque }} />
               Garçom chamado — já vem!
             </p>
             <Button variant="ghost" size="sm" onClick={cancelar}>
@@ -111,13 +118,14 @@ export function ChamarGarcomButton({ mesaToken }: { mesaToken: string | null }) 
           </div>
         ) : estado === "aceito" ? (
           <p className="flex items-center justify-center gap-2 py-2 text-sm font-medium">
-            <Check className="size-4 text-primary" />
+            <Check className="size-4" style={{ color: corDestaque }} />
             {garcom ? `${garcom} está a caminho` : "Um garçom está a caminho"} 🎉
           </p>
         ) : (
           <>
             <Button
               className="h-12 w-full rounded-xl text-base"
+              style={corDestaque ? { backgroundColor: corDestaque, color: "#fff" } : undefined}
               onClick={chamar}
               disabled={estado === "enviando"}
             >
