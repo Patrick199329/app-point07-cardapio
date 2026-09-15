@@ -69,8 +69,11 @@ export type Database = {
           cor_destaque: string
           cor_fundo: string
           cor_fundo_cabecalho: string
+          cor_texto_cabecalho: string
           id: number
           logo_path: string | null
+          logo_posicao: Database["public"]["Enums"]["cardapio_logo_posicao"]
+          logo_tamanho: Database["public"]["Enums"]["cardapio_logo_tamanho"]
           mostrar_nome_com_logo: boolean
           nome_estabelecimento: string
           sombra: boolean
@@ -83,8 +86,11 @@ export type Database = {
           cor_destaque?: string
           cor_fundo?: string
           cor_fundo_cabecalho?: string
+          cor_texto_cabecalho?: string
           id?: number
           logo_path?: string | null
+          logo_posicao?: Database["public"]["Enums"]["cardapio_logo_posicao"]
+          logo_tamanho?: Database["public"]["Enums"]["cardapio_logo_tamanho"]
           mostrar_nome_com_logo?: boolean
           nome_estabelecimento?: string
           sombra?: boolean
@@ -97,8 +103,11 @@ export type Database = {
           cor_destaque?: string
           cor_fundo?: string
           cor_fundo_cabecalho?: string
+          cor_texto_cabecalho?: string
           id?: number
           logo_path?: string | null
+          logo_posicao?: Database["public"]["Enums"]["cardapio_logo_posicao"]
+          logo_tamanho?: Database["public"]["Enums"]["cardapio_logo_tamanho"]
           mostrar_nome_com_logo?: boolean
           nome_estabelecimento?: string
           sombra?: boolean
@@ -427,6 +436,8 @@ export type Database = {
     }
     Enums: {
       cardapio_arredondamento: "nenhum" | "pequeno" | "medio" | "grande"
+      cardapio_logo_posicao: "esquerda" | "centro" | "direita"
+      cardapio_logo_tamanho: "pequeno" | "medio" | "grande"
       chamado_status: "pendente" | "aceito" | "cancelado"
       mesa_area: "interna" | "externa"
       produto_imagem_layout: "miniatura" | "grande"
@@ -563,6 +574,8 @@ export const Constants = {
   public: {
     Enums: {
       cardapio_arredondamento: ["nenhum", "pequeno", "medio", "grande"],
+      cardapio_logo_posicao: ["esquerda", "centro", "direita"],
+      cardapio_logo_tamanho: ["pequeno", "medio", "grande"],
       chamado_status: ["pendente", "aceito", "cancelado"],
       mesa_area: ["interna", "externa"],
       produto_imagem_layout: ["miniatura", "grande"],

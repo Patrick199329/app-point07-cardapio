@@ -35,9 +35,12 @@ export default async function AparenciaPage() {
         config={{
           nome_estabelecimento: config?.nome_estabelecimento ?? "Point07",
           logoUrl: urlImagemProduto(config?.logo_path ?? null),
+          logo_posicao: config?.logo_posicao ?? "esquerda",
+          logo_tamanho: config?.logo_tamanho ?? "medio",
           mostrar_nome_com_logo: config?.mostrar_nome_com_logo ?? true,
           cor_fundo: config?.cor_fundo ?? "#f5f5f4",
           cor_fundo_cabecalho: config?.cor_fundo_cabecalho ?? "#ffffff",
+          cor_texto_cabecalho: config?.cor_texto_cabecalho ?? "#111111",
           cor_bloco: config?.cor_bloco ?? "#ffffff",
           cor_destaque: config?.cor_destaque ?? "#f07e22",
           sombra: config?.sombra ?? true,

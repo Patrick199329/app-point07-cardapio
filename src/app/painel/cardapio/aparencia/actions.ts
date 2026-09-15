@@ -9,12 +9,17 @@ import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/types/database";
 
 type Arredondamento = Database["public"]["Enums"]["cardapio_arredondamento"];
+type LogoPosicao = Database["public"]["Enums"]["cardapio_logo_posicao"];
+type LogoTamanho = Database["public"]["Enums"]["cardapio_logo_tamanho"];
+
 const ARREDONDAMENTOS: Arredondamento[] = [
   "nenhum",
   "pequeno",
   "medio",
   "grande",
 ];
+const LOGO_POSICOES: LogoPosicao[] = ["esquerda", "centro", "direita"];
+const LOGO_TAMANHOS: LogoTamanho[] = ["pequeno", "medio", "grande"];
 
 export type AparenciaState = { error: string | null; ok: boolean };
 
@@ -29,6 +34,7 @@ export async function salvarAparencia(
   ).trim();
   const cor_fundo = String(formData.get("cor_fundo") ?? "");
   const cor_fundo_cabecalho = String(formData.get("cor_fundo_cabecalho") ?? "");
+  const cor_texto_cabecalho = String(formData.get("cor_texto_cabecalho") ?? "");
   const cor_bloco = String(formData.get("cor_bloco") ?? "");
   const cor_destaque = String(formData.get("cor_destaque") ?? "");
   const sombra = formData.get("sombra") === "true";
@@ -38,6 +44,12 @@ export async function salvarAparencia(
   const arredondamento = String(
     formData.get("arredondamento") ?? "medio",
   ) as Arredondamento;
+  const logo_posicao = String(
+    formData.get("logo_posicao") ?? "esquerda",
+  ) as LogoPosicao;
+  const logo_tamanho = String(
+    formData.get("logo_tamanho") ?? "medio",
+  ) as LogoTamanho;
 
   if (!nome_estabelecimento) {
     return { error: "Informe o nome do estabelecimento.", ok: false };
@@ -45,6 +57,7 @@ export async function salvarAparencia(
   const cores: [string, string][] = [
     [cor_fundo, "Cor de fundo do cardápio"],
     [cor_fundo_cabecalho, "Cor de fundo do cabeçalho"],
+    [cor_texto_cabecalho, "Cor do texto do cabeçalho"],
     [cor_bloco, "Cor dos blocos de produto"],
     [cor_destaque, "Cor de destaque"],
   ];
@@ -54,29 +67,41 @@ export async function salvarAparencia(
   if (!ARREDONDAMENTOS.includes(arredondamento)) {
     return { error: "Arredondamento inválido.", ok: false };
   }
+  if (!LOGO_POSICOES.includes(logo_posicao)) {
+    return { error: "Posição da logo inválida.", ok: false };
+  }
+  if (!LOGO_TAMANHOS.includes(logo_tamanho)) {
+    return { error: "Tamanho da logo inválido.", ok: false };
+  }
 
   const supabase = await createClient();
   const update: {
     nome_estabelecimento: string;
     cor_fundo: string;
     cor_fundo_cabecalho: string;
+    cor_texto_cabecalho: string;
     cor_bloco: string;
     cor_destaque: string;
     sombra: boolean;
     categorias_centralizadas: boolean;
     mostrar_nome_com_logo: boolean;
     arredondamento: Arredondamento;
+    logo_posicao: LogoPosicao;
+    logo_tamanho: LogoTamanho;
     logo_path?: string | null;
   } = {
     nome_estabelecimento,
     cor_fundo,
     cor_fundo_cabecalho,
+    cor_texto_cabecalho,
     cor_bloco,
     cor_destaque,
     sombra,
     categorias_centralizadas,
     mostrar_nome_com_logo,
     arredondamento,
+    logo_posicao,
+    logo_tamanho,
   };
 
   if (formData.get("remover_logo") === "true") {

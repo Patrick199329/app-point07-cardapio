@@ -7,7 +7,7 @@ import type {
   GrupoOpcoesPublico,
   ProdutoPublico,
 } from "@/lib/cardapio";
-import { RAIO_PX } from "@/lib/cardapio-tema";
+import { LOGO_ALTURA_PX, RAIO_PX } from "@/lib/cardapio-tema";
 import { formatarPreco } from "@/lib/formato";
 import { urlImagemProduto } from "@/lib/imagem";
 
@@ -150,6 +150,7 @@ export function CardapioPublico({
     "--cardapio-bloco": config.cor_bloco,
     "--cardapio-destaque": config.cor_destaque,
     "--cardapio-raio": `${raio}px`,
+    "--cardapio-texto-cabecalho": config.cor_texto_cabecalho,
   } as CSSProperties;
 
   const logoUrl = urlImagemProduto(config.logo_path);
@@ -157,21 +158,29 @@ export function CardapioPublico({
     ? `${logoUrl}?v=${encodeURIComponent(config.updated_at)}`
     : null;
   const mostrarNome = !logoSrc || config.mostrar_nome_com_logo;
+  const logoAltura = LOGO_ALTURA_PX[config.logo_tamanho];
+  const alinhamentoLogo =
+    config.logo_posicao === "centro"
+      ? "justify-center"
+      : config.logo_posicao === "direita"
+        ? "justify-end"
+        : "justify-start";
 
   return (
     <div
       className="mx-auto min-h-svh w-full max-w-2xl bg-[var(--cardapio-fundo)] pb-28"
       style={vars}
     >
-      <header className="sticky top-0 z-30 border-b bg-[var(--cardapio-cabecalho)]">
-        <div className="flex items-center justify-between gap-3 px-4 py-3">
+      <header className="sticky top-0 z-30 border-b bg-[var(--cardapio-cabecalho)] text-[var(--cardapio-texto-cabecalho)]">
+        <div className={`relative flex items-center px-4 py-3 ${alinhamentoLogo}`}>
           <div className="flex items-center gap-2">
             {logoSrc ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={logoSrc}
                 alt={config.nome_estabelecimento}
-                className="h-9 w-auto object-contain"
+                style={{ height: logoAltura }}
+                className="w-auto object-contain"
               />
             ) : null}
             {mostrarNome ? (
@@ -181,7 +190,7 @@ export function CardapioPublico({
             ) : null}
           </div>
           {mesaIdentificador ? (
-            <span className="shrink-0 text-sm text-muted-foreground">
+            <span className="absolute top-1/2 right-4 shrink-0 -translate-y-1/2 text-sm opacity-70">
               {mesaIdentificador}
             </span>
           ) : null}
@@ -192,7 +201,7 @@ export function CardapioPublico({
               <a
                 key={c.id}
                 href={`#cat-${c.id}`}
-                className="shrink-0 rounded-full border px-3 py-1 text-sm text-muted-foreground"
+                className="shrink-0 rounded-full border border-current px-3 py-1 text-sm opacity-80"
               >
                 {c.nome}
               </a>

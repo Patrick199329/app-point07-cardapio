@@ -19,6 +19,29 @@ export const ARREDONDAMENTO_LABEL: Record<Arredondamento, string> = {
   grande: "Grande",
 };
 
+/** Altura da logo no cabeçalho, em px. */
+export const LOGO_ALTURA_PX = {
+  pequeno: 28,
+  medio: 40,
+  grande: 56,
+} as const;
+
+export type LogoTamanho = keyof typeof LOGO_ALTURA_PX;
+
+export const LOGO_TAMANHO_LABEL: Record<LogoTamanho, string> = {
+  pequeno: "Pequena",
+  medio: "Média",
+  grande: "Grande",
+};
+
+export type LogoPosicao = "esquerda" | "centro" | "direita";
+
+export const LOGO_POSICAO_LABEL: Record<LogoPosicao, string> = {
+  esquerda: "Esquerda",
+  centro: "Centro",
+  direita: "Direita",
+};
+
 const HEX_RE = /^#[0-9a-f]{6}$/i;
 
 /** Valida um valor de cor hex (#rrggbb) vindo de um &lt;input type="color"&gt;. */

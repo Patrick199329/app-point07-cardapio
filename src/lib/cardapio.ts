@@ -1,12 +1,19 @@
 import { createClient } from "@/lib/supabase/server";
-import type { Arredondamento } from "@/lib/cardapio-tema";
+import type {
+  Arredondamento,
+  LogoPosicao,
+  LogoTamanho,
+} from "@/lib/cardapio-tema";
 
 export type CardapioConfig = {
   nome_estabelecimento: string;
   logo_path: string | null;
+  logo_posicao: LogoPosicao;
+  logo_tamanho: LogoTamanho;
   mostrar_nome_com_logo: boolean;
   cor_fundo: string;
   cor_fundo_cabecalho: string;
+  cor_texto_cabecalho: string;
   cor_bloco: string;
   cor_destaque: string;
   sombra: boolean;
@@ -53,9 +60,12 @@ export type CardapioPublicoData = {
 const CONFIG_PADRAO: CardapioConfig = {
   nome_estabelecimento: "Point07",
   logo_path: null,
+  logo_posicao: "esquerda",
+  logo_tamanho: "medio",
   mostrar_nome_com_logo: true,
   cor_fundo: "#f5f5f4",
   cor_fundo_cabecalho: "#ffffff",
+  cor_texto_cabecalho: "#111111",
   cor_bloco: "#ffffff",
   cor_destaque: "#f07e22",
   sombra: true,

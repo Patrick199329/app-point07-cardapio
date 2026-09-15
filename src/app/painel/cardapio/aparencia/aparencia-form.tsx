@@ -10,16 +10,28 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Switch } from "@/components/ui/switch";
-import { ARREDONDAMENTO_LABEL, RAIO_PX, type Arredondamento } from "@/lib/cardapio-tema";
+import {
+  ARREDONDAMENTO_LABEL,
+  type Arredondamento,
+  LOGO_ALTURA_PX,
+  LOGO_POSICAO_LABEL,
+  LOGO_TAMANHO_LABEL,
+  type LogoPosicao,
+  type LogoTamanho,
+  RAIO_PX,
+} from "@/lib/cardapio-tema";
 
 import { type AparenciaState, salvarAparencia } from "./actions";
 
 export type AparenciaConfig = {
   nome_estabelecimento: string;
   logoUrl: string | null;
+  logo_posicao: LogoPosicao;
+  logo_tamanho: LogoTamanho;
   mostrar_nome_com_logo: boolean;
   cor_fundo: string;
   cor_fundo_cabecalho: string;
+  cor_texto_cabecalho: string;
   cor_bloco: string;
   cor_destaque: string;
   sombra: boolean;
@@ -86,9 +98,12 @@ function ToggleField({
 function PreviaCardapio({
   nome,
   logoPreview,
+  logoPosicao,
+  logoTamanho,
   mostrarNomeComLogo,
   corFundo,
   corCabecalho,
+  corTextoCabecalho,
   corBloco,
   corDestaque,
   sombra,
@@ -97,9 +112,12 @@ function PreviaCardapio({
 }: {
   nome: string;
   logoPreview: string | null;
+  logoPosicao: LogoPosicao;
+  logoTamanho: LogoTamanho;
   mostrarNomeComLogo: boolean;
   corFundo: string;
   corCabecalho: string;
+  corTextoCabecalho: string;
   corBloco: string;
   corDestaque: string;
   sombra: boolean;
@@ -108,16 +126,29 @@ function PreviaCardapio({
 }) {
   const raio = RAIO_PX[arredondamento];
   const mostrarNome = !logoPreview || mostrarNomeComLogo;
+  // Prévia em miniatura: metade da altura real, pra não dominar o cartão.
+  const alturaLogo = LOGO_ALTURA_PX[logoTamanho] / 2;
+  const alinhamento =
+    logoPosicao === "centro"
+      ? "justify-center"
+      : logoPosicao === "direita"
+        ? "justify-end"
+        : "justify-start";
 
   return (
     <div className="overflow-hidden rounded-lg border">
       <div
-        style={{ backgroundColor: corCabecalho }}
-        className="flex items-center gap-2 border-b px-3 py-2"
+        style={{ backgroundColor: corCabecalho, color: corTextoCabecalho }}
+        className={`flex items-center gap-2 border-b px-3 py-2 ${alinhamento}`}
       >
         {logoPreview ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={logoPreview} alt="" className="h-7 w-auto object-contain" />
+          <img
+            src={logoPreview}
+            alt=""
+            style={{ height: alturaLogo }}
+            className="w-auto object-contain"
+          />
         ) : null}
         {mostrarNome ? (
           <span className="text-sm font-semibold">{nome || "Point07"}</span>
@@ -182,11 +213,20 @@ export function AparenciaForm({ config }: { config: AparenciaConfig }) {
   const [nome, setNome] = useState(config.nome_estabelecimento);
   const [logoPreview, setLogoPreview] = useState<string | null>(config.logoUrl);
   const [logoRemovida, setLogoRemovida] = useState(false);
+  const [logoPosicao, setLogoPosicao] = useState<LogoPosicao>(
+    config.logo_posicao,
+  );
+  const [logoTamanho, setLogoTamanho] = useState<LogoTamanho>(
+    config.logo_tamanho,
+  );
   const [mostrarNomeComLogo, setMostrarNomeComLogo] = useState(
     config.mostrar_nome_com_logo,
   );
   const [corFundo, setCorFundo] = useState(config.cor_fundo);
   const [corCabecalho, setCorCabecalho] = useState(config.cor_fundo_cabecalho);
+  const [corTextoCabecalho, setCorTextoCabecalho] = useState(
+    config.cor_texto_cabecalho,
+  );
   const [corBloco, setCorBloco] = useState(config.cor_bloco);
   const [corDestaque, setCorDestaque] = useState(config.cor_destaque);
   const [sombra, setSombra] = useState(config.sombra);
@@ -277,6 +317,41 @@ export function AparenciaForm({ config }: { config: AparenciaConfig }) {
           />
         </div>
 
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="logo_posicao">Posição da logo</Label>
+            <NativeSelect
+              id="logo_posicao"
+              name="logo_posicao"
+              value={logoPosicao}
+              onChange={(e) => setLogoPosicao(e.target.value as LogoPosicao)}
+              className={INPUT}
+            >
+              {Object.entries(LOGO_POSICAO_LABEL).map(([valor, rotulo]) => (
+                <option key={valor} value={valor}>
+                  {rotulo}
+                </option>
+              ))}
+            </NativeSelect>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="logo_tamanho">Tamanho da logo</Label>
+            <NativeSelect
+              id="logo_tamanho"
+              name="logo_tamanho"
+              value={logoTamanho}
+              onChange={(e) => setLogoTamanho(e.target.value as LogoTamanho)}
+              className={INPUT}
+            >
+              {Object.entries(LOGO_TAMANHO_LABEL).map(([valor, rotulo]) => (
+                <option key={valor} value={valor}>
+                  {rotulo}
+                </option>
+              ))}
+            </NativeSelect>
+          </div>
+        </div>
+
         <ToggleField
           id="mostrar_nome_com_logo_switch"
           label="Mostrar nome junto da logo"
@@ -297,6 +372,12 @@ export function AparenciaForm({ config }: { config: AparenciaConfig }) {
             name="cor_fundo_cabecalho"
             value={corCabecalho}
             onChange={setCorCabecalho}
+          />
+          <ColorField
+            label="Cor do texto do cabeçalho"
+            name="cor_texto_cabecalho"
+            value={corTextoCabecalho}
+            onChange={setCorTextoCabecalho}
           />
           <ColorField
             label="Cor dos blocos de produto"
@@ -364,9 +445,12 @@ export function AparenciaForm({ config }: { config: AparenciaConfig }) {
         <PreviaCardapio
           nome={nome}
           logoPreview={logoPreview}
+          logoPosicao={logoPosicao}
+          logoTamanho={logoTamanho}
           mostrarNomeComLogo={mostrarNomeComLogo}
           corFundo={corFundo}
           corCabecalho={corCabecalho}
+          corTextoCabecalho={corTextoCabecalho}
           corBloco={corBloco}
           corDestaque={corDestaque}
           sombra={sombra}
