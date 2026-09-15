@@ -196,6 +196,24 @@ export type Database = {
           },
         ]
       }
+      fila_config: {
+        Row: {
+          alerta_atraso_segundos: number
+          id: number
+          updated_at: string
+        }
+        Insert: {
+          alerta_atraso_segundos?: number
+          id?: number
+          updated_at?: string
+        }
+        Update: {
+          alerta_atraso_segundos?: number
+          id?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       mesas: {
         Row: {
           apelido: string | null

@@ -44,21 +44,24 @@ function tocarBip() {
   }
 }
 
-function haQuantoTempo(iso: string, agora: number) {
-  const min = Math.max(0, Math.floor((agora - new Date(iso).getTime()) / 60000));
-  if (min < 1) return "agora";
-  if (min === 1) return "há 1 min";
-  return `há ${min} min`;
+/** Cronômetro mm:ss decorrido desde `iso`. */
+function formatarCronometro(iso: string, agora: number) {
+  const totalSeg = Math.max(0, Math.floor((agora - new Date(iso).getTime()) / 1000));
+  const min = Math.floor(totalSeg / 60);
+  const seg = totalSeg % 60;
+  return `${String(min).padStart(2, "0")}:${String(seg).padStart(2, "0")}`;
 }
 
 export function FilaRealtime({
   inicial,
   mesas,
   meusHoje,
+  alertaAtrasoSegundos,
 }: {
   inicial: ChamadoFila[];
   mesas: Record<string, string>;
   meusHoje: number;
+  alertaAtrasoSegundos: number;
 }) {
   const supabase = useMemo(() => createClient(), []);
   const [fila, setFila] = useState<ChamadoFila[]>(inicial);
@@ -71,9 +74,9 @@ export function FilaRealtime({
     somRef.current = somAtivo;
   }, [somAtivo]);
 
-  // Relógio para o "há N min".
+  // Cronômetro mm:ss de cada chamado — precisa de tique por segundo.
   useEffect(() => {
-    const iv = setInterval(() => setAgora(Date.now()), 20000);
+    const iv = setInterval(() => setAgora(Date.now()), 1000);
     return () => clearInterval(iv);
   }, []);
 
@@ -186,13 +189,18 @@ export function FilaRealtime({
       ) : (
         <ul className="space-y-3">
           {ordenada.map((chamado, i) => {
-            const min = Math.floor(
-              (agora - new Date(chamado.criadoEm).getTime()) / 60000,
+            const decorridoSeg = Math.floor(
+              (agora - new Date(chamado.criadoEm).getTime()) / 1000,
             );
+            const atrasado = decorridoSeg >= alertaAtrasoSegundos;
             return (
               <li
                 key={chamado.id}
-                className="flex items-center justify-between gap-3 rounded-xl border p-4"
+                className={
+                  atrasado
+                    ? "flex items-center justify-between gap-3 rounded-xl border border-destructive bg-destructive/10 p-4"
+                    : "flex items-center justify-between gap-3 rounded-xl border p-4"
+                }
               >
                 <div>
                   <p className="text-lg font-semibold">
@@ -201,12 +209,12 @@ export function FilaRealtime({
                   </p>
                   <p
                     className={
-                      min >= 5
-                        ? "text-sm font-medium text-destructive"
-                        : "text-sm text-muted-foreground"
+                      atrasado
+                        ? "font-mono text-sm font-semibold text-destructive tabular-nums"
+                        : "font-mono text-sm text-muted-foreground tabular-nums"
                     }
                   >
-                    {haQuantoTempo(chamado.criadoEm, agora)}
+                    {formatarCronometro(chamado.criadoEm, agora)}
                   </p>
                 </div>
                 <Button

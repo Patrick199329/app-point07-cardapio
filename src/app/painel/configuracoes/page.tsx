@@ -22,6 +22,12 @@ const SECOES = [
       "Logo da tela de login, do menu do painel e do cabeçalho da fila do garçom.",
     href: "/painel/configuracoes/sistema",
   },
+  {
+    titulo: "Fila do Garçom",
+    descricao:
+      "Tempo limite antes de um chamado pendente ser destacado na tela do garçom.",
+    href: "/painel/configuracoes/fila",
+  },
 ];
 
 export default function ConfiguracoesPage() {
