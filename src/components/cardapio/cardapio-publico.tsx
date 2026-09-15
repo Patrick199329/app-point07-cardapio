@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 
 import { ChamarGarcomButton } from "@/app/cardapio/chamar-garcom-button";
+import { CategoriaNav } from "@/components/cardapio/categoria-nav";
 import { ImagemProduto } from "@/components/cardapio/imagem-produto";
 import type {
   CardapioPublicoData,
@@ -196,17 +197,9 @@ export function CardapioPublico({
           ) : null}
         </div>
         {categorias.length > 1 ? (
-          <nav className="flex gap-2 overflow-x-auto px-4 pb-3">
-            {categorias.map((c) => (
-              <a
-                key={c.id}
-                href={`#cat-${c.id}`}
-                className="shrink-0 rounded-full border border-current px-3 py-1 text-sm opacity-80"
-              >
-                {c.nome}
-              </a>
-            ))}
-          </nav>
+          <CategoriaNav
+            categorias={categorias.map((c) => ({ id: c.id, nome: c.nome }))}
+          />
         ) : null}
       </header>
 
