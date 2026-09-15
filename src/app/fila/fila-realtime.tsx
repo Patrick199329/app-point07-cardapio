@@ -15,6 +15,8 @@ import { Button } from "@/components/ui/button";
 import { formatarHora } from "@/lib/formato";
 import { createClient } from "@/lib/supabase/client";
 
+import { PushToggle } from "./push-toggle";
+
 export type ChamadoFila = {
   id: string;
   mesaId: string;
@@ -161,23 +163,26 @@ export function FilaRealtime({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm text-muted-foreground">
           {atendidos} atendimento(s) seu(s) hoje
         </p>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setSomAtivo((s) => !s)}
-          aria-pressed={somAtivo}
-        >
-          {somAtivo ? (
-            <Volume2 className="size-4" />
-          ) : (
-            <VolumeX className="size-4" />
-          )}
-          Som {somAtivo ? "ligado" : "desligado"}
-        </Button>
+        <div className="flex flex-wrap items-center justify-end gap-1">
+          <PushToggle />
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setSomAtivo((s) => !s)}
+            aria-pressed={somAtivo}
+          >
+            {somAtivo ? (
+              <Volume2 className="size-4" />
+            ) : (
+              <VolumeX className="size-4" />
+            )}
+            Som {somAtivo ? "ligado" : "desligado"}
+          </Button>
+        </div>
       </div>
 
       {ordenada.length === 0 ? (

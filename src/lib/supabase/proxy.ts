@@ -3,7 +3,12 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
 /** Rotas acessíveis sem sessão. */
-const PUBLIC_PATHS = ["/login"];
+const PUBLIC_PATHS = [
+  "/login",
+  // Disparo de push (bônus) chamado pelo cliente do salão, sem login — ver
+  // docs/Push-Notificacoes-Garcom-Bonus.md.
+  "/api/chamados/notificar",
+];
 
 /** Prefixos públicos (Fase 2: cardápio público e QR de mesa). */
 const PUBLIC_PREFIXES = ["/cardapio", "/mesa", "/auth"];

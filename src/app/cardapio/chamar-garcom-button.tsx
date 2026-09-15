@@ -19,9 +19,11 @@ type Estado = "idle" | "enviando" | "pendente" | "aceito" | "erro";
  */
 export function ChamarGarcomButton({
   mesaToken,
+  mesaIdentificador,
   corDestaque,
 }: {
   mesaToken: string | null;
+  mesaIdentificador?: string;
   /** Cor de marca (`cardapio_config.cor_destaque`) — mesma usada no resto do cardápio. */
   corDestaque?: string;
 }) {
@@ -85,7 +87,21 @@ export function ChamarGarcomButton({
     }
     chamadoRef.current = { id: row.chamado_id, origem: row.origem_token };
     setEstado("pendente");
-  }, [mesaToken, supabase]);
+
+    // Bônus não contratual (docs/Push-Notificacoes-Garcom-Bonus.md): avisa os
+    // garçons inscritos. Best-effort — se falhar, o chamado já está na fila
+    // via Realtime de qualquer forma.
+    if (!row.ja_existia) {
+      fetch("/api/chamados/notificar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chamadoId: row.chamado_id,
+          mesa: mesaIdentificador ?? "Uma mesa",
+        }),
+      }).catch(() => {});
+    }
+  }, [mesaIdentificador, mesaToken, supabase]);
 
   const cancelar = useCallback(async () => {
     const c = chamadoRef.current;

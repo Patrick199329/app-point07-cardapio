@@ -244,7 +244,11 @@ export function CardapioPublico({
         </div>
       ) : null}
 
-      <ChamarGarcomButton mesaToken={mesaToken} corDestaque={config.cor_destaque} />
+      <ChamarGarcomButton
+        mesaToken={mesaToken}
+        mesaIdentificador={mesaIdentificador}
+        corDestaque={config.cor_destaque}
+      />
     </div>
   );
 }
