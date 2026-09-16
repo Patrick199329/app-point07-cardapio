@@ -50,23 +50,23 @@ function GruposOpcoes({ grupos }: { grupos: GrupoOpcoesPublico[] }) {
 }
 
 function Precos({ produto }: { produto: ProdutoPublico }) {
-  const preco = "text-[var(--cardapio-destaque)]";
+  const preco = "font-medium text-[var(--cardapio-destaque)]";
   if (produto.modelo === "tamanhos") {
     return (
-      <div className="shrink-0 text-right text-sm tabular-nums">
-        <div>
+      <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-sm tabular-nums">
+        <span>
           <span className="text-muted-foreground">{produto.preco_medio_label} </span>
           <span className={preco}>{formatarPreco(produto.preco_medio)}</span>
-        </div>
-        <div>
+        </span>
+        <span>
           <span className="text-muted-foreground">{produto.preco_grande_label} </span>
           <span className={preco}>{formatarPreco(produto.preco_grande)}</span>
-        </div>
+        </span>
       </div>
     );
   }
   return (
-    <div className={`shrink-0 text-right text-sm font-medium tabular-nums ${preco}`}>
+    <div className={`text-sm tabular-nums ${preco}`}>
       {formatarPreco(produto.preco)}
     </div>
   );
@@ -109,17 +109,17 @@ function ProdutoCard({
         {img ? (
           <ImagemProduto src={img} alt={produto.nome} className="size-16" />
         ) : null}
-        <div className="flex min-w-0 flex-1 justify-between gap-3">
-          <div className="min-w-0">
-            <p className="font-medium">{produto.nome}</p>
-            {produto.descricao ? (
-              <p className="text-sm text-muted-foreground">
-                {produto.descricao}
-              </p>
-            ) : null}
-            {serveAte}
+        <div className="min-w-0 flex-1">
+          <p className="font-medium">{produto.nome}</p>
+          {produto.descricao ? (
+            <p className="text-sm text-muted-foreground">
+              {produto.descricao}
+            </p>
+          ) : null}
+          {serveAte}
+          <div className="mt-1.5">
+            <Precos produto={produto} />
           </div>
-          <Precos produto={produto} />
         </div>
       </div>
     );
