@@ -73,11 +73,15 @@ declare
   cat_entradas uuid;
   cat_porcoes uuid;
   cat_tabuas uuid;
+  cat_batata uuid;
 begin
   insert into public.categorias (nome, ordem) values ('Bebidas', 0) returning id into cat_bebidas;
   insert into public.categorias (nome, ordem) values ('Entradas', 1) returning id into cat_entradas;
   insert into public.categorias (nome, ordem) values ('Porções', 2) returning id into cat_porcoes;
   insert into public.categorias (nome, ordem) values ('Tábuas Especiais', 3) returning id into cat_tabuas;
+  -- Categoria própria, não sub-item de Porções — é assim no cardápio real (confirmado
+  -- na migração do WordPress, ver scripts/migracao-cardapio/).
+  insert into public.categorias (nome, ordem) values ('Batata Recheada', 4) returning id into cat_batata;
 
   -- Modelo A — item simples
   insert into public.produtos (categoria_id, nome, descricao, modelo, preco, ordem) values
@@ -87,14 +91,11 @@ begin
 
   -- Modelo B — item com tamanhos (médio / grande)
   insert into public.produtos (categoria_id, nome, descricao, modelo, preco_medio, preco_grande, preco_medio_label, preco_grande_label, ordem) values
-    (cat_entradas, 'Bolinho de bacalhau', 'Porção com 6 ou 12 unidades', 'tamanhos', 34.00, 58.00, 'Médio', 'Grande', 0),
-    (cat_porcoes, 'Batata frita', 'Crocante, com alecrim', 'tamanhos', 29.00, 45.00, 'Médio', 'Grande', 0),
-    (cat_porcoes, 'Calabresa acebolada', null, 'tamanhos', 39.00, 62.00, 'Médio', 'Grande', 1);
+    (cat_entradas, 'Bolinho de bacalhau', 'Porção com 6 ou 12 unidades', 'tamanhos', 34.00, 58.00, 'Médio', 'Grande', 0);
 
   -- Modelo C — item para compartilhar
   insert into public.produtos (categoria_id, nome, descricao, modelo, preco, serve_ate, ordem) values
-    (cat_tabuas, 'Tábua de frios', 'Queijos, embutidos, azeitonas e pães', 'compartilhar', 129.00, 4, 0),
-    (cat_tabuas, 'Tábua da casa', 'Seleção especial do chef', 'compartilhar', 219.00, 6, 1);
+    (cat_tabuas, 'Tábua da casa', 'Seleção especial do chef', 'compartilhar', 219.00, 6, 0);
 end $$;
 
 insert into public.avisos (texto, ordem) values
@@ -103,20 +104,21 @@ insert into public.avisos (texto, ordem) values
 
 -- ---------------------------------------------------------------------------
 -- Produto de exemplo com grupos de opções (Modelo A + acompanhamentos/escolhas
--- informativas) — mesmo padrão do "Batata Recheada" do cardápio atual.
+-- informativas) — mesmo padrão do "Batata Recheada" do cardápio real (própria
+-- categoria, confirmado na migração do WordPress).
 -- ---------------------------------------------------------------------------
 do $$
 declare
-  cat_porcoes uuid;
+  cat_batata uuid;
   prod_batata uuid;
   g_acompanha uuid;
   g_carne uuid;
   g_complemento uuid;
 begin
-  select id into cat_porcoes from public.categorias where nome = 'Porções';
+  select id into cat_batata from public.categorias where nome = 'Batata Recheada';
 
   insert into public.produtos (categoria_id, nome, modelo, preco, ordem)
-  values (cat_porcoes, 'Batata Recheada', 'simples', 29.90, 2)
+  values (cat_batata, 'Batata Recheada', 'simples', 29.90, 0)
   returning id into prod_batata;
 
   insert into public.produto_grupos_opcoes (produto_id, titulo, ordem)

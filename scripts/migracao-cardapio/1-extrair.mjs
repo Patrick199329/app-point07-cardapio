@@ -49,6 +49,21 @@ function humanizar(slug) {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+const CONECTIVOS = new Set(["de", "da", "do", "das", "dos", "e"]);
+
+/** "TÁBUAS ESPECIAIS" -> "Tábuas Especiais" (mantém o WP como fonte, só a caixa muda). */
+function titleCase(texto) {
+  return texto
+    .toLowerCase()
+    .split(" ")
+    .map((palavra, i) =>
+      i > 0 && CONECTIVOS.has(palavra)
+        ? palavra
+        : palavra.charAt(0).toUpperCase() + palavra.slice(1),
+    )
+    .join(" ");
+}
+
 function getMetas(itemXml) {
   const metas = {};
   const blocos = itemXml.match(/<wp:postmeta>[\s\S]*?<\/wp:postmeta>/g) ?? [];
@@ -117,7 +132,7 @@ for (const it of items) {
 
   const categoria =
     CATEGORIA_OVERRIDE[postType] ??
-    rotuloPorTipo[postType] ??
+    (rotuloPorTipo[postType] ? titleCase(rotuloPorTipo[postType]) : null) ??
     humanizar(postType);
 
   const nome = (metas.nome || titulo).trim();
@@ -136,11 +151,18 @@ for (const it of items) {
     modelo = "compartilhar";
     preco = parsePreco(metas.preco).valor;
   } else if (postType === "porcoes" || postType === "entrada_tira_gosto") {
-    modelo = "tamanhos";
-    precoMedio = parsePreco(metas.medio).valor;
-    precoGrande = parsePreco(metas.grande).valor;
-    precoMedioLabel = "Médio";
-    precoGrandeLabel = "Grande";
+    const medio = parsePreco(metas.medio);
+    const grande = parsePreco(metas.grande);
+    if (medio.valor !== null && grande.valor !== null) {
+      modelo = "tamanhos";
+      precoMedio = medio.valor;
+      precoGrande = grande.valor;
+      precoMedioLabel = "Médio";
+      precoGrandeLabel = "Grande";
+    } else {
+      modelo = "simples";
+      preco = medio.valor ?? grande.valor;
+    }
   } else if (postType === "cachaca_de_sabores") {
     const dose = parsePreco(metas.dose);
     const litro = parsePreco(metas.litro);
@@ -191,10 +213,6 @@ for (const it of items) {
     if (p.nota) observacoes.push(`preço original: "${p.nota}"`);
   }
 
-  if (modelo === "simples" && preco === null) {
-    observacoes.push("SEM PREÇO — precisa ser preenchido antes de importar");
-  }
-
   const thumbId = metas._thumbnail_id;
   const imagemUrl = thumbId ? imagemPorId[thumbId] ?? "" : "";
   if (thumbId && !imagemUrl) observacoes.push("tinha _thumbnail_id mas a imagem não foi encontrada no export");
@@ -233,13 +251,30 @@ for (const it of items) {
   const principal = doCategoria.find((l) => l.preco !== null);
   const instrucoes = doCategoria.filter((l) => l.preco === null);
   if (principal && instrucoes.length > 0) {
-    const extra = instrucoes.map((l) => `${l.nome}: ${l.descricao}`).join(". ");
-    principal.descricao = [principal.descricao, extra].filter(Boolean).join(" — ");
+    principal.descricao =
+      "Escolha 1 carne (frango, calabresa, lombo, presunto, atum, contrafilé ou bacon). " +
+      "Acompanha batata, mussarela e catupiry. Escolha 2 complementos à sua escolha " +
+      "(milho, tomate, alho, provolone, pimentão, ervilha, cebola, cheddar, parmesão, " +
+      "brócolis ou azeitona). Acréscimo de carne R$ 9,00, acréscimo de complemento R$ 4,99.";
     principal.observacao = [
       principal.observacao,
-      `descrição enriquecida com ${instrucoes.length} linha(s) de instrução do WP (não eram produtos) — conferir texto`,
+      `descrição reescrita a partir de ${instrucoes.length} linha(s) de instrução do WP que não eram produtos`,
     ].filter(Boolean).join(" | ");
     for (const l of instrucoes) linhas.splice(linhas.indexOf(l), 1);
+  }
+}
+
+// Itens "simples" sem nenhum preço no WP (7 drinks, todos já "private") —
+// decisão do Patrick (19/09): importa mesmo assim com R$ 0,00 em vez de
+// bloquear a importação. Como já ficam ativo=false, não aparecem no
+// cardápio público; o preço real fica pra acertar com o Aquiles depois.
+for (const l of linhas) {
+  if (l.modelo === "simples" && l.preco === null) {
+    l.preco = 0;
+    l.observacao = [
+      l.observacao,
+      "SEM PREÇO no WordPress — importado com R$ 0,00, ajustar com o Aquiles depois",
+    ].filter(Boolean).join(" | ");
   }
 }
 
