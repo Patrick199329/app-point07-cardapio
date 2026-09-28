@@ -43,6 +43,9 @@ export default async function AparenciaCardapioPage() {
           cor_texto_cabecalho: config?.cor_texto_cabecalho ?? "#111111",
           cor_bloco: config?.cor_bloco ?? "#ffffff",
           cor_destaque: config?.cor_destaque ?? "#f07e22",
+          cor_categoria_nav_fundo: config?.cor_categoria_nav_fundo ?? "#ffffff",
+          cor_categoria_nav_fundo_ativa:
+            config?.cor_categoria_nav_fundo_ativa ?? "#ffffff",
           sombra: config?.sombra ?? true,
           arredondamento: config?.arredondamento ?? "medio",
           categorias_centralizadas: config?.categorias_centralizadas ?? false,

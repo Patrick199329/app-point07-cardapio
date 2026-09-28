@@ -152,6 +152,8 @@ export function CardapioPublico({
     "--cardapio-destaque": config.cor_destaque,
     "--cardapio-raio": `${raio}px`,
     "--cardapio-texto-cabecalho": config.cor_texto_cabecalho,
+    "--cardapio-categoria-nav-fundo": config.cor_categoria_nav_fundo,
+    "--cardapio-categoria-nav-fundo-ativa": config.cor_categoria_nav_fundo_ativa,
   } as CSSProperties;
 
   const logoUrl = urlImagemProduto(config.logo_path);

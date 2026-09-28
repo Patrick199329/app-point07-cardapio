@@ -34,6 +34,8 @@ export type AparenciaConfig = {
   cor_texto_cabecalho: string;
   cor_bloco: string;
   cor_destaque: string;
+  cor_categoria_nav_fundo: string;
+  cor_categoria_nav_fundo_ativa: string;
   sombra: boolean;
   arredondamento: Arredondamento;
   categorias_centralizadas: boolean;
@@ -106,6 +108,8 @@ function PreviaCardapio({
   corTextoCabecalho,
   corBloco,
   corDestaque,
+  corCategoriaNavFundo,
+  corCategoriaNavFundoAtiva,
   sombra,
   arredondamento,
   categoriasCentralizadas,
@@ -120,6 +124,8 @@ function PreviaCardapio({
   corTextoCabecalho: string;
   corBloco: string;
   corDestaque: string;
+  corCategoriaNavFundo: string;
+  corCategoriaNavFundoAtiva: string;
   sombra: boolean;
   arredondamento: Arredondamento;
   categoriasCentralizadas: boolean;
@@ -153,6 +159,30 @@ function PreviaCardapio({
         {mostrarNome ? (
           <span className="text-sm font-semibold">{nome || "Point07"}</span>
         ) : null}
+      </div>
+      <div
+        style={{ backgroundColor: corCabecalho, color: corTextoCabecalho }}
+        className="flex gap-2 overflow-x-auto border-b px-3 py-2"
+      >
+        {["Bebidas", "Porções", "Pizzas", "Sobremesas"].map((nome, i) => (
+          <span
+            key={nome}
+            style={
+              i === 0
+                ? {
+                    backgroundColor: corCategoriaNavFundoAtiva,
+                    borderColor: corDestaque,
+                    color: corDestaque,
+                  }
+                : { backgroundColor: corCategoriaNavFundo, borderColor: "currentColor" }
+            }
+            className={`shrink-0 rounded-full border px-3 py-1 text-xs ${
+              i === 0 ? "font-medium" : "opacity-70"
+            }`}
+          >
+            {nome}
+          </span>
+        ))}
       </div>
       <div style={{ backgroundColor: corFundo }} className="space-y-3 p-3">
         <p
@@ -229,6 +259,12 @@ export function AparenciaForm({ config }: { config: AparenciaConfig }) {
   );
   const [corBloco, setCorBloco] = useState(config.cor_bloco);
   const [corDestaque, setCorDestaque] = useState(config.cor_destaque);
+  const [corCategoriaNavFundo, setCorCategoriaNavFundo] = useState(
+    config.cor_categoria_nav_fundo,
+  );
+  const [corCategoriaNavFundoAtiva, setCorCategoriaNavFundoAtiva] = useState(
+    config.cor_categoria_nav_fundo_ativa,
+  );
   const [sombra, setSombra] = useState(config.sombra);
   const [arredondamento, setArredondamento] = useState<Arredondamento>(
     config.arredondamento,
@@ -391,6 +427,18 @@ export function AparenciaForm({ config }: { config: AparenciaConfig }) {
             value={corDestaque}
             onChange={setCorDestaque}
           />
+          <ColorField
+            label="Fundo dos botões de categoria"
+            name="cor_categoria_nav_fundo"
+            value={corCategoriaNavFundo}
+            onChange={setCorCategoriaNavFundo}
+          />
+          <ColorField
+            label="Fundo do botão de categoria em foco"
+            name="cor_categoria_nav_fundo_ativa"
+            value={corCategoriaNavFundoAtiva}
+            onChange={setCorCategoriaNavFundoAtiva}
+          />
         </div>
 
         <ToggleField
@@ -453,6 +501,8 @@ export function AparenciaForm({ config }: { config: AparenciaConfig }) {
           corTextoCabecalho={corTextoCabecalho}
           corBloco={corBloco}
           corDestaque={corDestaque}
+          corCategoriaNavFundo={corCategoriaNavFundo}
+          corCategoriaNavFundoAtiva={corCategoriaNavFundoAtiva}
           sombra={sombra}
           arredondamento={arredondamento}
           categoriasCentralizadas={categoriasCentralizadas}

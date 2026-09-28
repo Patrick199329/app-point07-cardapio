@@ -69,8 +69,8 @@ export function CategoriaNav({
             aria-current={destacada ? "true" : undefined}
             className={`shrink-0 rounded-full border px-3 py-1 text-sm transition-all duration-200 ease-out active:scale-95 ${
               destacada
-                ? "border-[var(--cardapio-destaque)] font-medium text-[var(--cardapio-destaque)] opacity-100"
-                : "border-current opacity-70"
+                ? "border-[var(--cardapio-destaque)] bg-[var(--cardapio-categoria-nav-fundo-ativa)] font-medium text-[var(--cardapio-destaque)] opacity-100"
+                : "border-current bg-[var(--cardapio-categoria-nav-fundo)] opacity-70"
             }`}
           >
             {c.nome}

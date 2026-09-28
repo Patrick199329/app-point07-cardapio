@@ -16,6 +16,8 @@ export type CardapioConfig = {
   cor_texto_cabecalho: string;
   cor_bloco: string;
   cor_destaque: string;
+  cor_categoria_nav_fundo: string;
+  cor_categoria_nav_fundo_ativa: string;
   sombra: boolean;
   arredondamento: Arredondamento;
   categorias_centralizadas: boolean;
@@ -70,6 +72,8 @@ const CONFIG_PADRAO: CardapioConfig = {
   cor_texto_cabecalho: "#111111",
   cor_bloco: "#ffffff",
   cor_destaque: "#f07e22",
+  cor_categoria_nav_fundo: "#ffffff",
+  cor_categoria_nav_fundo_ativa: "#ffffff",
   sombra: true,
   arredondamento: "medio",
   categorias_centralizadas: false,

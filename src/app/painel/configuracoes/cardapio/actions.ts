@@ -37,6 +37,12 @@ export async function salvarAparencia(
   const cor_texto_cabecalho = String(formData.get("cor_texto_cabecalho") ?? "");
   const cor_bloco = String(formData.get("cor_bloco") ?? "");
   const cor_destaque = String(formData.get("cor_destaque") ?? "");
+  const cor_categoria_nav_fundo = String(
+    formData.get("cor_categoria_nav_fundo") ?? "",
+  );
+  const cor_categoria_nav_fundo_ativa = String(
+    formData.get("cor_categoria_nav_fundo_ativa") ?? "",
+  );
   const sombra = formData.get("sombra") === "true";
   const categorias_centralizadas =
     formData.get("categorias_centralizadas") === "true";
@@ -60,6 +66,8 @@ export async function salvarAparencia(
     [cor_texto_cabecalho, "Cor do texto do cabeçalho"],
     [cor_bloco, "Cor dos blocos de produto"],
     [cor_destaque, "Cor de destaque"],
+    [cor_categoria_nav_fundo, "Cor de fundo dos botões de categoria"],
+    [cor_categoria_nav_fundo_ativa, "Cor de fundo do botão de categoria em foco"],
   ];
   for (const [cor, rotulo] of cores) {
     if (!corValida(cor)) return { error: `${rotulo}: cor inválida.`, ok: false };
@@ -82,6 +90,8 @@ export async function salvarAparencia(
     cor_texto_cabecalho: string;
     cor_bloco: string;
     cor_destaque: string;
+    cor_categoria_nav_fundo: string;
+    cor_categoria_nav_fundo_ativa: string;
     sombra: boolean;
     categorias_centralizadas: boolean;
     mostrar_nome_com_logo: boolean;
@@ -96,6 +106,8 @@ export async function salvarAparencia(
     cor_texto_cabecalho,
     cor_bloco,
     cor_destaque,
+    cor_categoria_nav_fundo,
+    cor_categoria_nav_fundo_ativa,
     sombra,
     categorias_centralizadas,
     mostrar_nome_com_logo,

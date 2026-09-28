@@ -66,6 +66,8 @@ export type Database = {
           arredondamento: Database["public"]["Enums"]["cardapio_arredondamento"]
           categorias_centralizadas: boolean
           cor_bloco: string
+          cor_categoria_nav_fundo: string
+          cor_categoria_nav_fundo_ativa: string
           cor_destaque: string
           cor_fundo: string
           cor_fundo_cabecalho: string
@@ -83,6 +85,8 @@ export type Database = {
           arredondamento?: Database["public"]["Enums"]["cardapio_arredondamento"]
           categorias_centralizadas?: boolean
           cor_bloco?: string
+          cor_categoria_nav_fundo?: string
+          cor_categoria_nav_fundo_ativa?: string
           cor_destaque?: string
           cor_fundo?: string
           cor_fundo_cabecalho?: string
@@ -100,6 +104,8 @@ export type Database = {
           arredondamento?: Database["public"]["Enums"]["cardapio_arredondamento"]
           categorias_centralizadas?: boolean
           cor_bloco?: string
+          cor_categoria_nav_fundo?: string
+          cor_categoria_nav_fundo_ativa?: string
           cor_destaque?: string
           cor_fundo?: string
           cor_fundo_cabecalho?: string
