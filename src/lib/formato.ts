@@ -21,6 +21,10 @@ export function parsePreco(valor: FormDataEntryValue | null): number | null {
   return Number(s.replace(/\s/g, "").replace(",", "."));
 }
 
+// Sem `timeZone` explícito, o Intl.DateTimeFormat usa o fuso do PROCESSO —
+// fixado em src/instrumentation.ts (produção na Vercel roda em UTC por
+// padrão, o que atrasaria esses horários em 3h). Ver também
+// src/lib/periodo.ts e src/lib/gerencial.ts.
 const DATA_HORA = new Intl.DateTimeFormat("pt-BR", {
   day: "2-digit",
   month: "2-digit",

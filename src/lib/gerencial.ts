@@ -25,6 +25,10 @@ type ChamadoRow = {
   profiles: { nome: string } | null;
 };
 
+// getFullYear/getMonth/getDate/setHours usam o fuso do PROCESSO Node, não um
+// fuso fixo — dependem do fuso ser fixado em src/instrumentation.ts (ver
+// também src/lib/periodo.ts). Sem isso, produção na Vercel (UTC por padrão)
+// agrupa cada chamado 3h adiantado no dia errado.
 function chaveDiaLocal(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
