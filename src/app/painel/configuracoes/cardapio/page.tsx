@@ -49,6 +49,7 @@ export default async function AparenciaCardapioPage() {
           sombra: config?.sombra ?? true,
           arredondamento: config?.arredondamento ?? "medio",
           categorias_centralizadas: config?.categorias_centralizadas ?? false,
+          descricao_caixa: config?.descricao_caixa ?? "original",
         }}
       />
     </div>

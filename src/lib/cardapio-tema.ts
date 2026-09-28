@@ -42,6 +42,30 @@ export const LOGO_POSICAO_LABEL: Record<LogoPosicao, string> = {
   direita: "Direita",
 };
 
+export type DescricaoCaixa = "original" | "maiusculo" | "frase";
+
+export const DESCRICAO_CAIXA_LABEL: Record<DescricaoCaixa, string> = {
+  original: "Como foi cadastrado",
+  maiusculo: "TUDO MAIÚSCULO",
+  frase: "Só a primeira letra maiúscula",
+};
+
+/**
+ * Normaliza a caixa da descrição pro cardápio público — os dados migrados do
+ * WordPress vêm com uma mistura de "tudo maiúsculo" e texto normal, sem
+ * padrão nenhum entre os itens. Em vez de reeditar cada um na mão, o
+ * Administrador escolhe um padrão de exibição só (a descrição salva no banco
+ * não muda, isso é só como ela aparece).
+ */
+export function formatarDescricao(texto: string, modo: DescricaoCaixa): string {
+  if (modo === "maiusculo") return texto.toUpperCase();
+  if (modo === "frase") {
+    const minusculo = texto.toLowerCase();
+    return minusculo.charAt(0).toUpperCase() + minusculo.slice(1);
+  }
+  return texto;
+}
+
 const HEX_RE = /^#[0-9a-f]{6}$/i;
 
 /** Valida um valor de cor hex (#rrggbb) vindo de um &lt;input type="color"&gt;. */

@@ -72,6 +72,7 @@ export type Database = {
           cor_fundo: string
           cor_fundo_cabecalho: string
           cor_texto_cabecalho: string
+          descricao_caixa: Database["public"]["Enums"]["cardapio_descricao_caixa"]
           id: number
           logo_path: string | null
           logo_posicao: Database["public"]["Enums"]["cardapio_logo_posicao"]
@@ -91,6 +92,7 @@ export type Database = {
           cor_fundo?: string
           cor_fundo_cabecalho?: string
           cor_texto_cabecalho?: string
+          descricao_caixa?: Database["public"]["Enums"]["cardapio_descricao_caixa"]
           id?: number
           logo_path?: string | null
           logo_posicao?: Database["public"]["Enums"]["cardapio_logo_posicao"]
@@ -110,6 +112,7 @@ export type Database = {
           cor_fundo?: string
           cor_fundo_cabecalho?: string
           cor_texto_cabecalho?: string
+          descricao_caixa?: Database["public"]["Enums"]["cardapio_descricao_caixa"]
           id?: number
           logo_path?: string | null
           logo_posicao?: Database["public"]["Enums"]["cardapio_logo_posicao"]
@@ -522,6 +525,7 @@ export type Database = {
     }
     Enums: {
       cardapio_arredondamento: "nenhum" | "pequeno" | "medio" | "grande"
+      cardapio_descricao_caixa: "original" | "maiusculo" | "frase"
       cardapio_logo_posicao: "esquerda" | "centro" | "direita"
       cardapio_logo_tamanho: "pequeno" | "medio" | "grande"
       chamado_status: "pendente" | "aceito" | "cancelado"
@@ -660,6 +664,7 @@ export const Constants = {
   public: {
     Enums: {
       cardapio_arredondamento: ["nenhum", "pequeno", "medio", "grande"],
+      cardapio_descricao_caixa: ["original", "maiusculo", "frase"],
       cardapio_logo_posicao: ["esquerda", "centro", "direita"],
       cardapio_logo_tamanho: ["pequeno", "medio", "grande"],
       chamado_status: ["pendente", "aceito", "cancelado"],

@@ -8,7 +8,12 @@ import type {
   GrupoOpcoesPublico,
   ProdutoPublico,
 } from "@/lib/cardapio";
-import { LOGO_ALTURA_PX, RAIO_PX } from "@/lib/cardapio-tema";
+import {
+  type DescricaoCaixa,
+  formatarDescricao,
+  LOGO_ALTURA_PX,
+  RAIO_PX,
+} from "@/lib/cardapio-tema";
 import { formatarPreco } from "@/lib/formato";
 import { urlImagemProduto } from "@/lib/imagem";
 
@@ -75,11 +80,16 @@ function Precos({ produto }: { produto: ProdutoPublico }) {
 function ProdutoCard({
   produto,
   sombra,
+  descricaoCaixa,
 }: {
   produto: ProdutoPublico;
   sombra: boolean;
+  descricaoCaixa: DescricaoCaixa;
 }) {
   const img = urlImagemProduto(produto.imagem_path);
+  const descricao = produto.descricao
+    ? formatarDescricao(produto.descricao, descricaoCaixa)
+    : null;
   const serveAte =
     produto.modelo === "compartilhar" && produto.serve_ate ? (
       <p className="mt-0.5 text-xs text-muted-foreground">
@@ -96,8 +106,8 @@ function ProdutoCard({
           className="mx-auto aspect-square w-full max-w-56 sm:max-w-64"
         />
         <p className="mt-3 font-medium">{produto.nome}</p>
-        {produto.descricao ? (
-          <p className="text-sm text-muted-foreground">{produto.descricao}</p>
+        {descricao ? (
+          <p className="text-sm text-muted-foreground">{descricao}</p>
         ) : null}
         {serveAte}
         <div className="mt-1">
@@ -111,10 +121,8 @@ function ProdutoCard({
         ) : null}
         <div className="min-w-0 flex-1">
           <p className="font-medium">{produto.nome}</p>
-          {produto.descricao ? (
-            <p className="text-sm text-muted-foreground">
-              {produto.descricao}
-            </p>
+          {descricao ? (
+            <p className="text-sm text-muted-foreground">{descricao}</p>
           ) : null}
           {serveAte}
           <div className="mt-1.5">
@@ -193,7 +201,11 @@ export function CardapioPublico({
             ) : null}
           </div>
           {mesaIdentificador ? (
-            <span className="absolute top-1/2 right-4 shrink-0 -translate-y-1/2 text-sm opacity-70">
+            // Sem opacity: cor_texto_cabecalho já é a escolha do Administrador
+            // pra ter contraste com cor_fundo_cabecalho — baixar a opacidade
+            // aqui diluía esse contraste de novo, ficando ilegível quando as
+            // duas cores do cabeçalho eram tons próximos.
+            <span className="absolute top-1/2 right-4 shrink-0 -translate-y-1/2 text-sm font-medium">
               {mesaIdentificador}
             </span>
           ) : null}
@@ -229,7 +241,11 @@ export function CardapioPublico({
               <ul className="space-y-3">
                 {categoria.produtos.map((produto) => (
                   <li key={produto.id}>
-                    <ProdutoCard produto={produto} sombra={config.sombra} />
+                    <ProdutoCard
+                      produto={produto}
+                      sombra={config.sombra}
+                      descricaoCaixa={config.descricao_caixa}
+                    />
                   </li>
                 ))}
               </ul>

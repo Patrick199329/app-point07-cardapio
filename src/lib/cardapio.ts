@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import type {
   Arredondamento,
+  DescricaoCaixa,
   LogoPosicao,
   LogoTamanho,
 } from "@/lib/cardapio-tema";
@@ -21,6 +22,7 @@ export type CardapioConfig = {
   sombra: boolean;
   arredondamento: Arredondamento;
   categorias_centralizadas: boolean;
+  descricao_caixa: DescricaoCaixa;
   updated_at: string;
 };
 
@@ -77,6 +79,7 @@ const CONFIG_PADRAO: CardapioConfig = {
   sombra: true,
   arredondamento: "medio",
   categorias_centralizadas: false,
+  descricao_caixa: "original",
   updated_at: new Date(0).toISOString(),
 };
 

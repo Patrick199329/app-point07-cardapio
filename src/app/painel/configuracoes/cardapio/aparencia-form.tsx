@@ -13,6 +13,9 @@ import { Switch } from "@/components/ui/switch";
 import {
   ARREDONDAMENTO_LABEL,
   type Arredondamento,
+  DESCRICAO_CAIXA_LABEL,
+  type DescricaoCaixa,
+  formatarDescricao,
   LOGO_ALTURA_PX,
   LOGO_POSICAO_LABEL,
   LOGO_TAMANHO_LABEL,
@@ -39,6 +42,7 @@ export type AparenciaConfig = {
   sombra: boolean;
   arredondamento: Arredondamento;
   categorias_centralizadas: boolean;
+  descricao_caixa: DescricaoCaixa;
 };
 
 const INITIAL: AparenciaState = { error: null, ok: false };
@@ -113,6 +117,7 @@ function PreviaCardapio({
   sombra,
   arredondamento,
   categoriasCentralizadas,
+  descricaoCaixa,
 }: {
   nome: string;
   logoPreview: string | null;
@@ -129,6 +134,7 @@ function PreviaCardapio({
   sombra: boolean;
   arredondamento: Arredondamento;
   categoriasCentralizadas: boolean;
+  descricaoCaixa: DescricaoCaixa;
 }) {
   const raio = RAIO_PX[arredondamento];
   const mostrarNome = !logoPreview || mostrarNomeComLogo;
@@ -202,7 +208,10 @@ function PreviaCardapio({
             <div>
               <p className="font-medium">Produto de Exemplo</p>
               <p className="text-sm text-muted-foreground">
-                Descrição do produto
+                {formatarDescricao(
+                  "CONTRA FILE suculento, Macio com TEMPERO especial da casa",
+                  descricaoCaixa,
+                )}
               </p>
             </div>
             <p className="text-sm font-medium" style={{ color: corDestaque }}>
@@ -271,6 +280,9 @@ export function AparenciaForm({ config }: { config: AparenciaConfig }) {
   );
   const [categoriasCentralizadas, setCategoriasCentralizadas] = useState(
     config.categorias_centralizadas,
+  );
+  const [descricaoCaixa, setDescricaoCaixa] = useState<DescricaoCaixa>(
+    config.descricao_caixa,
   );
 
   const [state, formAction, pending] = useActionState(
@@ -475,6 +487,32 @@ export function AparenciaForm({ config }: { config: AparenciaConfig }) {
           onChange={setCategoriasCentralizadas}
         />
 
+        <div className="space-y-2">
+          <Label htmlFor="descricao_caixa">
+            Caixa da descrição dos produtos
+          </Label>
+          <NativeSelect
+            id="descricao_caixa"
+            name="descricao_caixa"
+            value={descricaoCaixa}
+            onChange={(e) =>
+              setDescricaoCaixa(e.target.value as DescricaoCaixa)
+            }
+            className={INPUT}
+          >
+            {Object.entries(DESCRICAO_CAIXA_LABEL).map(([valor, rotulo]) => (
+              <option key={valor} value={valor}>
+                {rotulo}
+              </option>
+            ))}
+          </NativeSelect>
+          <p className="text-xs text-muted-foreground">
+            Os dados migrados do WordPress vêm sem padrão (uns em CAIXA ALTA,
+            outros não). Isso só muda como aparece no cardápio público — o
+            texto salvo continua do jeito que foi cadastrado.
+          </p>
+        </div>
+
         {state.error ? (
           <p className="text-sm text-destructive" role="alert">
             {state.error}
@@ -506,6 +544,7 @@ export function AparenciaForm({ config }: { config: AparenciaConfig }) {
           sombra={sombra}
           arredondamento={arredondamento}
           categoriasCentralizadas={categoriasCentralizadas}
+          descricaoCaixa={descricaoCaixa}
         />
       </div>
     </div>

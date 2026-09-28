@@ -11,6 +11,7 @@ import type { Database } from "@/lib/types/database";
 type Arredondamento = Database["public"]["Enums"]["cardapio_arredondamento"];
 type LogoPosicao = Database["public"]["Enums"]["cardapio_logo_posicao"];
 type LogoTamanho = Database["public"]["Enums"]["cardapio_logo_tamanho"];
+type DescricaoCaixa = Database["public"]["Enums"]["cardapio_descricao_caixa"];
 
 const ARREDONDAMENTOS: Arredondamento[] = [
   "nenhum",
@@ -20,6 +21,7 @@ const ARREDONDAMENTOS: Arredondamento[] = [
 ];
 const LOGO_POSICOES: LogoPosicao[] = ["esquerda", "centro", "direita"];
 const LOGO_TAMANHOS: LogoTamanho[] = ["pequeno", "medio", "grande"];
+const DESCRICAO_CAIXAS: DescricaoCaixa[] = ["original", "maiusculo", "frase"];
 
 export type AparenciaState = { error: string | null; ok: boolean };
 
@@ -56,6 +58,9 @@ export async function salvarAparencia(
   const logo_tamanho = String(
     formData.get("logo_tamanho") ?? "medio",
   ) as LogoTamanho;
+  const descricao_caixa = String(
+    formData.get("descricao_caixa") ?? "original",
+  ) as DescricaoCaixa;
 
   if (!nome_estabelecimento) {
     return { error: "Informe o nome do estabelecimento.", ok: false };
@@ -81,6 +86,9 @@ export async function salvarAparencia(
   if (!LOGO_TAMANHOS.includes(logo_tamanho)) {
     return { error: "Tamanho da logo inválido.", ok: false };
   }
+  if (!DESCRICAO_CAIXAS.includes(descricao_caixa)) {
+    return { error: "Padrão de caixa da descrição inválido.", ok: false };
+  }
 
   const supabase = await createClient();
   const update: {
@@ -98,6 +106,7 @@ export async function salvarAparencia(
     arredondamento: Arredondamento;
     logo_posicao: LogoPosicao;
     logo_tamanho: LogoTamanho;
+    descricao_caixa: DescricaoCaixa;
     logo_path?: string | null;
   } = {
     nome_estabelecimento,
@@ -114,6 +123,7 @@ export async function salvarAparencia(
     arredondamento,
     logo_posicao,
     logo_tamanho,
+    descricao_caixa,
   };
 
   if (formData.get("remover_logo") === "true") {
