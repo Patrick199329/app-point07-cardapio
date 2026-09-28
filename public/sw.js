@@ -37,16 +37,30 @@ self.addEventListener("push", (event) => {
 
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  const { chamadoId } = event.notification.data ?? {};
+  const { mesa, chamadoId } = event.notification.data ?? {};
 
   if (event.action === "aceitar" && chamadoId) {
+    // Aceita direto da notificação, sem abrir nada — só cai pra fila se der
+    // errado (outro garçom já aceitou, sessão expirada etc.), pro garçom ver
+    // o que aconteceu e agir na mão.
     event.waitUntil(
       fetch("/api/chamados/aceitar", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ chamadoId }),
-      }).then(() => self.clients.openWindow("/fila")),
+      })
+        .then((res) => res.json().catch(() => ({ ok: false })))
+        .then((resultado) =>
+          resultado.ok
+            ? self.registration.showNotification(`${mesa ?? "Mesa"} — aceito`, {
+                body: "Chamado aceito. Pode ir até a mesa.",
+                icon: "/marca/logo-point07-preta.png",
+                tag: chamadoId,
+              })
+            : self.clients.openWindow("/fila"),
+        )
+        .catch(() => self.clients.openWindow("/fila")),
     );
     return;
   }

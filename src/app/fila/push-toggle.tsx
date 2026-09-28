@@ -6,7 +6,8 @@ import { Bell, BellOff, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
-import { removerInscricaoPush, salvarInscricaoPush } from "./push-actions";
+import { desinscreverPushAtual } from "./push-cliente";
+import { salvarInscricaoPush } from "./push-actions";
 
 function urlBase64ToUint8Array(base64: string) {
   const padding = "=".repeat((4 - (base64.length % 4)) % 4);
@@ -80,12 +81,7 @@ export function PushToggle() {
   async function desativar() {
     setEstado("carregando");
     try {
-      const registration = await navigator.serviceWorker.getRegistration("/sw.js");
-      const sub = await registration?.pushManager.getSubscription();
-      if (sub) {
-        await removerInscricaoPush(sub.endpoint);
-        await sub.unsubscribe();
-      }
+      await desinscreverPushAtual();
     } finally {
       setEstado("inativo");
     }
