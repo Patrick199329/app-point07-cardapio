@@ -124,11 +124,6 @@ export function ChamarGarcomButton({
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-40 flex flex-col items-center">
-      {avisos && avisos.length > 0 ? (
-        <div className="w-full overflow-x-auto border-t bg-background/95 px-4 py-1.5 text-center text-[11px] whitespace-nowrap text-[#5a5a5a] backdrop-blur">
-          {avisos.map((a) => a.texto).join("  •  ")}
-        </div>
-      ) : null}
       <div className="flex w-full justify-center p-4">
         <div className="pointer-events-auto w-full max-w-md rounded-2xl border bg-background/95 p-3 shadow-lg backdrop-blur">
           {!mesaToken ? (
@@ -174,6 +169,12 @@ export function ChamarGarcomButton({
           )}
         </div>
       </div>
+
+      {avisos && avisos.length > 0 ? (
+        <div className="w-full overflow-x-auto border-t bg-background/95 px-4 pt-1.5 pb-2 text-center text-[11px] whitespace-nowrap text-[#5a5a5a] backdrop-blur">
+          {avisos.map((a) => a.texto).join("  •  ")}
+        </div>
+      ) : null}
     </div>
   );
 }
