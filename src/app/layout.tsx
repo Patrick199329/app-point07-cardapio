@@ -18,6 +18,17 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Point07",
   description: "Plataforma de cardápio digital e atendimento de salão — Point07",
+  // appleWebApp: sem isso, "Adicionar à Tela de Início" no iPhone abre num
+  // navegador comum (com barra de endereço) em vez de tela cheia — e o Web
+  // Push da Apple exige o app rodando nesse modo "standalone".
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Point07",
+  },
+  icons: {
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
