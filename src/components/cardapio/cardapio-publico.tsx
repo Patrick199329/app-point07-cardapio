@@ -3,6 +3,7 @@ import type { CSSProperties } from "react";
 import { ChamarGarcomButton } from "@/app/cardapio/chamar-garcom-button";
 import { CategoriaNav } from "@/components/cardapio/categoria-nav";
 import { ImagemProduto } from "@/components/cardapio/imagem-produto";
+import { VoltarAoTopo } from "@/components/cardapio/voltar-ao-topo";
 import type {
   CardapioPublicoData,
   GrupoOpcoesPublico,
@@ -187,7 +188,7 @@ export function CardapioPublico({
 
   return (
     <div
-      className="mx-auto min-h-svh w-full max-w-2xl bg-[var(--cardapio-fundo)] pb-28"
+      className="mx-auto min-h-svh w-full max-w-2xl bg-[var(--cardapio-fundo)] pb-32"
       style={vars}
     >
       <header className="sticky top-0 z-30 border-b bg-[var(--cardapio-cabecalho)] text-[var(--cardapio-texto-cabecalho)]">
@@ -262,20 +263,15 @@ export function CardapioPublico({
             ))}
           </div>
         )}
-
-        {avisos.length > 0 ? (
-          <div className="mt-2 space-y-1 border-t bg-muted/40 px-4 py-5 text-sm text-[#5a5a5a]">
-            {avisos.map((aviso) => (
-              <p key={aviso.id}>{aviso.texto}</p>
-            ))}
-          </div>
-        ) : null}
       </main>
+
+      <VoltarAoTopo />
 
       <ChamarGarcomButton
         mesaToken={mesaToken}
         mesaIdentificador={mesaIdentificador}
         corDestaque={config.cor_destaque}
+        avisos={avisos}
       />
     </div>
   );

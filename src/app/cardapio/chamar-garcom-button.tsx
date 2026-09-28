@@ -21,11 +21,18 @@ export function ChamarGarcomButton({
   mesaToken,
   mesaIdentificador,
   corDestaque,
+  avisos,
 }: {
   mesaToken: string | null;
   mesaIdentificador?: string;
   /** Cor de marca (`cardapio_config.cor_destaque`) — mesma usada no resto do cardápio. */
   corDestaque?: string;
+  /**
+   * Avisos (taxa de embalagem, couvert etc.) — fixos junto com este botão em
+   * vez de só no fim da rolagem, porque o cliente raramente rola até lá
+   * antes de pedir. Texto pequeno de propósito, pra não tomar espaço da tela.
+   */
+  avisos?: { id: string; texto: string }[];
 }) {
   const supabase = useMemo(() => createClient(), []);
   const [estado, setEstado] = useState<Estado>("idle");
@@ -116,49 +123,56 @@ export function ChamarGarcomButton({
   }, [supabase]);
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 flex justify-center p-4">
-      <div className="pointer-events-auto w-full max-w-md rounded-2xl border bg-background/95 p-3 shadow-lg backdrop-blur">
-        {!mesaToken ? (
-          <p className="px-1 py-2 text-center text-sm text-muted-foreground">
-            Escaneie o QR code da sua mesa para chamar o garçom pelo app.
-          </p>
-        ) : estado === "pendente" ? (
-          <div className="flex items-center justify-between gap-3">
-            <p className="flex items-center gap-2 text-sm font-medium">
-              <BellRing className="size-4" style={{ color: corDestaque }} />
-              Garçom chamado — já vem!
+    <div className="fixed inset-x-0 bottom-0 z-40 flex flex-col items-center">
+      {avisos && avisos.length > 0 ? (
+        <div className="w-full overflow-x-auto border-t bg-background/95 px-4 py-1.5 text-center text-[11px] whitespace-nowrap text-[#5a5a5a] backdrop-blur">
+          {avisos.map((a) => a.texto).join("  •  ")}
+        </div>
+      ) : null}
+      <div className="flex w-full justify-center p-4">
+        <div className="pointer-events-auto w-full max-w-md rounded-2xl border bg-background/95 p-3 shadow-lg backdrop-blur">
+          {!mesaToken ? (
+            <p className="px-1 py-2 text-center text-sm text-muted-foreground">
+              Escaneie o QR code da sua mesa para chamar o garçom pelo app.
             </p>
-            <Button variant="ghost" size="sm" onClick={cancelar}>
-              Cancelar
-            </Button>
-          </div>
-        ) : estado === "aceito" ? (
-          <p className="flex items-center justify-center gap-2 py-2 text-sm font-medium">
-            <Check className="size-4" style={{ color: corDestaque }} />
-            {garcom ? `${garcom} está a caminho` : "Um garçom está a caminho"} 🎉
-          </p>
-        ) : (
-          <>
-            <Button
-              className="h-12 w-full rounded-xl text-base"
-              style={corDestaque ? { backgroundColor: corDestaque, color: "#fff" } : undefined}
-              onClick={chamar}
-              disabled={estado === "enviando"}
-            >
-              {estado === "enviando" ? (
-                <Loader2 className="size-5 animate-spin" />
-              ) : (
-                <BellRing className="size-5" />
-              )}
-              {estado === "enviando" ? "Chamando…" : "Chamar garçom"}
-            </Button>
-            {estado === "erro" ? (
-              <p className="mt-2 text-center text-sm text-destructive">
-                Não foi possível chamar agora. Tente de novo.
+          ) : estado === "pendente" ? (
+            <div className="flex items-center justify-between gap-3">
+              <p className="flex items-center gap-2 text-sm font-medium">
+                <BellRing className="size-4" style={{ color: corDestaque }} />
+                Garçom chamado — já vem!
               </p>
-            ) : null}
-          </>
-        )}
+              <Button variant="ghost" size="sm" onClick={cancelar}>
+                Cancelar
+              </Button>
+            </div>
+          ) : estado === "aceito" ? (
+            <p className="flex items-center justify-center gap-2 py-2 text-sm font-medium">
+              <Check className="size-4" style={{ color: corDestaque }} />
+              {garcom ? `${garcom} está a caminho` : "Um garçom está a caminho"} 🎉
+            </p>
+          ) : (
+            <>
+              <Button
+                className="h-12 w-full rounded-xl text-base"
+                style={corDestaque ? { backgroundColor: corDestaque, color: "#fff" } : undefined}
+                onClick={chamar}
+                disabled={estado === "enviando"}
+              >
+                {estado === "enviando" ? (
+                  <Loader2 className="size-5 animate-spin" />
+                ) : (
+                  <BellRing className="size-5" />
+                )}
+                {estado === "enviando" ? "Chamando…" : "Chamar garçom"}
+              </Button>
+              {estado === "erro" ? (
+                <p className="mt-2 text-center text-sm text-destructive">
+                  Não foi possível chamar agora. Tente de novo.
+                </p>
+              ) : null}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
