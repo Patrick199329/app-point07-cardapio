@@ -14,7 +14,10 @@ export const config = {
      * Todas as rotas, exceto:
      * - _next/static, _next/image (assets internos do Next)
      * - favicon.ico e arquivos de imagem estáticos
+     * - sw.js e manifest.webmanifest (bônus de push — PWA/service worker
+     *   precisam ser sempre acessíveis sem sessão; um 307 pro /login no
+     *   lugar do JS/manifest de verdade quebra a instalação e o push)
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|sw\\.js|manifest\\.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };
