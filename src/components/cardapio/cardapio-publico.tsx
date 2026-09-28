@@ -17,6 +17,14 @@ import {
 import { formatarPreco } from "@/lib/formato";
 import { urlImagemProduto } from "@/lib/imagem";
 
+// `text-[#5a5a5a]` em vez de `text-muted-foreground` (cinza padrão do tema,
+// shadcn) em todo texto secundário desta página: o cinza padrão só passa
+// ~3,9-4,5:1 de contraste contra os fundos configuráveis do cardápio
+// (cor_fundo/cor_bloco), abaixo dos 4,5:1 exigidos pelo WCAG AA — achado
+// rodando Lighthouse contra produção (28/09). Como essas cores de fundo são
+// escolhidas livremente pelo Administrador, um cinza fixo mais escuro é mais
+// seguro do que o token do tema (pensado pra fundo branco puro).
+
 /**
  * Grupos de opções são só informativos — o cliente lê pra saber o que pedir
  * verbalmente com o garçom, sem seleção nem total calculado (o cardápio é
@@ -44,7 +52,7 @@ function GruposOpcoes({ grupos }: { grupos: GrupoOpcoesPublico[] }) {
             </div>
           ) : null}
           {grupo.observacao ? (
-            <p className="mt-1 text-xs text-muted-foreground">
+            <p className="mt-1 text-xs text-[#5a5a5a]">
               {grupo.observacao}
             </p>
           ) : null}
@@ -60,11 +68,11 @@ function Precos({ produto }: { produto: ProdutoPublico }) {
     return (
       <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-sm tabular-nums">
         <span>
-          <span className="text-muted-foreground">{produto.preco_medio_label} </span>
+          <span className="text-[#5a5a5a]">{produto.preco_medio_label} </span>
           <span className={preco}>{formatarPreco(produto.preco_medio)}</span>
         </span>
         <span>
-          <span className="text-muted-foreground">{produto.preco_grande_label} </span>
+          <span className="text-[#5a5a5a]">{produto.preco_grande_label} </span>
           <span className={preco}>{formatarPreco(produto.preco_grande)}</span>
         </span>
       </div>
@@ -92,7 +100,7 @@ function ProdutoCard({
     : null;
   const serveAte =
     produto.modelo === "compartilhar" && produto.serve_ate ? (
-      <p className="mt-0.5 text-xs text-muted-foreground">
+      <p className="mt-0.5 text-xs text-[#5a5a5a]">
         Serve até {produto.serve_ate} pessoas
       </p>
     ) : null;
@@ -107,7 +115,7 @@ function ProdutoCard({
         />
         <p className="mt-3 font-medium">{produto.nome}</p>
         {descricao ? (
-          <p className="text-sm text-muted-foreground">{descricao}</p>
+          <p className="text-sm text-[#5a5a5a]">{descricao}</p>
         ) : null}
         {serveAte}
         <div className="mt-1">
@@ -122,7 +130,7 @@ function ProdutoCard({
         <div className="min-w-0 flex-1">
           <p className="font-medium">{produto.nome}</p>
           {descricao ? (
-            <p className="text-sm text-muted-foreground">{descricao}</p>
+            <p className="text-sm text-[#5a5a5a]">{descricao}</p>
           ) : null}
           {serveAte}
           <div className="mt-1.5">
@@ -219,7 +227,7 @@ export function CardapioPublico({
 
       <main>
         {categorias.length === 0 ? (
-          <p className="px-4 py-16 text-center text-sm text-muted-foreground">
+          <p className="px-4 py-16 text-center text-sm text-[#5a5a5a]">
             O cardápio está sendo atualizado. Volte em instantes.
           </p>
         ) : (
@@ -256,7 +264,7 @@ export function CardapioPublico({
         )}
 
         {avisos.length > 0 ? (
-          <div className="mt-2 space-y-1 border-t bg-muted/40 px-4 py-5 text-sm text-muted-foreground">
+          <div className="mt-2 space-y-1 border-t bg-muted/40 px-4 py-5 text-sm text-[#5a5a5a]">
             {avisos.map((aviso) => (
               <p key={aviso.id}>{aviso.texto}</p>
             ))}
