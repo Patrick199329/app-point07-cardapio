@@ -104,7 +104,6 @@ function ProdutoCard({
           src={img}
           alt={produto.nome}
           className="mx-auto aspect-square w-full max-w-56 sm:max-w-64"
-          sizes="(min-width: 640px) 256px, 224px"
         />
         <p className="mt-3 font-medium">{produto.nome}</p>
         {descricao ? (
