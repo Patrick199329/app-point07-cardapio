@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import type {
   Arredondamento,
   DescricaoCaixa,
@@ -91,7 +91,7 @@ const CONFIG_PADRAO: CardapioConfig = {
  * produtos ativos são descartadas.
  */
 export async function carregarCardapioPublico(): Promise<CardapioPublicoData> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   const [{ data: categoriasRaw }, { data: avisos }, { data: config }] =
     await Promise.all([

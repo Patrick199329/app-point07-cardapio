@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import Image from "next/image";
+
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
@@ -9,15 +11,26 @@ import { cn } from "@/lib/utils";
  * Foto de produto do cardápio público. Clicável em ambos os layouts
  * (miniatura/grande) — amplia num diálogo simples, sem esticar o layout do
  * card nem depender de lib de galeria.
+ *
+ * A miniatura usa next/image (`fill`) pra baixar só o tamanho de exibição
+ * real — as fotos são salvas com até 1280px de largura (src/lib/imagem.ts),
+ * bem mais que os ~64px de uma miniatura; o otimizador da Vercel resolve
+ * isso sem precisar do plano pago de transformação de imagem do Supabase.
+ * O diálogo ampliado continua com `<img>` simples: o tamanho de exibição ali
+ * depende da proporção da foto, que só se sabe depois de carregada — não dá
+ * pra usar `fill` sem já saber as dimensões.
  */
 export function ImagemProduto({
   src,
   alt,
   className,
+  sizes = "64px",
 }: {
   src: string;
   alt: string;
   className?: string;
+  /** Repassado pro next/image — a largura real de exibição neste contexto. */
+  sizes?: string;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -27,14 +40,14 @@ export function ImagemProduto({
         type="button"
         onClick={() => setOpen(true)}
         aria-label={`Ampliar foto${alt ? ` de ${alt}` : ""}`}
-        className={cn("block shrink-0 cursor-zoom-in", className)}
+        className={cn("relative block shrink-0 cursor-zoom-in", className)}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={src}
           alt={alt}
-          loading="lazy"
-          className="size-full rounded-lg border object-cover"
+          fill
+          sizes={sizes}
+          className="rounded-lg border object-cover"
         />
       </button>
 

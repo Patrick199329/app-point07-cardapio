@@ -104,6 +104,7 @@ function ProdutoCard({
           src={img}
           alt={produto.nome}
           className="mx-auto aspect-square w-full max-w-56 sm:max-w-64"
+          sizes="(min-width: 640px) 256px, 224px"
         />
         <p className="mt-3 font-medium">{produto.nome}</p>
         {descricao ? (
@@ -217,50 +218,52 @@ export function CardapioPublico({
         ) : null}
       </header>
 
-      {categorias.length === 0 ? (
-        <p className="px-4 py-16 text-center text-sm text-muted-foreground">
-          O cardápio está sendo atualizado. Volte em instantes.
-        </p>
-      ) : (
-        <div className="space-y-6 px-4 py-5">
-          {categorias.map((categoria) => (
-            <section
-              key={categoria.id}
-              id={`cat-${categoria.id}`}
-              className="scroll-mt-28"
-            >
-              <h2
-                className={
-                  config.categorias_centralizadas
-                    ? "mb-3 text-center text-xl font-bold"
-                    : "mb-3 text-base font-semibold"
-                }
+      <main>
+        {categorias.length === 0 ? (
+          <p className="px-4 py-16 text-center text-sm text-muted-foreground">
+            O cardápio está sendo atualizado. Volte em instantes.
+          </p>
+        ) : (
+          <div className="space-y-6 px-4 py-5">
+            {categorias.map((categoria) => (
+              <section
+                key={categoria.id}
+                id={`cat-${categoria.id}`}
+                className="scroll-mt-28"
               >
-                {categoria.nome}
-              </h2>
-              <ul className="space-y-3">
-                {categoria.produtos.map((produto) => (
-                  <li key={produto.id}>
-                    <ProdutoCard
-                      produto={produto}
-                      sombra={config.sombra}
-                      descricaoCaixa={config.descricao_caixa}
-                    />
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ))}
-        </div>
-      )}
+                <h2
+                  className={
+                    config.categorias_centralizadas
+                      ? "mb-3 text-center text-xl font-bold"
+                      : "mb-3 text-base font-semibold"
+                  }
+                >
+                  {categoria.nome}
+                </h2>
+                <ul className="space-y-3">
+                  {categoria.produtos.map((produto) => (
+                    <li key={produto.id}>
+                      <ProdutoCard
+                        produto={produto}
+                        sombra={config.sombra}
+                        descricaoCaixa={config.descricao_caixa}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ))}
+          </div>
+        )}
 
-      {avisos.length > 0 ? (
-        <div className="mt-2 space-y-1 border-t bg-muted/40 px-4 py-5 text-sm text-muted-foreground">
-          {avisos.map((aviso) => (
-            <p key={aviso.id}>{aviso.texto}</p>
-          ))}
-        </div>
-      ) : null}
+        {avisos.length > 0 ? (
+          <div className="mt-2 space-y-1 border-t bg-muted/40 px-4 py-5 text-sm text-muted-foreground">
+            {avisos.map((aviso) => (
+              <p key={aviso.id}>{aviso.texto}</p>
+            ))}
+          </div>
+        ) : null}
+      </main>
 
       <ChamarGarcomButton
         mesaToken={mesaToken}

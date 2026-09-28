@@ -17,7 +17,8 @@ export const config = {
      * - sw.js e manifest.webmanifest (bônus de push — PWA/service worker
      *   precisam ser sempre acessíveis sem sessão; um 307 pro /login no
      *   lugar do JS/manifest de verdade quebra a instalação e o push)
+     * - robots.txt (metadata pública — ver src/app/robots.ts; mesmo motivo)
      */
-    "/((?!_next/static|_next/image|favicon.ico|sw\\.js|manifest\\.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|sw\\.js|manifest\\.webmanifest|robots\\.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };
