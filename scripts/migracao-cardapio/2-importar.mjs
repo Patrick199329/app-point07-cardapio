@@ -10,6 +10,8 @@
 // categoria e atualiza em vez de inserir de novo.
 //
 // Rode com: node scripts/migracao-cardapio/2-importar.mjs
+// Pra apontar pra outro ambiente (ex.: produção): node 2-importar.mjs --env=.env.production.local
+// (esse .env.production.local é gitignored — nunca commitar).
 
 import { createClient } from "@supabase/supabase-js";
 import { readFileSync } from "node:fs";
@@ -23,7 +25,9 @@ const BUCKET = "cardapio";
 const LARGURA_MAX = 1280;
 
 function lerEnvLocal() {
-  const envPath = path.join(__dirname, "../../.env.local");
+  const arg = process.argv.find((a) => a.startsWith("--env="));
+  const nomeArquivo = arg ? arg.slice("--env=".length) : ".env.local";
+  const envPath = path.join(__dirname, "../..", nomeArquivo);
   const env = {};
   for (const linha of readFileSync(envPath, "utf-8").split("\n")) {
     const m = linha.match(/^([A-Z0-9_]+)=(.*)$/);
