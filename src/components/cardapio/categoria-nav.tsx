@@ -1,6 +1,12 @@
 "use client";
 
-import { type MouseEvent, useEffect, useRef, useState } from "react";
+import {
+  type CSSProperties,
+  type MouseEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 /**
  * Navegação de categorias do cabeçalho do cardápio público. Rolagem suave ao
@@ -48,17 +54,25 @@ export function CategoriaNav({
 
   function irParaCategoria(event: MouseEvent<HTMLAnchorElement>, id: string) {
     event.preventDefault();
-    document
-      .getElementById(`cat-${id}`)
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    document.dispatchEvent(
+      new CustomEvent("cardapio:abrir-categoria", { detail: { id } }),
+    );
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        document
+          .getElementById(`cat-${id}`)
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
   }
 
   return (
     <nav
       ref={navRef}
-      className="flex gap-2 overflow-x-auto scroll-smooth px-4 pb-3"
+      aria-label="Categorias do cardápio"
+      className="cardapio-categorias-nav flex snap-x gap-2 overflow-x-auto scroll-smooth px-4 pb-3"
     >
-      {categorias.map((c) => {
+      {categorias.map((c, indice) => {
         const destacada = ativa === c.id;
         return (
           <a
@@ -67,9 +81,10 @@ export function CategoriaNav({
             href={`#cat-${c.id}`}
             onClick={(e) => irParaCategoria(e, c.id)}
             aria-current={destacada ? "true" : undefined}
-            className={`shrink-0 rounded-full border px-3 py-1 text-sm transition-all duration-200 ease-out active:scale-95 ${
+            style={{ "--categoria-indice": indice } as CSSProperties}
+            className={`cardapio-categoria-chip shrink-0 snap-center rounded-full border px-3 py-1 text-sm transition-[background-color,border-color,box-shadow,color,opacity,transform] duration-200 ease-out active:scale-95 ${
               destacada
-                ? "border-[var(--cardapio-destaque)] bg-[var(--cardapio-categoria-nav-fundo-ativa)] font-medium text-[var(--cardapio-destaque)] opacity-100"
+                ? "-translate-y-0.5 border-[var(--cardapio-destaque)] bg-[var(--cardapio-categoria-nav-fundo-ativa)] font-medium text-[var(--cardapio-destaque)] opacity-100 shadow-[0_5px_14px_color-mix(in_srgb,var(--cardapio-destaque)_24%,transparent)]"
                 : "border-current bg-[var(--cardapio-categoria-nav-fundo)] opacity-70"
             }`}
           >

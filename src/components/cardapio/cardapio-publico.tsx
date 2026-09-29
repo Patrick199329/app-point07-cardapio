@@ -1,8 +1,10 @@
 import type { CSSProperties } from "react";
 
 import { ChamarGarcomButton } from "@/app/cardapio/chamar-garcom-button";
+import { CategoriaExpansivel } from "@/components/cardapio/categoria-expansivel";
 import { CategoriaNav } from "@/components/cardapio/categoria-nav";
 import { ImagemProduto } from "@/components/cardapio/imagem-produto";
+import { RevelarAoRolar } from "@/components/cardapio/revelar-ao-rolar";
 import { VoltarAoTopo } from "@/components/cardapio/voltar-ao-topo";
 import type {
   CardapioPublicoData,
@@ -233,34 +235,60 @@ export function CardapioPublico({
           </p>
         ) : (
           <div className="space-y-6 px-4 py-5">
-            {categorias.map((categoria) => (
-              <section
-                key={categoria.id}
-                id={`cat-${categoria.id}`}
-                className="scroll-mt-28"
-              >
-                <h2
-                  className={
-                    config.categorias_centralizadas
-                      ? "mb-3 text-center text-xl font-bold"
-                      : "mb-3 text-base font-semibold"
-                  }
+            {categorias.map((categoria) =>
+              config.agrupar_categorias ? (
+                <CategoriaExpansivel
+                  key={categoria.id}
+                  id={categoria.id}
+                  nome={categoria.nome}
+                  abertaInicialmente={categoria.id === categorias[0]?.id}
+                  centralizada={config.categorias_centralizadas}
                 >
-                  {categoria.nome}
-                </h2>
-                <ul className="space-y-3">
-                  {categoria.produtos.map((produto) => (
-                    <li key={produto.id}>
-                      <ProdutoCard
-                        produto={produto}
-                        sombra={config.sombra}
-                        descricaoCaixa={config.descricao_caixa}
-                      />
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            ))}
+                  <ul className="space-y-3">
+                    {categoria.produtos.map((produto, indice) => (
+                      <li key={produto.id}>
+                        <RevelarAoRolar atraso={(indice % 4) * 55}>
+                          <ProdutoCard
+                            produto={produto}
+                            sombra={config.sombra}
+                            descricaoCaixa={config.descricao_caixa}
+                          />
+                        </RevelarAoRolar>
+                      </li>
+                    ))}
+                  </ul>
+                </CategoriaExpansivel>
+              ) : (
+                <section
+                  key={categoria.id}
+                  id={`cat-${categoria.id}`}
+                  className="scroll-mt-28"
+                >
+                  <h2
+                    className={
+                      config.categorias_centralizadas
+                        ? "mb-3 text-center text-xl font-bold"
+                        : "mb-3 text-base font-semibold"
+                    }
+                  >
+                    {categoria.nome}
+                  </h2>
+                  <ul className="space-y-3">
+                    {categoria.produtos.map((produto, indice) => (
+                      <li key={produto.id}>
+                        <RevelarAoRolar atraso={(indice % 4) * 55}>
+                          <ProdutoCard
+                            produto={produto}
+                            sombra={config.sombra}
+                            descricaoCaixa={config.descricao_caixa}
+                          />
+                        </RevelarAoRolar>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )
+            )}
           </div>
         )}
       </main>

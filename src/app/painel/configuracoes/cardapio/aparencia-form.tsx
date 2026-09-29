@@ -42,6 +42,7 @@ export type AparenciaConfig = {
   sombra: boolean;
   arredondamento: Arredondamento;
   categorias_centralizadas: boolean;
+  agrupar_categorias: boolean;
   descricao_caixa: DescricaoCaixa;
 };
 
@@ -117,6 +118,7 @@ function PreviaCardapio({
   sombra,
   arredondamento,
   categoriasCentralizadas,
+  agruparCategorias,
   descricaoCaixa,
 }: {
   nome: string;
@@ -134,6 +136,7 @@ function PreviaCardapio({
   sombra: boolean;
   arredondamento: Arredondamento;
   categoriasCentralizadas: boolean;
+  agruparCategorias: boolean;
   descricaoCaixa: DescricaoCaixa;
 }) {
   const raio = RAIO_PX[arredondamento];
@@ -146,6 +149,51 @@ function PreviaCardapio({
       : logoPosicao === "direita"
         ? "justify-end"
         : "justify-start";
+  const tituloCategoria = (
+    <span
+      className={
+        categoriasCentralizadas
+          ? "w-full text-center text-lg font-bold"
+          : "text-sm font-semibold"
+      }
+    >
+      Categoria de Exemplo
+    </span>
+  );
+  const produtoExemplo = (
+    <div
+      style={{ backgroundColor: corBloco, borderRadius: raio }}
+      className={`p-3 ${sombra ? "shadow-md" : ""}`}
+    >
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="font-medium">Produto de Exemplo</p>
+          <p className="text-sm text-muted-foreground">
+            {formatarDescricao(
+              "CONTRA FILE suculento, Macio com TEMPERO especial da casa",
+              descricaoCaixa,
+            )}
+          </p>
+        </div>
+        <p className="text-sm font-medium" style={{ color: corDestaque }}>
+          R$ 29,90
+        </p>
+      </div>
+      <div className="mt-2 space-y-1 border-t pt-2">
+        <p className="text-xs font-semibold" style={{ color: corDestaque }}>
+          Escolha 1 Opção
+        </p>
+        <div className="mt-1 flex gap-1.5">
+          <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs">
+            Opção A
+          </span>
+          <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs">
+            Opção B
+          </span>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="overflow-hidden rounded-lg border">
@@ -191,47 +239,22 @@ function PreviaCardapio({
         ))}
       </div>
       <div style={{ backgroundColor: corFundo }} className="space-y-3 p-3">
-        <p
-          className={
-            categoriasCentralizadas
-              ? "text-center text-lg font-bold"
-              : "text-sm font-semibold"
-          }
-        >
-          Categoria de Exemplo
-        </p>
-        <div
-          style={{ backgroundColor: corBloco, borderRadius: raio }}
-          className={`p-3 ${sombra ? "shadow-md" : ""}`}
-        >
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="font-medium">Produto de Exemplo</p>
-              <p className="text-sm text-muted-foreground">
-                {formatarDescricao(
-                  "CONTRA FILE suculento, Macio com TEMPERO especial da casa",
-                  descricaoCaixa,
-                )}
-              </p>
-            </div>
-            <p className="text-sm font-medium" style={{ color: corDestaque }}>
-              R$ 29,90
-            </p>
-          </div>
-          <div className="mt-2 space-y-1 border-t pt-2">
-            <p className="text-xs font-semibold" style={{ color: corDestaque }}>
-              Escolha 1 Opção
-            </p>
-            <div className="mt-1 flex gap-1.5">
-              <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs">
-                Opção A
+        {agruparCategorias ? (
+          <details key="agrupado" open>
+            <summary className="flex cursor-pointer list-none items-center justify-between rounded-lg bg-white/70 px-3 py-2 shadow-sm">
+              {tituloCategoria}
+              <span aria-hidden="true" style={{ color: corDestaque }}>
+                ⌄
               </span>
-              <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs">
-                Opção B
-              </span>
-            </div>
-          </div>
-        </div>
+            </summary>
+            <div className="mt-3">{produtoExemplo}</div>
+          </details>
+        ) : (
+          <>
+            <p>{tituloCategoria}</p>
+            {produtoExemplo}
+          </>
+        )}
         <button
           type="button"
           tabIndex={-1}
@@ -281,6 +304,9 @@ export function AparenciaForm({ config }: { config: AparenciaConfig }) {
   const [categoriasCentralizadas, setCategoriasCentralizadas] = useState(
     config.categorias_centralizadas,
   );
+  const [agruparCategorias, setAgruparCategorias] = useState(
+    config.agrupar_categorias,
+  );
   const [descricaoCaixa, setDescricaoCaixa] = useState<DescricaoCaixa>(
     config.descricao_caixa,
   );
@@ -314,6 +340,11 @@ export function AparenciaForm({ config }: { config: AparenciaConfig }) {
           type="hidden"
           name="categorias_centralizadas"
           value={categoriasCentralizadas ? "true" : "false"}
+        />
+        <input
+          type="hidden"
+          name="agrupar_categorias"
+          value={agruparCategorias ? "true" : "false"}
         />
         <input
           type="hidden"
@@ -487,6 +518,14 @@ export function AparenciaForm({ config }: { config: AparenciaConfig }) {
           onChange={setCategoriasCentralizadas}
         />
 
+        <ToggleField
+          id="agrupar_categorias_switch"
+          label="Agrupar itens por categoria"
+          hint="Exibe cada categoria como um bloco que abre e fecha ao tocar no nome."
+          checked={agruparCategorias}
+          onChange={setAgruparCategorias}
+        />
+
         <div className="space-y-2">
           <Label htmlFor="descricao_caixa">
             Caixa da descrição dos produtos
@@ -544,6 +583,7 @@ export function AparenciaForm({ config }: { config: AparenciaConfig }) {
           sombra={sombra}
           arredondamento={arredondamento}
           categoriasCentralizadas={categoriasCentralizadas}
+          agruparCategorias={agruparCategorias}
           descricaoCaixa={descricaoCaixa}
         />
       </div>

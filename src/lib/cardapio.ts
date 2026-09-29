@@ -22,6 +22,7 @@ export type CardapioConfig = {
   sombra: boolean;
   arredondamento: Arredondamento;
   categorias_centralizadas: boolean;
+  agrupar_categorias: boolean;
   descricao_caixa: DescricaoCaixa;
   updated_at: string;
 };
@@ -79,6 +80,7 @@ const CONFIG_PADRAO: CardapioConfig = {
   sombra: true,
   arredondamento: "medio",
   categorias_centralizadas: false,
+  agrupar_categorias: false,
   descricao_caixa: "original",
   updated_at: new Date(0).toISOString(),
 };
