@@ -16,12 +16,6 @@ import { Button } from "@/components/ui/button";
 import { LeitorQr } from "@/components/cardapio/leitor-qr";
 import { cn } from "@/lib/utils";
 
-// Depois desse tempo com a aba escondida/sem uso, na volta perguntamos se o
-// cliente ainda está na mesma mesa antes de liberar o "Chamar garçom" de
-// novo. Curto o bastante pra pegar quem foi embora e outro grupo sentou;
-// longo o bastante pra não incomodar quem só trocou de aba rapidinho.
-const LIMITE_INATIVIDADE_MS = 15 * 60 * 1000;
-
 /**
  * QR code é fixo (impresso na mesa) — nada impede o cliente de deixar o app
  * aberto, sair, e outra pessoa/grupo ocupar a mesma mesa depois. Sem isso, o
@@ -40,9 +34,12 @@ const LIMITE_INATIVIDADE_MS = 15 * 60 * 1000;
  */
 export function ConfirmarMesa({
   mesaIdentificador,
+  confirmarAposMinutos,
   className,
 }: {
   mesaIdentificador: string;
+  /** `cardapio_config.mesa_confirmar_apos_minutos` — configurável pelo Administrador. */
+  confirmarAposMinutos: number;
   className?: string;
 }) {
   const [perguntar, setPerguntar] = useState(false);
@@ -50,6 +47,7 @@ export function ConfirmarMesa({
   const escondidoDesdeRef = useRef<number | null>(null);
 
   useEffect(() => {
+    const limiteMs = confirmarAposMinutos * 60 * 1000;
     function aoMudarVisibilidade() {
       if (document.visibilityState === "hidden") {
         escondidoDesdeRef.current = Date.now();
@@ -57,13 +55,13 @@ export function ConfirmarMesa({
       }
       const desde = escondidoDesdeRef.current;
       escondidoDesdeRef.current = null;
-      if (desde && Date.now() - desde >= LIMITE_INATIVIDADE_MS) {
+      if (desde && Date.now() - desde >= limiteMs) {
         setPerguntar(true);
       }
     }
     document.addEventListener("visibilitychange", aoMudarVisibilidade);
     return () => document.removeEventListener("visibilitychange", aoMudarVisibilidade);
-  }, []);
+  }, [confirmarAposMinutos]);
 
   function abrirLeitor() {
     setPerguntar(false);

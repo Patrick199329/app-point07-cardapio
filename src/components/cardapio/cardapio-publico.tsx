@@ -219,6 +219,7 @@ export function CardapioPublico({
             // duas cores do cabeçalho eram tons próximos.
             <ConfirmarMesa
               mesaIdentificador={mesaIdentificador}
+              confirmarAposMinutos={config.mesa_confirmar_apos_minutos}
               className="absolute top-1/2 right-4 shrink-0 -translate-y-1/2 text-sm font-medium"
             />
           ) : null}

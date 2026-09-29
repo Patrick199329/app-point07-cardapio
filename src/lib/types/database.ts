@@ -78,6 +78,7 @@ export type Database = {
           logo_path: string | null
           logo_posicao: Database["public"]["Enums"]["cardapio_logo_posicao"]
           logo_tamanho: Database["public"]["Enums"]["cardapio_logo_tamanho"]
+          mesa_confirmar_apos_minutos: number
           mostrar_nome_com_logo: boolean
           nome_estabelecimento: string
           sombra: boolean
@@ -99,6 +100,7 @@ export type Database = {
           logo_path?: string | null
           logo_posicao?: Database["public"]["Enums"]["cardapio_logo_posicao"]
           logo_tamanho?: Database["public"]["Enums"]["cardapio_logo_tamanho"]
+          mesa_confirmar_apos_minutos?: number
           mostrar_nome_com_logo?: boolean
           nome_estabelecimento?: string
           sombra?: boolean
@@ -120,6 +122,7 @@ export type Database = {
           logo_path?: string | null
           logo_posicao?: Database["public"]["Enums"]["cardapio_logo_posicao"]
           logo_tamanho?: Database["public"]["Enums"]["cardapio_logo_tamanho"]
+          mesa_confirmar_apos_minutos?: number
           mostrar_nome_com_logo?: boolean
           nome_estabelecimento?: string
           sombra?: boolean
@@ -678,3 +681,4 @@ export const Constants = {
     },
   },
 } as const
+

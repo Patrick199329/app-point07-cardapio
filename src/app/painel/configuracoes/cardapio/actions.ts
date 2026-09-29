@@ -62,6 +62,9 @@ export async function salvarAparencia(
   const descricao_caixa = String(
     formData.get("descricao_caixa") ?? "original",
   ) as DescricaoCaixa;
+  const mesa_confirmar_apos_minutos = Number(
+    formData.get("mesa_confirmar_apos_minutos") ?? 15,
+  );
 
   if (!nome_estabelecimento) {
     return { error: "Informe o nome do estabelecimento.", ok: false };
@@ -90,6 +93,16 @@ export async function salvarAparencia(
   if (!DESCRICAO_CAIXAS.includes(descricao_caixa)) {
     return { error: "Padrão de caixa da descrição inválido.", ok: false };
   }
+  if (
+    !Number.isFinite(mesa_confirmar_apos_minutos) ||
+    mesa_confirmar_apos_minutos < 1 ||
+    mesa_confirmar_apos_minutos > 180
+  ) {
+    return {
+      error: "Tempo pra confirmar a mesa precisa ser entre 1 e 180 minutos.",
+      ok: false,
+    };
+  }
 
   const supabase = await createClient();
   const update: {
@@ -109,6 +122,7 @@ export async function salvarAparencia(
     logo_posicao: LogoPosicao;
     logo_tamanho: LogoTamanho;
     descricao_caixa: DescricaoCaixa;
+    mesa_confirmar_apos_minutos: number;
     logo_path?: string | null;
   } = {
     nome_estabelecimento,
@@ -127,6 +141,7 @@ export async function salvarAparencia(
     logo_posicao,
     logo_tamanho,
     descricao_caixa,
+    mesa_confirmar_apos_minutos,
   };
 
   if (formData.get("remover_logo") === "true") {

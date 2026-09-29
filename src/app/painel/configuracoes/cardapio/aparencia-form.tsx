@@ -44,6 +44,7 @@ export type AparenciaConfig = {
   categorias_centralizadas: boolean;
   agrupar_categorias: boolean;
   descricao_caixa: DescricaoCaixa;
+  mesa_confirmar_apos_minutos: number;
 };
 
 const INITIAL: AparenciaState = { error: null, ok: false };
@@ -549,6 +550,28 @@ export function AparenciaForm({ config }: { config: AparenciaConfig }) {
             Os dados migrados do WordPress vêm sem padrão (uns em CAIXA ALTA,
             outros não). Isso só muda como aparece no cardápio público — o
             texto salvo continua do jeito que foi cadastrado.
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="mesa_confirmar_apos_minutos">
+            Confirmar mesa após (minutos parado)
+          </Label>
+          <Input
+            id="mesa_confirmar_apos_minutos"
+            name="mesa_confirmar_apos_minutos"
+            type="number"
+            min={1}
+            max={180}
+            step={1}
+            defaultValue={config.mesa_confirmar_apos_minutos}
+            className={INPUT}
+          />
+          <p className="text-xs text-muted-foreground">
+            Quando o cliente escaneou o QR da mesa e fica esse tempo com o app
+            em segundo plano, ao voltar perguntamos se ele ainda está na mesma
+            mesa antes de liberar o &quot;Chamar garçom&quot; de novo — evita
+            chamar pra mesa errada quando outro grupo já sentou lá.
           </p>
         </div>
 
