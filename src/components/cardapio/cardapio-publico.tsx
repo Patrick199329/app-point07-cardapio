@@ -3,6 +3,7 @@ import type { CSSProperties } from "react";
 import { ChamarGarcomButton } from "@/app/cardapio/chamar-garcom-button";
 import { CategoriaExpansivel } from "@/components/cardapio/categoria-expansivel";
 import { CategoriaNav } from "@/components/cardapio/categoria-nav";
+import { ConfirmarMesa } from "@/components/cardapio/confirmar-mesa";
 import { ImagemProduto } from "@/components/cardapio/imagem-produto";
 import { RevelarAoRolar } from "@/components/cardapio/revelar-ao-rolar";
 import { VoltarAoTopo } from "@/components/cardapio/voltar-ao-topo";
@@ -294,6 +295,10 @@ export function CardapioPublico({
       </main>
 
       <VoltarAoTopo />
+
+      {mesaToken && mesaIdentificador ? (
+        <ConfirmarMesa mesaIdentificador={mesaIdentificador} />
+      ) : null}
 
       <ChamarGarcomButton
         mesaToken={mesaToken}
