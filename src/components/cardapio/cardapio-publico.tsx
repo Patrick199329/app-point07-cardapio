@@ -212,14 +212,15 @@ export function CardapioPublico({
               </h1>
             ) : null}
           </div>
-          {mesaIdentificador ? (
+          {mesaIdentificador && mesaToken ? (
             // Sem opacity: cor_texto_cabecalho já é a escolha do Administrador
             // pra ter contraste com cor_fundo_cabecalho — baixar a opacidade
             // aqui diluía esse contraste de novo, ficando ilegível quando as
             // duas cores do cabeçalho eram tons próximos.
-            <span className="absolute top-1/2 right-4 shrink-0 -translate-y-1/2 text-sm font-medium">
-              {mesaIdentificador}
-            </span>
+            <ConfirmarMesa
+              mesaIdentificador={mesaIdentificador}
+              className="absolute top-1/2 right-4 shrink-0 -translate-y-1/2 text-sm font-medium"
+            />
           ) : null}
         </div>
         {categorias.length > 1 ? (
@@ -295,10 +296,6 @@ export function CardapioPublico({
       </main>
 
       <VoltarAoTopo />
-
-      {mesaToken && mesaIdentificador ? (
-        <ConfirmarMesa mesaIdentificador={mesaIdentificador} />
-      ) : null}
 
       <ChamarGarcomButton
         mesaToken={mesaToken}
