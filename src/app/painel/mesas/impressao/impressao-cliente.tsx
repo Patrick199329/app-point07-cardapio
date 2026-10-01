@@ -80,7 +80,7 @@ export function ImpressaoCliente({ cartoes }: { cartoes: CartaoMesa[] }) {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/mesas/modelo-cartao.png" alt="" className="fundo" />
             <div className="qr-area" dangerouslySetInnerHTML={{ __html: c.svg }} />
-            <p className="mesa-label">MESA {c.identificador}</p>
+            <p className="mesa-label">{c.identificador}</p>
           </article>
         ))}
       </div>
@@ -116,7 +116,7 @@ export function ImpressaoCliente({ cartoes }: { cartoes: CartaoMesa[] }) {
           top: 53.65%;
           width: 29%;
           height: 22.59%;
-          padding: 6%;
+          padding: 1.5%;
           box-sizing: border-box;
         }
         .cartao-mesa .qr-area svg {
@@ -136,6 +136,7 @@ export function ImpressaoCliente({ cartoes }: { cartoes: CartaoMesa[] }) {
           font-weight: 800;
           font-size: 4.2cqw;
           letter-spacing: 0.04em;
+          text-transform: uppercase;
         }
         @media screen {
           .area-impressao {
