@@ -86,19 +86,15 @@ export function ImpressaoCliente({ cartoes }: { cartoes: CartaoMesa[] }) {
       </div>
 
       <style>{`
+        /* Tamanho de impressão real que o cliente definiu pra essa arte —
+           não é A4 inteira, é um cartão de mesa (108 x 146mm). */
         .cartao-mesa {
           position: relative;
           container-type: inline-size;
-          width: 100%;
-          max-width: 190mm;
-          margin: 0 auto;
-          aspect-ratio: 1276 / 1713;
+          width: 108mm;
+          height: 146mm;
           break-inside: avoid;
-          break-after: page;
           overflow: hidden;
-        }
-        .cartao-mesa:last-child {
-          break-after: auto;
         }
         .cartao-mesa .fundo {
           position: absolute;
@@ -106,6 +102,7 @@ export function ImpressaoCliente({ cartoes }: { cartoes: CartaoMesa[] }) {
           width: 100%;
           height: 100%;
           display: block;
+          object-fit: fill;
         }
         /* Coordenadas do quadrado branco medidas por pixel no modelo
            (1276x1713: x 674-1044, y 919-1306) — não é um chute visual.
@@ -138,10 +135,13 @@ export function ImpressaoCliente({ cartoes }: { cartoes: CartaoMesa[] }) {
           letter-spacing: 0.04em;
           text-transform: uppercase;
         }
+        .area-impressao {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 4mm;
+        }
         @media screen {
           .area-impressao {
-            display: grid;
-            gap: 16px;
             border: 1px dashed var(--border, #ccc);
             border-radius: 12px;
             padding: 16px;
@@ -149,22 +149,14 @@ export function ImpressaoCliente({ cartoes }: { cartoes: CartaoMesa[] }) {
           }
         }
         @media print {
-          @page { size: A4 portrait; margin: 0; }
+          @page { size: A4 portrait; margin: 5mm; }
           body * { visibility: hidden !important; }
           .area-impressao, .area-impressao * { visibility: visible !important; }
           .area-impressao {
             position: absolute;
             left: 0;
             top: 0;
-            width: 100%;
           }
-          .cartao-mesa {
-            max-width: none;
-            width: 210mm;
-            height: 297mm;
-            aspect-ratio: auto;
-          }
-          .cartao-mesa .fundo { object-fit: contain; }
         }
       `}</style>
     </div>
