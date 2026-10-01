@@ -73,86 +73,74 @@ export function ImpressaoCliente({ cartoes }: { cartoes: CartaoMesa[] }) {
         </ul>
       </div>
 
-      {/* Folha de impressão */}
+      {/* Folha de impressão — uma mesa por página, no modelo de arte do cliente */}
       <div className="area-impressao">
-        <div className="cartoes">
-          {paraImprimir.map((c) => (
-            <article key={c.id} className="cartao">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/marca/logo-point07-branca.png"
-                alt="Point07"
-                className="logo"
-              />
-              <p className="mesa">MESA {c.identificador}</p>
-              <div
-                className="qr"
-                dangerouslySetInnerHTML={{ __html: c.svg }}
-              />
-              <p className="chamada">
-                Aponte a câmera para ver o cardápio e chamar o garçom
-              </p>
-              <p className="tag">O Point certo para viver bons momentos!</p>
-            </article>
-          ))}
-        </div>
+        {paraImprimir.map((c) => (
+          <article key={c.id} className="cartao-mesa">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/mesas/modelo-cartao.png" alt="" className="fundo" />
+            <div className="qr-area" dangerouslySetInnerHTML={{ __html: c.svg }} />
+            <p className="mesa-label">MESA {c.identificador}</p>
+          </article>
+        ))}
       </div>
 
       <style>{`
-        .cartoes {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 8mm;
-        }
-        .cartao {
+        .cartao-mesa {
+          position: relative;
+          container-type: inline-size;
+          width: 100%;
+          max-width: 190mm;
+          margin: 0 auto;
+          aspect-ratio: 1276 / 1713;
           break-inside: avoid;
-          background: #0c0c0c;
-          color: #fff;
-          border-radius: 14px;
-          padding: 10mm 8mm;
-          text-align: center;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 5mm;
+          break-after: page;
+          overflow: hidden;
         }
-        .cartao .logo {
-          width: 46mm;
-          height: auto;
+        .cartao-mesa:last-child {
+          break-after: auto;
         }
-        .cartao .mesa {
-          font-size: 20pt;
-          font-weight: 800;
-          letter-spacing: 0.06em;
-          color: #f07e22;
-          margin: 0;
-        }
-        .cartao .qr {
-          background: #fff;
-          border-radius: 10px;
-          padding: 5mm;
-          width: 46mm;
-          height: 46mm;
-        }
-        .cartao .qr svg {
+        .cartao-mesa .fundo {
+          position: absolute;
+          inset: 0;
           width: 100%;
           height: 100%;
           display: block;
         }
-        .cartao .chamada {
-          font-size: 8.5pt;
-          line-height: 1.35;
-          color: #e9e9e9;
-          margin: 0;
-          max-width: 55mm;
+        /* Coordenadas do quadrado branco medidas por pixel no modelo
+           (1276x1713: x 674-1044, y 919-1306) — não é um chute visual.
+           padding dá uma margininha pro QR não encostar no canto arredondado. */
+        .cartao-mesa .qr-area {
+          position: absolute;
+          left: 52.82%;
+          top: 53.65%;
+          width: 29%;
+          height: 22.59%;
+          padding: 6%;
+          box-sizing: border-box;
         }
-        .cartao .tag {
-          font-size: 8pt;
-          color: #f07e22;
+        .cartao-mesa .qr-area svg {
+          width: 100%;
+          height: 100%;
+          display: block;
+        }
+        .cartao-mesa .mesa-label {
+          position: absolute;
+          left: 52.82%;
+          width: 29%;
+          top: 78%;
           margin: 0;
+          text-align: center;
+          color: #f07e22;
+          font-family: ui-sans-serif, system-ui, sans-serif;
+          font-weight: 800;
+          font-size: 4.2cqw;
+          letter-spacing: 0.04em;
         }
         @media screen {
           .area-impressao {
+            display: grid;
+            gap: 16px;
             border: 1px dashed var(--border, #ccc);
             border-radius: 12px;
             padding: 16px;
@@ -160,7 +148,7 @@ export function ImpressaoCliente({ cartoes }: { cartoes: CartaoMesa[] }) {
           }
         }
         @media print {
-          @page { size: A4; margin: 10mm; }
+          @page { size: A4 portrait; margin: 0; }
           body * { visibility: hidden !important; }
           .area-impressao, .area-impressao * { visibility: visible !important; }
           .area-impressao {
@@ -168,11 +156,14 @@ export function ImpressaoCliente({ cartoes }: { cartoes: CartaoMesa[] }) {
             left: 0;
             top: 0;
             width: 100%;
-            padding: 0;
-            border: 0;
-            background: #fff;
           }
-          .cartao { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .cartao-mesa {
+            max-width: none;
+            width: 210mm;
+            height: 297mm;
+            aspect-ratio: auto;
+          }
+          .cartao-mesa .fundo { object-fit: contain; }
         }
       `}</style>
     </div>
