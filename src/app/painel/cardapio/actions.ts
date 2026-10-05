@@ -409,3 +409,69 @@ export async function moverItem(formData: FormData): Promise<void> {
 
   revalidarCardapio();
 }
+
+/**
+ * Grava a ordem inteira de uma lista de uma vez (arrastar e soltar). Valida que
+ * os ids enviados são exatamente os irmãos atuais — não confia no cliente pra
+ * reatribuir ordem a itens de outra lista.
+ */
+export async function reordenarItens(
+  tabela: "categorias" | "produtos",
+  idsNovaOrdem: string[],
+  categoriaId?: string,
+): Promise<{ error: string } | { ok: true }> {
+  await requireRole("admin");
+  if (!Array.isArray(idsNovaOrdem) || idsNovaOrdem.length === 0) {
+    return { error: "Lista vazia." };
+  }
+
+  const supabase = await createClient();
+  const { data: atuais, error } =
+    tabela === "produtos"
+      ? categoriaId
+        ? await supabase.from("produtos").select("id").eq("categoria_id", categoriaId)
+        : { data: null, error: new Error("Categoria não informada.") }
+      : await supabase.from("categorias").select("id");
+  if (error || !atuais) return { error: "Não foi possível ler a lista." };
+
+  const conjuntoAtual = new Set(atuais.map((x) => x.id));
+  const conjuntoNovo = new Set(idsNovaOrdem);
+  if (
+    conjuntoAtual.size !== conjuntoNovo.size ||
+    idsNovaOrdem.some((id) => !conjuntoAtual.has(id))
+  ) {
+    return { error: "A lista mudou enquanto você organizava. Atualize a página." };
+  }
+
+  const resultados = await Promise.all(
+    idsNovaOrdem.map((id, ordem) =>
+      supabase.from(tabela).update({ ordem }).eq("id", id),
+    ),
+  );
+  if (resultados.some((r) => r.error)) {
+    return { error: "Não foi possível salvar a nova ordem." };
+  }
+
+  revalidarCardapio();
+  return { ok: true };
+}
+
+/** Move um produto pra outra categoria, no fim da lista de destino. */
+export async function moverProdutoParaCategoria(formData: FormData): Promise<void> {
+  await requireRole("admin");
+  const produtoId = String(formData.get("produto_id") ?? "");
+  const destinoId = String(formData.get("categoria_destino_id") ?? "");
+  if (!produtoId || !destinoId) return;
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("produtos")
+    .update({
+      categoria_id: destinoId,
+      ordem: await proximaOrdem("produtos", destinoId),
+    })
+    .eq("id", produtoId);
+  if (error) return;
+
+  revalidarCardapio();
+}

@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 
 import { definirStatusCategoria } from "./actions";
 import { CategoriaDialog } from "./categoria-dialog";
+import { ListaOrdenavel } from "./lista-ordenavel";
 import { ReorderButtons } from "./reorder-buttons";
 
 export const metadata = { title: "Cardápio — Point07" };
@@ -45,64 +46,68 @@ export default async function CardapioPage() {
           Nenhuma categoria ainda. Crie a primeira para começar o cardápio.
         </p>
       ) : (
-        <ul className="space-y-3">
-          {lista.map((categoria, i) => {
+        <ListaOrdenavel
+          key={lista.map((c) => c.id).join("|")}
+          tabela="categorias"
+          classeLista="space-y-3"
+          classeLinha="flex items-center gap-2 rounded-lg border p-3 sm:p-4"
+          itens={lista.map((categoria, i) => {
             const produtos = categoria.produtos ?? [];
             const ativos = produtos.filter((p) => p.ativo).length;
-            return (
-              <li
-                key={categoria.id}
-                className="flex items-center gap-2 rounded-lg border p-3 sm:p-4"
-              >
-                <ReorderButtons
-                  tabela="categorias"
-                  id={categoria.id}
-                  primeiro={i === 0}
-                  ultimo={i === lista.length - 1}
-                />
-
-                <Link
-                  href={`/painel/cardapio/${categoria.id}`}
-                  className="min-w-0 flex-1"
-                >
-                  <span className="flex items-center gap-2">
-                    <span className="truncate font-medium">{categoria.nome}</span>
-                    {!categoria.ativo ? (
-                      <Badge variant="secondary">Inativa</Badge>
-                    ) : null}
-                  </span>
-                  <span className="text-sm text-muted-foreground">
-                    {produtos.length === 0
-                      ? "sem produtos"
-                      : `${ativos} de ${produtos.length} ativo(s)`}
-                  </span>
-                </Link>
-
-                <div className="flex shrink-0 items-center gap-1">
-                  <CategoriaDialog
-                    categoria={categoria}
-                    trigger={
-                      <Button variant="outline" size="sm">
-                        Editar
-                      </Button>
-                    }
+            return {
+              id: categoria.id,
+              conteudo: (
+                <>
+                  <ReorderButtons
+                    tabela="categorias"
+                    id={categoria.id}
+                    primeiro={i === 0}
+                    ultimo={i === lista.length - 1}
                   />
-                  <form action={definirStatusCategoria}>
-                    <input type="hidden" name="id" value={categoria.id} />
-                    <input
-                      type="hidden"
-                      name="ativo"
-                      value={categoria.ativo ? "false" : "true"}
+
+                  <Link
+                    href={`/painel/cardapio/${categoria.id}`}
+                    className="min-w-0 flex-1"
+                  >
+                    <span className="flex items-center gap-2">
+                      <span className="truncate font-medium">{categoria.nome}</span>
+                      {!categoria.ativo ? (
+                        <Badge variant="secondary">Inativa</Badge>
+                      ) : null}
+                    </span>
+                    <span className="text-sm text-muted-foreground">
+                      {produtos.length === 0
+                        ? "sem produtos"
+                        : `${ativos} de ${produtos.length} ativo(s)`}
+                    </span>
+                  </Link>
+
+                  <div className="flex shrink-0 items-center gap-1">
+                    <CategoriaDialog
+                      categoria={categoria}
+                      trigger={
+                        <Button variant="outline" size="sm">
+                          Editar
+                        </Button>
+                      }
                     />
-                    <Button variant="ghost" size="sm" type="submit">
-                      {categoria.ativo ? "Desativar" : "Ativar"}
-                    </Button>
-                  </form>
-                </div>
-              </li>
-            );
+                    <form action={definirStatusCategoria}>
+                      <input type="hidden" name="id" value={categoria.id} />
+                      <input
+                        type="hidden"
+                        name="ativo"
+                        value={categoria.ativo ? "false" : "true"}
+                      />
+                      <Button variant="ghost" size="sm" type="submit">
+                        {categoria.ativo ? "Desativar" : "Ativar"}
+                      </Button>
+                    </form>
+                  </div>
+                </>
+              ),
+            };
           })}
-        </ul>
+        />
       )}
     </div>
   );
