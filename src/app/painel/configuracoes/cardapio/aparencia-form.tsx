@@ -45,7 +45,6 @@ export type AparenciaConfig = {
   agrupar_categorias: boolean;
   descricao_caixa: DescricaoCaixa;
   mesa_confirmar_apos_minutos: number;
-  avisos_fixos: boolean;
 };
 
 const INITIAL: AparenciaState = { error: null, ok: false };
@@ -309,7 +308,6 @@ export function AparenciaForm({ config }: { config: AparenciaConfig }) {
   const [agruparCategorias, setAgruparCategorias] = useState(
     config.agrupar_categorias,
   );
-  const [avisosFixos, setAvisosFixos] = useState(config.avisos_fixos);
   const [descricaoCaixa, setDescricaoCaixa] = useState<DescricaoCaixa>(
     config.descricao_caixa,
   );
@@ -344,7 +342,6 @@ export function AparenciaForm({ config }: { config: AparenciaConfig }) {
           name="categorias_centralizadas"
           value={categoriasCentralizadas ? "true" : "false"}
         />
-        <input type="hidden" name="avisos_fixos" value={avisosFixos ? "true" : "false"} />
         <input
           type="hidden"
           name="agrupar_categorias"
@@ -555,14 +552,6 @@ export function AparenciaForm({ config }: { config: AparenciaConfig }) {
             texto salvo continua do jeito que foi cadastrado.
           </p>
         </div>
-
-        <ToggleField
-          id="avisos_fixos_switch"
-          label="Avisos fixos na tela"
-          hint="Ligado: taxa e couvert ficam sempre visíveis embaixo da tela. Desligado: aparecem só no fim da página."
-          checked={avisosFixos}
-          onChange={setAvisosFixos}
-        />
 
         <div className="space-y-2">
           <Label htmlFor="mesa_confirmar_apos_minutos">

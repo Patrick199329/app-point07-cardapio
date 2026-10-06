@@ -25,7 +25,6 @@ export type CardapioConfig = {
   agrupar_categorias: boolean;
   descricao_caixa: DescricaoCaixa;
   mesa_confirmar_apos_minutos: number;
-  avisos_fixos: boolean;
   updated_at: string;
 };
 
@@ -85,7 +84,6 @@ const CONFIG_PADRAO: CardapioConfig = {
   agrupar_categorias: false,
   descricao_caixa: "original",
   mesa_confirmar_apos_minutos: 15,
-  avisos_fixos: true,
   updated_at: new Date(0).toISOString(),
 };
 

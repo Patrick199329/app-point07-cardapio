@@ -62,7 +62,6 @@ export async function salvarAparencia(
   const descricao_caixa = String(
     formData.get("descricao_caixa") ?? "original",
   ) as DescricaoCaixa;
-  const avisos_fixos = formData.get("avisos_fixos") === "true";
   const mesa_confirmar_apos_minutos = Number(
     formData.get("mesa_confirmar_apos_minutos") ?? 15,
   );
@@ -124,7 +123,6 @@ export async function salvarAparencia(
     logo_tamanho: LogoTamanho;
     descricao_caixa: DescricaoCaixa;
     mesa_confirmar_apos_minutos: number;
-    avisos_fixos: boolean;
     logo_path?: string | null;
   } = {
     nome_estabelecimento,
@@ -144,7 +142,6 @@ export async function salvarAparencia(
     logo_tamanho,
     descricao_caixa,
     mesa_confirmar_apos_minutos,
-    avisos_fixos,
   };
 
   if (formData.get("remover_logo") === "true") {
