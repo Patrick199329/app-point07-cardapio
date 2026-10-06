@@ -60,20 +60,20 @@ export function DestaquesCarrossel({
         onPointerLeave={() => setPausado(false)}
         onMouseEnter={() => setPausado(true)}
         onMouseLeave={() => setPausado(false)}
-        className="flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth px-[18%] pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth px-[10%] pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {itens.map((p) => {
           return (
             <article
               key={p.id}
-              className={`w-[64%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[var(--cardapio-bloco)] ${sombra ? "shadow-sm" : ""} ring-1 ring-black/5`}
+              className={`w-[80%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[var(--cardapio-bloco)] ${sombra ? "shadow-sm" : ""} ring-1 ring-black/5`}
             >
               {p.imagemUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={p.imagemUrl} alt={p.nome} className="h-40 w-full object-cover" />
               ) : null}
               <div className="space-y-1.5 p-4">
-                <p className="line-clamp-1 font-semibold">{p.nome}</p>
+                <p className="line-clamp-2 font-semibold leading-snug">{p.nome}</p>
                 {p.descricao ? (
                   <p className="line-clamp-2 text-sm text-[#5a5a5a]">{p.descricao}</p>
                 ) : null}
