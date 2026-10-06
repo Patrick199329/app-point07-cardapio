@@ -50,6 +50,7 @@ export type ProdutoPublico = {
   serve_ate: number | null;
   imagem_path: string | null;
   imagem_layout: "miniatura" | "grande";
+  destaque: boolean;
   grupos: GrupoOpcoesPublico[];
 };
 
@@ -61,6 +62,7 @@ export type CategoriaPublica = {
 
 export type CardapioPublicoData = {
   categorias: CategoriaPublica[];
+  destaques: ProdutoPublico[];
   avisos: { id: string; texto: string; fixo: boolean }[];
   config: CardapioConfig;
 };
@@ -102,7 +104,7 @@ export async function carregarCardapioPublico(): Promise<CardapioPublicoData> {
       supabase
         .from("categorias")
         .select(
-          "id, nome, produtos(id, nome, descricao, modelo, preco, preco_medio, preco_grande, preco_medio_label, preco_grande_label, serve_ate, imagem_path, imagem_layout, produto_grupos_opcoes(id, titulo, observacao, produto_opcoes(id, nome)))",
+          "id, nome, produtos(id, nome, descricao, modelo, preco, preco_medio, preco_grande, preco_medio_label, preco_grande_label, serve_ate, imagem_path, imagem_layout, destaque, produto_grupos_opcoes(id, titulo, observacao, produto_opcoes(id, nome)))",
         )
         .order("ordem", { ascending: true })
         .order("ordem", { ascending: true, referencedTable: "produtos" })
@@ -137,5 +139,12 @@ export async function carregarCardapioPublico(): Promise<CardapioPublicoData> {
     }))
     .filter((c) => c.produtos.length > 0);
 
-  return { categorias, avisos: avisos ?? [], config: config ?? CONFIG_PADRAO };
+  const destaques = categorias.flatMap((c) => c.produtos.filter((p) => p.destaque));
+
+  return {
+    categorias,
+    destaques,
+    avisos: avisos ?? [],
+    config: config ?? CONFIG_PADRAO,
+  };
 }

@@ -113,6 +113,7 @@ type ProdutoData = {
   preco_grande_label: string | null;
   serve_ate: number | null;
   imagem_layout: ProdutoImagemLayout;
+  destaque: boolean;
 };
 
 type Parse<T> = { ok: false; error: string } | { ok: true; data: T };
@@ -150,6 +151,7 @@ function parseProdutoForm(formData: FormData): Parse<ProdutoData> {
     preco_grande_label: null,
     serve_ate: null,
     imagem_layout,
+    destaque: formData.get("destaque") === "true",
   };
 
   if (modelo === "simples" || modelo === "compartilhar") {

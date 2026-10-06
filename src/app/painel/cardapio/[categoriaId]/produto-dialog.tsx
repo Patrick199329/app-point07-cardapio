@@ -46,6 +46,7 @@ export type ProdutoForm = {
   serve_ate: number | null;
   imagemUrl: string | null;
   imagemLayout: "miniatura" | "grande";
+  destaque: boolean;
 };
 
 const INITIAL: CardapioState = { error: null, ok: false };
@@ -286,6 +287,22 @@ export function ProdutoDialog({
               <option value="grande">Grande, centralizada</option>
             </NativeSelect>
           </div>
+
+          <label className="flex cursor-pointer items-start gap-3 rounded-md border p-3 text-sm">
+            <input
+              type="checkbox"
+              name="destaque"
+              value="true"
+              defaultChecked={produto?.destaque ?? false}
+              className="mt-1 size-4"
+            />
+            <span>
+              <span className="font-medium">Destaque</span>
+              <span className="block text-muted-foreground">
+                Aparece no bloco Destaques, no topo do cardápio público.
+              </span>
+            </span>
+          </label>
 
           {state.error ? (
             <p className="text-sm text-destructive" role="alert">

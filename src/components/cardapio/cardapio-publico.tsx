@@ -4,6 +4,7 @@ import { ChamarGarcomButton } from "@/app/cardapio/chamar-garcom-button";
 import { CategoriaExpansivel } from "@/components/cardapio/categoria-expansivel";
 import { CategoriaNav } from "@/components/cardapio/categoria-nav";
 import { ConfirmarMesa } from "@/components/cardapio/confirmar-mesa";
+import { DestaquesCarrossel } from "@/components/cardapio/destaques-carrossel";
 import { ImagemProduto } from "@/components/cardapio/imagem-produto";
 import { RevelarAoRolar } from "@/components/cardapio/revelar-ao-rolar";
 import { VoltarAoTopo } from "@/components/cardapio/voltar-ao-topo";
@@ -156,6 +157,7 @@ function ProdutoCard({
 
 export function CardapioPublico({
   categorias,
+  destaques,
   avisos,
   config,
   mesaToken,
@@ -230,6 +232,8 @@ export function CardapioPublico({
           />
         ) : null}
       </header>
+
+      <DestaquesCarrossel produtos={destaques} corDestaque={config.cor_destaque} />
 
       <main>
         {categorias.length === 0 ? (

@@ -71,7 +71,7 @@ export default async function CategoriaProdutosPage({
   const { data: produtos } = await supabase
     .from("produtos")
     .select(
-      "id, nome, descricao, modelo, preco, preco_medio, preco_grande, preco_medio_label, preco_grande_label, serve_ate, imagem_path, imagem_layout, ativo, ordem, produto_grupos_opcoes(count)",
+      "id, nome, descricao, modelo, preco, preco_medio, preco_grande, preco_medio_label, preco_grande_label, serve_ate, imagem_path, imagem_layout, destaque, ativo, ordem, produto_grupos_opcoes(count)",
     )
     .eq("categoria_id", categoriaId)
     .order("ordem", { ascending: true });
@@ -130,6 +130,7 @@ export default async function CategoriaProdutosPage({
               serve_ate: produto.serve_ate,
               imagemUrl: urlImagemProduto(produto.imagem_path),
               imagemLayout: produto.imagem_layout,
+              destaque: produto.destaque,
             };
             return {
               id: produto.id,
