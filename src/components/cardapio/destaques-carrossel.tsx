@@ -28,6 +28,32 @@ export function DestaquesCarrossel({
   const [pausado, setPausado] = useState(false);
 
   useEffect(() => {
+    const trilha = trilhaRef.current;
+    if (!trilha) return;
+    let frame = 0;
+    function aplicar() {
+      frame = 0;
+      const meio = trilha!.getBoundingClientRect();
+      const centro = meio.left + meio.width / 2;
+      for (const card of Array.from(trilha!.children) as HTMLElement[]) {
+        const r = card.getBoundingClientRect();
+        const distancia = Math.abs(r.left + r.width / 2 - centro);
+        const perto = distancia < meio.width / 6;
+        card.style.transform = perto ? "scale(0.9)" : "scale(1)";
+      }
+    }
+    function aoRolar() {
+      if (!frame) frame = requestAnimationFrame(aplicar);
+    }
+    aplicar();
+    trilha.addEventListener("scroll", aoRolar, { passive: true });
+    return () => {
+      trilha.removeEventListener("scroll", aoRolar);
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, [itens.length]);
+
+  useEffect(() => {
     if (pausado || itens.length < 2) return;
     const trilha = trilhaRef.current;
     if (!trilha) return;
@@ -38,7 +64,8 @@ export function DestaquesCarrossel({
       if (fimDaTrilha) {
         trilha.scrollTo({ left: 0, behavior: "smooth" });
       } else {
-        trilha.scrollBy({ left: trilha.clientWidth * 0.8, behavior: "smooth" });
+        const passo = (trilha.firstElementChild as HTMLElement | null)?.offsetWidth ?? trilha.clientWidth;
+        trilha.scrollBy({ left: passo + 12, behavior: "smooth" });
       }
     }, INTERVALO_MS);
     return () => clearInterval(id);
@@ -62,18 +89,18 @@ export function DestaquesCarrossel({
           return (
             <article
               key={p.id}
-              className="w-[78%] shrink-0 snap-start overflow-hidden rounded-[var(--cardapio-raio)] bg-[var(--cardapio-bloco)] shadow-md sm:w-72"
+              className="w-[30%] shrink-0 snap-start overflow-hidden rounded-[var(--cardapio-raio)] bg-[var(--cardapio-bloco)] shadow-md transition-transform duration-300"
             >
               {p.imagemUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={p.imagemUrl} alt={p.nome} className="h-36 w-full object-cover" />
+                <img src={p.imagemUrl} alt={p.nome} className="h-24 w-full object-cover" />
               ) : null}
               <div className="space-y-1 p-3">
-                <p className="line-clamp-1 font-semibold">{p.nome}</p>
+                <p className="line-clamp-1 text-sm font-semibold">{p.nome}</p>
                 {p.descricao ? (
-                  <p className="line-clamp-2 text-sm text-[#5a5a5a]">{p.descricao}</p>
+                  <p className="line-clamp-2 text-xs text-[#5a5a5a]">{p.descricao}</p>
                 ) : null}
-                <p className="pt-1 font-medium tabular-nums" style={{ color: corDestaque }}>
+                <p className="pt-1 text-sm font-medium tabular-nums" style={{ color: corDestaque }}>
                   {p.precoTexto}
                 </p>
               </div>
