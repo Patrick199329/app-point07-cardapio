@@ -20,9 +20,11 @@ export type ItemDestaque = {
 export function DestaquesCarrossel({
   itens,
   corDestaque,
+  sombra,
 }: {
   itens: ItemDestaque[];
   corDestaque: string;
+  sombra: boolean;
 }) {
   const trilhaRef = useRef<HTMLDivElement>(null);
   const [pausado, setPausado] = useState(false);
@@ -64,7 +66,7 @@ export function DestaquesCarrossel({
           return (
             <article
               key={p.id}
-              className="w-[64%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[var(--cardapio-bloco)] shadow-sm ring-1 ring-black/5"
+              className={`w-[64%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[var(--cardapio-bloco)] ${sombra ? "shadow-sm" : ""} ring-1 ring-black/5`}
             >
               {p.imagemUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element

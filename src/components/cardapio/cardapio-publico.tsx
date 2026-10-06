@@ -244,10 +244,13 @@ export function CardapioPublico({
 
       <DestaquesCarrossel
         corDestaque={config.cor_destaque}
+        sombra={config.sombra}
         itens={destaques.map((p) => ({
           id: p.id,
           nome: p.nome,
-          descricao: p.descricao,
+          descricao: p.descricao
+            ? formatarDescricao(p.descricao, config.descricao_caixa)
+            : null,
           imagemUrl: urlImagemProduto(p.imagem_path),
           precoTexto: formatarPreco(p.modelo === "tamanhos" ? p.preco_medio : p.preco),
         }))}
