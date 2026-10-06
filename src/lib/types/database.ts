@@ -38,6 +38,7 @@ export type Database = {
         Row: {
           ativo: boolean
           created_at: string
+          fixo: boolean
           id: string
           ordem: number
           texto: string
@@ -46,6 +47,7 @@ export type Database = {
         Insert: {
           ativo?: boolean
           created_at?: string
+          fixo?: boolean
           id?: string
           ordem?: number
           texto: string
@@ -54,6 +56,7 @@ export type Database = {
         Update: {
           ativo?: boolean
           created_at?: string
+          fixo?: boolean
           id?: string
           ordem?: number
           texto?: string

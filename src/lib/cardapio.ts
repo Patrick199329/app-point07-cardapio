@@ -61,7 +61,7 @@ export type CategoriaPublica = {
 
 export type CardapioPublicoData = {
   categorias: CategoriaPublica[];
-  avisos: { id: string; texto: string }[];
+  avisos: { id: string; texto: string; fixo: boolean }[];
   config: CardapioConfig;
 };
 
@@ -116,7 +116,7 @@ export async function carregarCardapioPublico(): Promise<CardapioPublicoData> {
         }),
       supabase
         .from("avisos")
-        .select("id, texto")
+        .select("id, texto, fixo")
         .order("ordem", { ascending: true }),
       supabase.from("cardapio_config").select("*").eq("id", 1).single(),
     ]);

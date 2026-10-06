@@ -297,12 +297,13 @@ export async function criarAviso(
 ): Promise<CardapioState> {
   await requireRole("admin");
   const texto = String(formData.get("texto") ?? "").trim();
+  const fixo = formData.get("fixo") !== "false";
   if (!texto) return { error: "Escreva o texto do aviso.", ok: false };
 
   const supabase = await createClient();
   const { error } = await supabase
     .from("avisos")
-    .insert({ texto, ordem: await proximaOrdem("avisos") });
+    .insert({ texto, fixo, ordem: await proximaOrdem("avisos") });
   if (error) return { error: "Não foi possível criar o aviso.", ok: false };
 
   revalidarCardapio();
@@ -316,13 +317,14 @@ export async function atualizarAviso(
   await requireRole("admin");
   const id = String(formData.get("id") ?? "");
   const texto = String(formData.get("texto") ?? "").trim();
+  const fixo = formData.get("fixo") !== "false";
   if (!id) return { error: "Aviso não identificado.", ok: false };
   if (!texto) return { error: "Escreva o texto do aviso.", ok: false };
 
   const supabase = await createClient();
   const { error } = await supabase
     .from("avisos")
-    .update({ texto })
+    .update({ texto, fixo })
     .eq("id", id);
   if (error) return { error: "Não foi possível salvar.", ok: false };
 

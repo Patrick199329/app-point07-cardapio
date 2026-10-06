@@ -14,7 +14,7 @@ export default async function AvisosPage() {
   const supabase = await createClient();
   const { data: avisos } = await supabase
     .from("avisos")
-    .select("id, texto, ativo, ordem")
+    .select("id, texto, ativo, ordem, fixo")
     .order("ordem", { ascending: true });
 
   const lista = avisos ?? [];
@@ -59,6 +59,7 @@ export default async function AvisosPage() {
               <div className="min-w-0 flex-1">
                 <div className="flex items-start gap-2">
                   <p className="min-w-0 flex-1 text-sm">{aviso.texto}</p>
+                  <Badge variant="outline">{aviso.fixo ? "Fixo" : "Só no rodapé"}</Badge>
                   {!aviso.ativo ? (
                     <Badge variant="secondary">Inativo</Badge>
                   ) : null}

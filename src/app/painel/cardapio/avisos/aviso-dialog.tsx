@@ -26,7 +26,7 @@ export function AvisoDialog({
   aviso,
   trigger,
 }: {
-  aviso?: { id: string; texto: string };
+  aviso?: { id: string; texto: string; fixo: boolean };
   trigger: ReactElement;
 }) {
   const router = useRouter();
@@ -80,6 +80,22 @@ export function AvisoDialog({
               {state.error}
             </p>
           ) : null}
+
+          <label className="flex cursor-pointer items-start gap-3 rounded-md border p-3 text-sm">
+            <input
+              type="checkbox"
+              name="fixo"
+              value="true"
+              defaultChecked={aviso?.fixo ?? true}
+              className="mt-1 size-4"
+            />
+            <span>
+              <span className="font-medium">Fixo na tela</span>
+              <span className="block text-muted-foreground">
+                Desmarcado: o aviso aparece só no fim da página.
+              </span>
+            </span>
+          </label>
 
           <DialogFooter>
             <Button type="submit" disabled={pending} className="h-10 md:h-9">
