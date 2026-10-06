@@ -294,6 +294,14 @@ export function CardapioPublico({
             )}
           </div>
         )}
+
+        {!config.avisos_fixos && avisos.length > 0 ? (
+          <div className="mt-2 space-y-1 border-t px-4 py-5 text-sm text-[#5a5a5a]">
+            {avisos.map((a) => (
+              <p key={a.id}>{a.texto}</p>
+            ))}
+          </div>
+        ) : null}
       </main>
 
       <VoltarAoTopo />
@@ -302,7 +310,7 @@ export function CardapioPublico({
         mesaToken={mesaToken}
         mesaIdentificador={mesaIdentificador}
         corDestaque={config.cor_destaque}
-        avisos={avisos}
+        avisos={config.avisos_fixos ? avisos : []}
       />
     </div>
   );

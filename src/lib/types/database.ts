@@ -64,6 +64,7 @@ export type Database = {
       cardapio_config: {
         Row: {
           agrupar_categorias: boolean
+          avisos_fixos: boolean
           arredondamento: Database["public"]["Enums"]["cardapio_arredondamento"]
           categorias_centralizadas: boolean
           cor_bloco: string
@@ -86,6 +87,7 @@ export type Database = {
         }
         Insert: {
           agrupar_categorias?: boolean
+          avisos_fixos?: boolean
           arredondamento?: Database["public"]["Enums"]["cardapio_arredondamento"]
           categorias_centralizadas?: boolean
           cor_bloco?: string
@@ -108,6 +110,7 @@ export type Database = {
         }
         Update: {
           agrupar_categorias?: boolean
+          avisos_fixos?: boolean
           arredondamento?: Database["public"]["Enums"]["cardapio_arredondamento"]
           categorias_centralizadas?: boolean
           cor_bloco?: string

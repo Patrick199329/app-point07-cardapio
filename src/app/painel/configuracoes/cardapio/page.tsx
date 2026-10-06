@@ -52,6 +52,7 @@ export default async function AparenciaCardapioPage() {
           agrupar_categorias: config?.agrupar_categorias ?? false,
           descricao_caixa: config?.descricao_caixa ?? "original",
           mesa_confirmar_apos_minutos: config?.mesa_confirmar_apos_minutos ?? 15,
+          avisos_fixos: config?.avisos_fixos ?? true,
         }}
       />
     </div>
