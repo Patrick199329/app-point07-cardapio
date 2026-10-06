@@ -297,7 +297,7 @@ export async function criarAviso(
 ): Promise<CardapioState> {
   await requireRole("admin");
   const texto = String(formData.get("texto") ?? "").trim();
-  const fixo = formData.get("fixo") !== "false";
+  const fixo = formData.get("fixo") === "true";
   if (!texto) return { error: "Escreva o texto do aviso.", ok: false };
 
   const supabase = await createClient();
@@ -317,7 +317,7 @@ export async function atualizarAviso(
   await requireRole("admin");
   const id = String(formData.get("id") ?? "");
   const texto = String(formData.get("texto") ?? "").trim();
-  const fixo = formData.get("fixo") !== "false";
+  const fixo = formData.get("fixo") === "true";
   if (!id) return { error: "Aviso não identificado.", ok: false };
   if (!texto) return { error: "Escreva o texto do aviso.", ok: false };
 
