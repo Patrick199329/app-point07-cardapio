@@ -94,10 +94,12 @@ function ProdutoCard({
   produto,
   sombra,
   descricaoCaixa,
+  tamanhoImagem,
 }: {
   produto: ProdutoPublico;
   sombra: boolean;
   descricaoCaixa: DescricaoCaixa;
+  tamanhoImagem: "pequeno" | "medio" | "grande";
 }) {
   const img = urlImagemProduto(produto.imagem_path);
   const descricao = produto.descricao
@@ -128,9 +130,13 @@ function ProdutoCard({
         </div>
       </div>
     ) : (
-      <div className="flex gap-3">
-        {img ? (
-          <ImagemProduto src={img} alt={produto.nome} className="size-16" />
+      <div className={`flex gap-3 ${tamanhoImagem === "grande" ? "min-h-36" : ""}`}>
+        {img && tamanhoImagem !== "grande" ? (
+          <ImagemProduto
+            src={img}
+            alt={produto.nome}
+            className={tamanhoImagem === "medio" ? "size-24" : "size-16"}
+          />
         ) : null}
         <div className="min-w-0 flex-1">
           <p className="font-medium">{produto.nome}</p>
@@ -142,6 +148,9 @@ function ProdutoCard({
             <Precos produto={produto} />
           </div>
         </div>
+        {img && tamanhoImagem === "grande" ? (
+          <ImagemProduto src={img} alt={produto.nome} className="h-36 w-[42%] shrink-0" />
+        ) : null}
       </div>
     );
 
@@ -268,6 +277,7 @@ export function CardapioPublico({
                             produto={produto}
                             sombra={config.sombra}
                             descricaoCaixa={config.descricao_caixa}
+                            tamanhoImagem={config.tamanho_imagem_produto}
                           />
                         </RevelarAoRolar>
                       </li>
@@ -297,6 +307,7 @@ export function CardapioPublico({
                             produto={produto}
                             sombra={config.sombra}
                             descricaoCaixa={config.descricao_caixa}
+                            tamanhoImagem={config.tamanho_imagem_produto}
                           />
                         </RevelarAoRolar>
                       </li>

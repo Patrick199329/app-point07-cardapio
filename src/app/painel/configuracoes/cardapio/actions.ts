@@ -62,6 +62,9 @@ export async function salvarAparencia(
   const descricao_caixa = String(
     formData.get("descricao_caixa") ?? "original",
   ) as DescricaoCaixa;
+  const tamanho_imagem_produto = String(
+    formData.get("tamanho_imagem_produto") ?? "pequeno",
+  ) as "pequeno" | "medio" | "grande";
   const mesa_confirmar_apos_minutos = Number(
     formData.get("mesa_confirmar_apos_minutos") ?? 15,
   );
@@ -89,6 +92,9 @@ export async function salvarAparencia(
   }
   if (!LOGO_TAMANHOS.includes(logo_tamanho)) {
     return { error: "Tamanho da logo inválido.", ok: false };
+  }
+  if (!["pequeno", "medio", "grande"].includes(tamanho_imagem_produto)) {
+    return { error: "Tamanho da imagem inválido.", ok: false };
   }
   if (!DESCRICAO_CAIXAS.includes(descricao_caixa)) {
     return { error: "Padrão de caixa da descrição inválido.", ok: false };
@@ -122,6 +128,7 @@ export async function salvarAparencia(
     logo_posicao: LogoPosicao;
     logo_tamanho: LogoTamanho;
     descricao_caixa: DescricaoCaixa;
+    tamanho_imagem_produto: "pequeno" | "medio" | "grande";
     mesa_confirmar_apos_minutos: number;
     logo_path?: string | null;
   } = {
@@ -141,6 +148,7 @@ export async function salvarAparencia(
     logo_posicao,
     logo_tamanho,
     descricao_caixa,
+    tamanho_imagem_produto,
     mesa_confirmar_apos_minutos,
   };
 

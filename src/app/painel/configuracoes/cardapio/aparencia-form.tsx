@@ -44,6 +44,7 @@ export type AparenciaConfig = {
   categorias_centralizadas: boolean;
   agrupar_categorias: boolean;
   descricao_caixa: DescricaoCaixa;
+  tamanho_imagem_produto: "pequeno" | "medio" | "grande";
   mesa_confirmar_apos_minutos: number;
 };
 
@@ -308,6 +309,7 @@ export function AparenciaForm({ config }: { config: AparenciaConfig }) {
   const [agruparCategorias, setAgruparCategorias] = useState(
     config.agrupar_categorias,
   );
+  const [tamanhoImagem, setTamanhoImagem] = useState(config.tamanho_imagem_produto);
   const [descricaoCaixa, setDescricaoCaixa] = useState<DescricaoCaixa>(
     config.descricao_caixa,
   );
@@ -526,6 +528,27 @@ export function AparenciaForm({ config }: { config: AparenciaConfig }) {
           checked={agruparCategorias}
           onChange={setAgruparCategorias}
         />
+
+        <div className="space-y-2">
+          <Label htmlFor="tamanho_imagem_produto">Tamanho das fotos dos produtos</Label>
+          <NativeSelect
+            id="tamanho_imagem_produto"
+            name="tamanho_imagem_produto"
+            value={tamanhoImagem}
+            onChange={(e) =>
+              setTamanhoImagem(e.target.value as typeof tamanhoImagem)
+            }
+            className={INPUT}
+          >
+            <option value="pequeno">Pequeno (miniatura ao lado)</option>
+            <option value="medio">Médio (miniatura maior)</option>
+            <option value="grande">Grande (ocupa o lado do card)</option>
+          </NativeSelect>
+          <p className="text-xs text-muted-foreground">
+            Todos os cards ficam com a mesma altura. No modo grande, a foto ocupa
+            o canto direito do card.
+          </p>
+        </div>
 
         <div className="space-y-2">
           <Label htmlFor="descricao_caixa">

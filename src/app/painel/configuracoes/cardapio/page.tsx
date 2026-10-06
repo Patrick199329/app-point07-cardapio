@@ -51,6 +51,7 @@ export default async function AparenciaCardapioPage() {
           categorias_centralizadas: config?.categorias_centralizadas ?? false,
           agrupar_categorias: config?.agrupar_categorias ?? false,
           descricao_caixa: config?.descricao_caixa ?? "original",
+          tamanho_imagem_produto: config?.tamanho_imagem_produto ?? "pequeno",
           mesa_confirmar_apos_minutos: config?.mesa_confirmar_apos_minutos ?? 15,
         }}
       />

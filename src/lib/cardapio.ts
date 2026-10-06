@@ -24,6 +24,7 @@ export type CardapioConfig = {
   categorias_centralizadas: boolean;
   agrupar_categorias: boolean;
   descricao_caixa: DescricaoCaixa;
+  tamanho_imagem_produto: "pequeno" | "medio" | "grande";
   mesa_confirmar_apos_minutos: number;
   updated_at: string;
 };
@@ -85,6 +86,7 @@ const CONFIG_PADRAO: CardapioConfig = {
   categorias_centralizadas: false,
   agrupar_categorias: false,
   descricao_caixa: "original",
+  tamanho_imagem_produto: "pequeno",
   mesa_confirmar_apos_minutos: 15,
   updated_at: new Date(0).toISOString(),
 };

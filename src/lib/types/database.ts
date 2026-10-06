@@ -77,6 +77,7 @@ export type Database = {
           cor_fundo_cabecalho: string
           cor_texto_cabecalho: string
           descricao_caixa: Database["public"]["Enums"]["cardapio_descricao_caixa"]
+          tamanho_imagem_produto: "pequeno" | "medio" | "grande"
           id: number
           logo_path: string | null
           logo_posicao: Database["public"]["Enums"]["cardapio_logo_posicao"]
@@ -99,6 +100,7 @@ export type Database = {
           cor_fundo_cabecalho?: string
           cor_texto_cabecalho?: string
           descricao_caixa?: Database["public"]["Enums"]["cardapio_descricao_caixa"]
+          tamanho_imagem_produto?: "pequeno" | "medio" | "grande"
           id?: number
           logo_path?: string | null
           logo_posicao?: Database["public"]["Enums"]["cardapio_logo_posicao"]
@@ -121,6 +123,7 @@ export type Database = {
           cor_fundo_cabecalho?: string
           cor_texto_cabecalho?: string
           descricao_caixa?: Database["public"]["Enums"]["cardapio_descricao_caixa"]
+          tamanho_imagem_produto?: "pequeno" | "medio" | "grande"
           id?: number
           logo_path?: string | null
           logo_posicao?: Database["public"]["Enums"]["cardapio_logo_posicao"]
