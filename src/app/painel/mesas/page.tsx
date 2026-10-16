@@ -46,7 +46,7 @@ function MesaAcoes({ mesa }: { mesa: Mesa }) {
 
 function StatusBadge({ ativo }: { ativo: boolean }) {
   return (
-    <Badge variant={ativo ? "default" : "secondary"}>
+    <Badge variant={ativo ? "success" : "secondary"}>
       {ativo ? "Ativa" : "Inativa"}
     </Badge>
   );

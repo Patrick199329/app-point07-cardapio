@@ -26,7 +26,7 @@ type Usuario = {
 
 function StatusBadge({ ativo }: { ativo: boolean }) {
   return (
-    <Badge variant={ativo ? "default" : "secondary"}>
+    <Badge variant={ativo ? "success" : "secondary"}>
       {ativo ? "Ativo" : "Inativo"}
     </Badge>
   );
