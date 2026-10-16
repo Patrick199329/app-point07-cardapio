@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 
 import { SistemaForm } from "./sistema-form";
 
-export const metadata = { title: "Identidade do Sistema — Point07" };
+export const metadata = { title: "Identidade do Sistema" };
 
 export default async function IdentidadeSistemaPage() {
   const supabase = await createClient();

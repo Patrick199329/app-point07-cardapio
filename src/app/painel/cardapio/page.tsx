@@ -9,7 +9,7 @@ import { CategoriaDialog } from "./categoria-dialog";
 import { ListaOrdenavel } from "./lista-ordenavel";
 import { ReorderButtons } from "./reorder-buttons";
 
-export const metadata = { title: "Cardápio — Point07" };
+export const metadata = { title: "Cardápio" };
 
 export default async function CardapioPage() {
   const supabase = await createClient();

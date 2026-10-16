@@ -22,7 +22,9 @@ export async function generateMetadata(): Promise<Metadata> {
   const faviconUrl = urlImagemProduto(faviconPath);
 
   return {
-    title: nome,
+    // Páginas definem só a parte própria (ex.: title: "Cardápio") e o molde
+    // completa com o nome do site — assim o nome fica num lugar só.
+    title: { default: nome, template: `%s — ${nome}` },
     description: `Plataforma de cardápio digital e atendimento de salão — ${nome}`,
     // appleWebApp: sem isso, "Adicionar à Tela de Início" no iPhone abre num
     // navegador comum (com barra de endereço) em vez de tela cheia — e o Web

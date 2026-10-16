@@ -14,7 +14,7 @@ import { createClient } from "@/lib/supabase/server";
 import { definirStatusUsuario } from "./actions";
 import { UsuarioDialog } from "./usuario-dialog";
 
-export const metadata = { title: "Usuários — Point07" };
+export const metadata = { title: "Usuários" };
 
 type Usuario = {
   id: string;

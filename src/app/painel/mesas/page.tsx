@@ -16,7 +16,7 @@ import { createClient } from "@/lib/supabase/server";
 import { definirStatusMesa } from "./actions";
 import { MesaDialog } from "./mesa-dialog";
 
-export const metadata = { title: "Mesas — Point07" };
+export const metadata = { title: "Mesas" };
 
 type Mesa = Database["public"]["Tables"]["mesas"]["Row"];
 

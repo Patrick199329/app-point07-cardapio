@@ -5,7 +5,7 @@ import { baseAtual, baseEhLocal, qrSvg, urlDaMesa } from "@/lib/qr";
 
 import { type CartaoMesa, ImpressaoCliente } from "./impressao-cliente";
 
-export const metadata = { title: "Imprimir QR das mesas — Point07" };
+export const metadata = { title: "Imprimir QR das mesas" };
 export const dynamic = "force-dynamic";
 
 export default async function ImpressaoQrPage() {

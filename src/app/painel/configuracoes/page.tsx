@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-export const metadata = { title: "Configurações — Point07" };
+export const metadata = { title: "Configurações" };
 
 const SECOES = [
   {

@@ -8,7 +8,7 @@ import { definirStatusAviso } from "../actions";
 import { ReorderButtons } from "../reorder-buttons";
 import { AvisoDialog } from "./aviso-dialog";
 
-export const metadata = { title: "Avisos — Cardápio — Point07" };
+export const metadata = { title: "Avisos — Cardápio" };
 
 export default async function AvisosPage() {
   const supabase = await createClient();

@@ -21,7 +21,7 @@ export async function generateMetadata({
     .select("nome")
     .eq("id", produtoId)
     .single();
-  return { title: `Opções — ${data?.nome ?? "Produto"} — Point07` };
+  return { title: `Opções — ${data?.nome ?? "Produto"}` };
 }
 
 export default async function OpcoesProdutoPage({

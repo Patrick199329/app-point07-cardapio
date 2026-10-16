@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 
 import { FilaConfigForm } from "./fila-config-form";
 
-export const metadata = { title: "Fila do Garçom — Point07" };
+export const metadata = { title: "Fila do Garçom" };
 
 export default async function ConfiguracoesFilaPage() {
   const supabase = await createClient();

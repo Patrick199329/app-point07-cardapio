@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 
 import { AparenciaForm } from "./aparencia-form";
 
-export const metadata = { title: "Aparência do Cardápio — Point07" };
+export const metadata = { title: "Aparência do Cardápio" };
 
 export default async function AparenciaCardapioPage() {
   const supabase = await createClient();

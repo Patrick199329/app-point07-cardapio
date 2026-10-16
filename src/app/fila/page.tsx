@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 
 import { type ChamadoFila, FilaRealtime } from "./fila-realtime";
 
-export const metadata = { title: "Fila — Point07" };
+export const metadata = { title: "Fila" };
 export const dynamic = "force-dynamic";
 
 export default async function FilaPage() {

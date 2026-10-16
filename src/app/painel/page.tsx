@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
 
-export const metadata = { title: "Visão geral — Point07" };
+export const metadata = { title: "Visão geral" };
 
 export default async function PainelHome() {
   const supabase = await createClient();

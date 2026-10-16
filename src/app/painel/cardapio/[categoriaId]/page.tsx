@@ -50,7 +50,7 @@ export async function generateMetadata({
     .select("nome")
     .eq("id", categoriaId)
     .single();
-  return { title: `${data?.nome ?? "Categoria"} — Cardápio — Point07` };
+  return { title: `${data?.nome ?? "Categoria"} — Cardápio` };
 }
 
 export default async function CategoriaProdutosPage({

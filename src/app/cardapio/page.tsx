@@ -12,7 +12,7 @@ import { carregarCardapioPublico } from "@/lib/cardapio";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "Cardápio — Point07",
+  title: "Cardápio",
   description: "Cardápio do Point07",
 };
 

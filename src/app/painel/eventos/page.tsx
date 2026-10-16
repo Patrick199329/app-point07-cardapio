@@ -17,7 +17,7 @@ import { createClient } from "@/lib/supabase/server";
 
 import { EventosFiltros } from "./eventos-filtros";
 
-export const metadata = { title: "Eventos — Point07" };
+export const metadata = { title: "Eventos" };
 export const dynamic = "force-dynamic";
 
 const STATUS: Record<

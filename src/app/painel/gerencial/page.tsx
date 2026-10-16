@@ -13,7 +13,7 @@ import { formatarDuracaoMs } from "@/lib/formato";
 
 import { PeriodoFiltro } from "./periodo-filtro";
 
-export const metadata = { title: "Painel Gerencial — Point07" };
+export const metadata = { title: "Painel Gerencial" };
 export const dynamic = "force-dynamic";
 
 // Hue único validado (dataviz: sequencial, não categórico — cada gráfico aqui

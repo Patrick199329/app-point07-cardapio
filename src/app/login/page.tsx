@@ -12,7 +12,7 @@ import { carregarLogoSistema } from "@/lib/sistema";
 import { LoginForm } from "./login-form";
 
 export const metadata: Metadata = {
-  title: "Entrar — Point07",
+  title: "Entrar",
 };
 
 export default async function LoginPage() {
