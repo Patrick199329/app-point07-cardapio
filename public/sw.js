@@ -26,6 +26,9 @@ self.addEventListener("push", (event) => {
       icon: "/marca/logo-point07-preta.png",
       tag: chamadoId,
       renotify: true,
+      // Repetido, pra se notar num bar barulhento (só Android — iPhone não
+      // deixa site nenhum controlar vibração, nem em notificação push).
+      vibrate: [300, 150, 300, 150, 300],
       actions: [
         { action: "aceitar", title: "Aceitar" },
         { action: "ir", title: "Ir até a fila" },

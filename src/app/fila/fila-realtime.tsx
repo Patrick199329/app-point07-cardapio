@@ -24,6 +24,15 @@ export type ChamadoFila = {
   criadoEm: string;
 };
 
+// Padrão de vibração do alerta — repetido, pra se notar num bar barulhento.
+// Só funciona em Android (iPhone não deixa site nenhum controlar vibração).
+const PADRAO_VIBRACAO = [300, 150, 300, 150, 300];
+
+/**
+ * Três bipes (não um só) com onda quadrada — mais estridente e insistente
+ * que um tom único em seno, pra cortar o barulho de ambiente de bar. Pedido
+ * do cliente depois de testar num ambiente real e achar o som baixo demais.
+ */
 function tocarBip() {
   try {
     const Ctx =
@@ -31,20 +40,24 @@ function tocarBip() {
       (window as unknown as { webkitAudioContext: typeof AudioContext })
         .webkitAudioContext;
     const ctx = new Ctx();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.type = "sine";
-    osc.frequency.value = 880;
-    gain.gain.setValueAtTime(0.18, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.45);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.45);
-    setTimeout(() => void ctx.close(), 700);
+    [0, 0.35, 0.7].forEach((atraso) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = "square";
+      osc.frequency.value = 1000;
+      const inicio = ctx.currentTime + atraso;
+      gain.gain.setValueAtTime(0.5, inicio);
+      gain.gain.exponentialRampToValueAtTime(0.0001, inicio + 0.25);
+      osc.start(inicio);
+      osc.stop(inicio + 0.25);
+    });
+    setTimeout(() => void ctx.close(), 1200);
   } catch {
     // AudioContext bloqueado até uma interação do usuário — silencioso.
   }
+  if ("vibrate" in navigator) navigator.vibrate(PADRAO_VIBRACAO);
 }
 
 /** Cronômetro mm:ss decorrido desde `iso`. */
