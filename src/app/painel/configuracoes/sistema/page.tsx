@@ -11,7 +11,7 @@ export default async function IdentidadeSistemaPage() {
   const supabase = await createClient();
   const { data } = await supabase
     .from("sistema_config")
-    .select("logo_path")
+    .select("logo_path, favicon_path")
     .eq("id", 1)
     .single();
 
@@ -26,13 +26,17 @@ export default async function IdentidadeSistemaPage() {
         </Link>
         <h1 className="mt-2 text-xl font-semibold">Identidade do sistema</h1>
         <p className="text-sm text-muted-foreground">
-          Uma logo só, usada na tela de login, no menu do painel do
-          Administrador e no cabeçalho da fila do Garçom — diferente da logo
-          do cardápio público (essa fica em Aparência do Cardápio).
+          Logo usada na tela de login, no menu do painel do Administrador e
+          no cabeçalho da fila do Garçom — diferente da logo do cardápio
+          público (essa fica em Aparência do Cardápio). O favicon (ícone da
+          aba do navegador) vale pra todas as páginas, incluindo o cardápio.
         </p>
       </div>
 
-      <SistemaForm logoUrl={urlImagemProduto(data?.logo_path ?? null)} />
+      <SistemaForm
+        logoUrl={urlImagemProduto(data?.logo_path ?? null)}
+        faviconUrl={urlImagemProduto(data?.favicon_path ?? null)}
+      />
     </div>
   );
 }

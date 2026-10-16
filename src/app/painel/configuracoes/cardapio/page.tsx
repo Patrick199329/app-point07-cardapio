@@ -35,7 +35,6 @@ export default async function AparenciaCardapioPage() {
         config={{
           nome_estabelecimento: config?.nome_estabelecimento ?? "Point07",
           logoUrl: urlImagemProduto(config?.logo_path ?? null),
-          faviconUrl: urlImagemProduto(config?.favicon_path ?? null),
           logo_posicao: config?.logo_posicao ?? "esquerda",
           logo_tamanho: config?.logo_tamanho ?? "medio",
           mostrar_nome_com_logo: config?.mostrar_nome_com_logo ?? true,

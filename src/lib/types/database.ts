@@ -77,7 +77,6 @@ export type Database = {
           cor_fundo_cabecalho: string
           cor_texto_cabecalho: string
           descricao_caixa: Database["public"]["Enums"]["cardapio_descricao_caixa"]
-          favicon_path: string | null
           tamanho_imagem_produto: "pequeno" | "medio" | "grande"
           id: number
           logo_path: string | null
@@ -91,7 +90,6 @@ export type Database = {
         }
         Insert: {
           agrupar_categorias?: boolean
-          favicon_path?: string | null
           arredondamento?: Database["public"]["Enums"]["cardapio_arredondamento"]
           categorias_centralizadas?: boolean
           cor_bloco?: string
@@ -115,7 +113,6 @@ export type Database = {
         }
         Update: {
           agrupar_categorias?: boolean
-          favicon_path?: string | null
           arredondamento?: Database["public"]["Enums"]["cardapio_arredondamento"]
           categorias_centralizadas?: boolean
           cor_bloco?: string
@@ -482,16 +479,19 @@ export type Database = {
       }
       sistema_config: {
         Row: {
+          favicon_path: string | null
           id: number
           logo_path: string | null
           updated_at: string
         }
         Insert: {
+          favicon_path?: string | null
           id?: number
           logo_path?: string | null
           updated_at?: string
         }
         Update: {
+          favicon_path?: string | null
           id?: number
           logo_path?: string | null
           updated_at?: string
