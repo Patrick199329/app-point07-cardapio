@@ -76,6 +76,24 @@ export async function salvarLogoCardapio(file: File): Promise<ResultadoImagem> {
 }
 
 /**
+ * Favicon do site (`cardapio_config.favicon_path`) — aba do navegador, em
+ * todas as páginas (cardápio público e painel admin). Path fixo, upsert.
+ */
+export async function salvarFaviconCardapio(file: File): Promise<ResultadoImagem> {
+  const convertido = await converterParaWebp(file, 256);
+  if (!convertido.ok) return convertido;
+
+  const path = "marca/favicon-cardapio.webp";
+  const supabase = createAdminClient();
+  const { error } = await supabase.storage
+    .from(BUCKET)
+    .upload(path, convertido.buffer, { contentType: "image/webp", upsert: true });
+  if (error) return { ok: false, error: "Falha ao enviar o favicon." };
+
+  return { ok: true, path };
+}
+
+/**
  * Logo interna do sistema (`sistema_config.logo_path`) — tela de login,
  * sidebar do painel e cabeçalho do garçom. Path fixo, upsert.
  */

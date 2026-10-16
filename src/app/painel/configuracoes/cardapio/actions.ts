@@ -1,10 +1,14 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 import { requireRole } from "@/lib/auth";
 import { corValida } from "@/lib/cardapio-tema";
-import { removerImagemProduto, salvarLogoCardapio } from "@/lib/imagem";
+import {
+  removerImagemProduto,
+  salvarFaviconCardapio,
+  salvarLogoCardapio,
+} from "@/lib/imagem";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/types/database";
 
@@ -131,6 +135,7 @@ export async function salvarAparencia(
     tamanho_imagem_produto: "pequeno" | "medio" | "grande";
     mesa_confirmar_apos_minutos: number;
     logo_path?: string | null;
+    favicon_path?: string | null;
   } = {
     nome_estabelecimento,
     cor_fundo,
@@ -169,6 +174,23 @@ export async function salvarAparencia(
     }
   }
 
+  if (formData.get("remover_favicon") === "true") {
+    const { data } = await supabase
+      .from("cardapio_config")
+      .select("favicon_path")
+      .eq("id", 1)
+      .single();
+    if (data?.favicon_path) await removerImagemProduto(data.favicon_path);
+    update.favicon_path = null;
+  } else {
+    const file = formData.get("favicon");
+    if (file instanceof File && file.size > 0) {
+      const res = await salvarFaviconCardapio(file);
+      if (!res.ok) return { error: res.error, ok: false };
+      update.favicon_path = res.path;
+    }
+  }
+
   const { error } = await supabase
     .from("cardapio_config")
     .update(update)
@@ -177,5 +199,6 @@ export async function salvarAparencia(
 
   revalidatePath("/painel/configuracoes/cardapio");
   revalidatePath("/cardapio");
+  revalidateTag("branding", { expire: 0 });
   return { error: null, ok: true };
 }

@@ -29,6 +29,7 @@ import { type AparenciaState, salvarAparencia } from "./actions";
 export type AparenciaConfig = {
   nome_estabelecimento: string;
   logoUrl: string | null;
+  faviconUrl: string | null;
   logo_posicao: LogoPosicao;
   logo_tamanho: LogoTamanho;
   mostrar_nome_com_logo: boolean;
@@ -273,10 +274,15 @@ function PreviaCardapio({
 export function AparenciaForm({ config }: { config: AparenciaConfig }) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
+  const faviconRef = useRef<HTMLInputElement>(null);
 
   const [nome, setNome] = useState(config.nome_estabelecimento);
   const [logoPreview, setLogoPreview] = useState<string | null>(config.logoUrl);
   const [logoRemovida, setLogoRemovida] = useState(false);
+  const [faviconPreview, setFaviconPreview] = useState<string | null>(
+    config.faviconUrl,
+  );
+  const [faviconRemovido, setFaviconRemovido] = useState(false);
   const [logoPosicao, setLogoPosicao] = useState<LogoPosicao>(
     config.logo_posicao,
   );
@@ -330,6 +336,12 @@ export function AparenciaForm({ config }: { config: AparenciaConfig }) {
     if (fileRef.current) fileRef.current.value = "";
     setLogoPreview(null);
     setLogoRemovida(true);
+  }
+
+  function removerFavicon() {
+    if (faviconRef.current) faviconRef.current.value = "";
+    setFaviconPreview(null);
+    setFaviconRemovido(true);
   }
 
   return (
@@ -441,6 +453,45 @@ export function AparenciaForm({ config }: { config: AparenciaConfig }) {
           checked={mostrarNomeComLogo}
           onChange={setMostrarNomeComLogo}
         />
+
+        {faviconRemovido ? (
+          <input type="hidden" name="remover_favicon" value="true" />
+        ) : null}
+        <div className="space-y-2">
+          <Label htmlFor="favicon">Favicon (ícone da aba do navegador)</Label>
+          {faviconPreview ? (
+            <div className="flex items-center gap-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={faviconPreview}
+                alt=""
+                className="size-8 rounded border object-contain p-0.5"
+              />
+              <Button type="button" variant="ghost" size="sm" onClick={removerFavicon}>
+                Remover
+              </Button>
+            </div>
+          ) : null}
+          <Input
+            ref={faviconRef}
+            id="favicon"
+            name="favicon"
+            type="file"
+            accept="image/*"
+            className={INPUT}
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) {
+                setFaviconPreview(URL.createObjectURL(f));
+                setFaviconRemovido(false);
+              }
+            }}
+          />
+          <p className="text-xs text-muted-foreground">
+            Aparece na aba do navegador em todas as páginas, junto com o nome do
+            estabelecimento (campo acima). Use uma imagem quadrada.
+          </p>
+        </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <ColorField
