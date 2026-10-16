@@ -24,6 +24,7 @@ export function LeitorQr({
   const streamRef = useRef<MediaStream | null>(null);
   const framePedidoRef = useRef<number | null>(null);
   const detectadoRef = useRef(false);
+  const ultimaTentativaRef = useRef(0);
   const [erro, setErro] = useState<string | null>(null);
 
   useEffect(() => {
@@ -31,8 +32,16 @@ export function LeitorQr({
 
     async function iniciar() {
       try {
+        // Sem limite de resolução, celular pede a câmera no máximo dele (em
+        // alguns chega a 4K) — decodificar isso a cada frame trava o
+        // aparelho e a leitura nunca completa a tempo. 1280px já é mais que
+        // suficiente pra ler QR code.
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "environment" },
+          video: {
+            facingMode: "environment",
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+          },
         });
         if (cancelado) {
           stream.getTracks().forEach((t) => t.stop());
@@ -43,7 +52,7 @@ export function LeitorQr({
           videoRef.current.srcObject = stream;
           await videoRef.current.play();
         }
-        ler();
+        ler(0);
       } catch {
         if (!cancelado) {
           setErro(
@@ -53,19 +62,34 @@ export function LeitorQr({
       }
     }
 
-    function ler() {
+    const MAX_LADO = 480; // suficiente pra ler QR, bem mais leve que o frame cheio
+    const INTERVALO_MS = 180; // tentar ~5x/s, não a cada frame — celular não aguenta
+
+    function ler(agora: number) {
+      if (detectadoRef.current) return;
+      if (agora - ultimaTentativaRef.current < INTERVALO_MS) {
+        framePedidoRef.current = requestAnimationFrame(ler);
+        return;
+      }
+      ultimaTentativaRef.current = agora;
+
       const video = videoRef.current;
       const canvas = canvasRef.current;
-      if (!video || !canvas || detectadoRef.current) return;
+      if (!video || !canvas) return;
 
-      if (video.readyState === video.HAVE_ENOUGH_DATA) {
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        const ctx = canvas.getContext("2d");
+      if (video.readyState === video.HAVE_ENOUGH_DATA && video.videoWidth) {
+        const escala = Math.min(1, MAX_LADO / Math.max(video.videoWidth, video.videoHeight));
+        canvas.width = Math.round(video.videoWidth * escala);
+        canvas.height = Math.round(video.videoHeight * escala);
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
         if (ctx) {
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
           const imagem = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          const resultado = jsQR(imagem.data, imagem.width, imagem.height);
+          // Nossos QR são sempre escuro sobre claro — "dontInvert" evita o
+          // jsQR tentar a leitura invertida à toa, quase 2x mais rápido.
+          const resultado = jsQR(imagem.data, imagem.width, imagem.height, {
+            inversionAttempts: "dontInvert",
+          });
           if (resultado?.data) {
             detectadoRef.current = true;
             onDetectado(resultado.data);
