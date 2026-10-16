@@ -24,6 +24,15 @@ function Marca({ logoUrl, className }: { logoUrl: string | null; className?: str
   return <span className="text-base font-semibold">Point07</span>;
 }
 
+function AvatarIniciais({ nome }: { nome: string }) {
+  const inicial = nome.trim().charAt(0).toUpperCase() || "?";
+  return (
+    <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
+      {inicial}
+    </span>
+  );
+}
+
 export function PainelShell({
   nome,
   perfil,
@@ -38,17 +47,17 @@ export function PainelShell({
   const [navOpen, setNavOpen] = useState(false);
 
   return (
-    <div className="flex min-h-svh flex-col md:flex-row">
+    <div className="flex min-h-svh flex-col bg-background md:flex-row">
       {/* Sidebar — desktop */}
-      <aside className="hidden shrink-0 border-r p-4 md:block md:w-60">
-        <div className="mb-4 px-3">
+      <aside className="hidden shrink-0 bg-sidebar p-4 md:block md:w-64 md:border-r md:border-sidebar-border">
+        <div className="mb-6 px-3 pt-1">
           <Marca logoUrl={logoUrl} className="h-8" />
         </div>
         <PainelNav />
       </aside>
 
       {/* Barra superior — mobile */}
-      <header className="flex items-center gap-2 border-b px-2 py-2 md:hidden">
+      <header className="flex items-center gap-2 border-b bg-sidebar px-2 py-2 md:hidden">
         <Button
           variant="ghost"
           size="icon"
@@ -82,10 +91,13 @@ export function PainelShell({
 
       {/* Conteúdo */}
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="hidden items-center justify-between border-b px-6 py-3 md:flex">
-          <div className="text-sm">
-            <span className="font-medium">{nome}</span>
-            <span className="ml-2 text-muted-foreground">{perfil}</span>
+        <header className="hidden items-center justify-between border-b bg-card px-6 py-3 md:flex">
+          <div className="flex items-center gap-3">
+            <AvatarIniciais nome={nome} />
+            <div className="text-sm">
+              <p className="font-medium">{nome}</p>
+              <p className="text-muted-foreground">{perfil}</p>
+            </div>
           </div>
           <SignOutButton />
         </header>

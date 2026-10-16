@@ -3,16 +3,25 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import {
+  CalendarDays,
+  LayoutGrid,
+  Settings,
+  Table2,
+  UtensilsCrossed,
+  Users,
+} from "lucide-react";
+
 import { cn } from "@/lib/utils";
 
 const ITEMS = [
-  { href: "/painel", label: "Visão geral", exact: true },
-  { href: "/painel/cardapio", label: "Cardápio" },
-  { href: "/painel/eventos", label: "Eventos" },
-  { href: "/painel/gerencial", label: "Painel gerencial" },
-  { href: "/painel/usuarios", label: "Usuários" },
-  { href: "/painel/mesas", label: "Mesas" },
-  { href: "/painel/configuracoes", label: "Configurações" },
+  { href: "/painel", label: "Visão geral", exact: true, icon: LayoutGrid },
+  { href: "/painel/cardapio", label: "Cardápio", icon: UtensilsCrossed },
+  { href: "/painel/eventos", label: "Eventos", icon: CalendarDays },
+  { href: "/painel/gerencial", label: "Painel gerencial", icon: LayoutGrid },
+  { href: "/painel/usuarios", label: "Usuários", icon: Users },
+  { href: "/painel/mesas", label: "Mesas", icon: Table2 },
+  { href: "/painel/configuracoes", label: "Configurações", icon: Settings },
 ];
 
 export function PainelNav({ onNavigate }: { onNavigate?: () => void }) {
@@ -24,6 +33,7 @@ export function PainelNav({ onNavigate }: { onNavigate?: () => void }) {
         const active = item.exact
           ? pathname === item.href
           : pathname.startsWith(item.href);
+        const Icone = item.icon;
         return (
           <Link
             key={item.href}
@@ -31,12 +41,13 @@ export function PainelNav({ onNavigate }: { onNavigate?: () => void }) {
             onClick={onNavigate}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "rounded-md px-3 py-2.5 text-sm transition-colors md:py-2",
+              "flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm transition-colors md:py-2",
               active
-                ? "bg-secondary font-medium text-secondary-foreground"
-                : "text-muted-foreground hover:bg-secondary/60",
+                ? "bg-primary font-medium text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
             )}
           >
+            <Icone className="size-4 shrink-0" />
             {item.label}
           </Link>
         );

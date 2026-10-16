@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { BellRing, Table2, UtensilsCrossed, Users } from "lucide-react";
+
 import {
   Card,
   CardContent,
@@ -62,24 +64,32 @@ export default async function PainelHome() {
       valor: chamadosHoje.count ?? 0,
       descricao: `${aceitosHoje.count ?? 0} chamado(s) aceito(s)`,
       href: "/painel/eventos?periodo=hoje",
+      icon: BellRing,
+      cor: "var(--chart-1)",
     },
     {
       titulo: "Cardápio",
       valor: produtosAtivos.count ?? 0,
       descricao: `${categoriasAtivas.count ?? 0} categoria(s) · produtos ativos`,
       href: "/painel/cardapio",
+      icon: UtensilsCrossed,
+      cor: "var(--chart-2)",
     },
     {
       titulo: "Usuários",
       valor: usuarios.count ?? 0,
       descricao: `${garconsAtivos.count ?? 0} garçom(ns) ativo(s)`,
       href: "/painel/usuarios",
+      icon: Users,
+      cor: "var(--chart-3)",
     },
     {
       titulo: "Mesas ativas",
       valor: mesasAtivas.count ?? 0,
       descricao: "Disponíveis para o QR por mesa",
       href: "/painel/mesas",
+      icon: Table2,
+      cor: "var(--chart-4)",
     },
   ];
 
@@ -93,21 +103,32 @@ export default async function PainelHome() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {cards.map((card) => (
-          <Link key={card.titulo} href={card.href} className="block">
-            <Card className="transition-colors hover:border-foreground/20">
-              <CardHeader className="pb-2">
-                <CardDescription>{card.titulo}</CardDescription>
-                <CardTitle className="text-3xl tabular-nums">
-                  {card.valor}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">{card.descricao}</p>
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
+        {cards.map((card) => {
+          const Icone = card.icon;
+          return (
+            <Link key={card.titulo} href={card.href} className="block">
+              <Card className="shadow-sm transition-shadow hover:shadow-md">
+                <CardHeader className="pb-2">
+                  <div className="flex items-start justify-between">
+                    <CardDescription>{card.titulo}</CardDescription>
+                    <span
+                      className="flex size-9 shrink-0 items-center justify-center rounded-full"
+                      style={{ backgroundColor: `color-mix(in oklch, ${card.cor} 15%, white)`, color: card.cor }}
+                    >
+                      <Icone className="size-4" />
+                    </span>
+                  </div>
+                  <CardTitle className="text-3xl tabular-nums">
+                    {card.valor}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">{card.descricao}</p>
+                </CardContent>
+              </Card>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
