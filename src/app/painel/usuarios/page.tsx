@@ -12,6 +12,7 @@ import { ROLE_LABEL } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 import { definirStatusUsuario } from "./actions";
+import { RedefinirSenhaDialog } from "./redefinir-senha-dialog";
 import { UsuarioDialog } from "./usuario-dialog";
 
 export const metadata = { title: "Usuários" };
@@ -43,6 +44,7 @@ function UsuarioAcoes({ usuario, isSelf }: { usuario: Usuario; isSelf: boolean }
           </Button>
         }
       />
+      <RedefinirSenhaDialog usuario={usuario} />
       <form action={definirStatusUsuario}>
         <input type="hidden" name="id" value={usuario.id} />
         <input

@@ -92,6 +92,31 @@ export async function atualizarUsuario(
   return { error: null, ok: true };
 }
 
+export async function redefinirSenha(
+  _prev: UsuarioState,
+  formData: FormData,
+): Promise<UsuarioState> {
+  await requireRole("admin");
+
+  const id = String(formData.get("id") ?? "");
+  const senha = String(formData.get("senha") ?? "");
+
+  if (!id) return { error: "Usuário não identificado.", ok: false };
+  if (senha.length < 6) {
+    return { error: "A senha deve ter ao menos 6 caracteres.", ok: false };
+  }
+
+  const admin = createAdminClient();
+  const { error } = await admin.auth.admin.updateUserById(id, {
+    password: senha,
+  });
+  if (error) {
+    return { error: "Não foi possível redefinir a senha.", ok: false };
+  }
+
+  return { error: null, ok: true };
+}
+
 /** Ativa/desativa um usuário. Usada diretamente como `action` de um <form>. */
 export async function definirStatusUsuario(formData: FormData): Promise<void> {
   const { user } = await requireRole("admin");
