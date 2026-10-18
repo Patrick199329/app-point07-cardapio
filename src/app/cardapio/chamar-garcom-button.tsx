@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BellRing, Check, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { marcarChamadoOcupado } from "@/lib/chamado-ocupado";
 import { createClient } from "@/lib/supabase/client";
 
 type Estado = "idle" | "enviando" | "pendente" | "aceito" | "erro";
@@ -38,6 +39,14 @@ export function ChamarGarcomButton({
   const [estado, setEstado] = useState<Estado>("idle");
   const [garcom, setGarcom] = useState<string | null>(null);
   const chamadoRef = useRef<{ id: string; origem: string } | null>(null);
+
+  // Impede o atualizador automático de publicação (ver chamado-ocupado.ts) de
+  // recarregar a página no meio de uma chamada ao garçom — da requisição em
+  // andamento até o chamado ser aceito/cancelado.
+  useEffect(() => {
+    marcarChamadoOcupado(estado !== "idle" && estado !== "erro");
+    return () => marcarChamadoOcupado(false);
+  }, [estado]);
 
   // Poll do status enquanto pendente.
   useEffect(() => {

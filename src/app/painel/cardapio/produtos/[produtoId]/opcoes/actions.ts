@@ -3,14 +3,15 @@
 import { revalidatePath } from "next/cache";
 
 import { requireRole } from "@/lib/auth";
+import { marcarRascunhoAlterado } from "@/lib/cardapio-publicacao";
 import { createClient } from "@/lib/supabase/server";
 
 export type OpcoesState = { error: string | null; ok: boolean };
 
-function revalidar(produtoId: string) {
+async function revalidar(produtoId: string) {
   revalidatePath(`/painel/cardapio/produtos/${produtoId}/opcoes`);
-  revalidatePath("/painel/cardapio", "layout");
-  revalidatePath("/cardapio");
+  revalidatePath("/painel", "layout");
+  await marcarRascunhoAlterado();
 }
 
 async function proximaOrdemGrupo(produtoId: string) {
@@ -45,7 +46,7 @@ export async function criarGrupo(
   });
   if (error) return { error: "Não foi possível criar o grupo.", ok: false };
 
-  revalidar(produtoId);
+  await revalidar(produtoId);
   return { error: null, ok: true };
 }
 
@@ -69,7 +70,7 @@ export async function atualizarGrupo(
     .eq("id", id);
   if (error) return { error: "Não foi possível salvar.", ok: false };
 
-  revalidar(produtoId);
+  await revalidar(produtoId);
   return { error: null, ok: true };
 }
 
@@ -82,7 +83,7 @@ export async function excluirGrupo(formData: FormData): Promise<void> {
 
   const supabase = await createClient();
   await supabase.from("produto_grupos_opcoes").delete().eq("id", id);
-  revalidar(produtoId);
+  await revalidar(produtoId);
 }
 
 export async function adicionarOpcao(formData: FormData): Promise<void> {
@@ -102,7 +103,7 @@ export async function adicionarOpcao(formData: FormData): Promise<void> {
   const ordem = (data?.[0]?.ordem ?? -1) + 1;
 
   await supabase.from("produto_opcoes").insert({ grupo_id: grupoId, nome, ordem });
-  revalidar(produtoId);
+  await revalidar(produtoId);
 }
 
 export async function removerOpcao(formData: FormData): Promise<void> {
@@ -113,5 +114,5 @@ export async function removerOpcao(formData: FormData): Promise<void> {
 
   const supabase = await createClient();
   await supabase.from("produto_opcoes").delete().eq("id", id);
-  revalidar(produtoId);
+  await revalidar(produtoId);
 }

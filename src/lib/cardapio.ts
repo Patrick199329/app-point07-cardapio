@@ -150,3 +150,24 @@ export async function carregarCardapioPublico(): Promise<CardapioPublicoData> {
     config: config ?? CONFIG_PADRAO,
   };
 }
+
+/**
+ * O que o cardápio público (`/cardapio`, `/mesa/[token]`) realmente lê: a
+ * "foto" congelada da última publicação (`cardapio_publicado.dados`), não as
+ * tabelas ao vivo — o Administrador edita à vontade no painel sem o público
+ * ver nada até clicar em "Publicar" (ver src/app/painel/publicar-actions.ts).
+ * `carregarCardapioPublico` acima é quem calcula essa foto na hora de publicar.
+ */
+export async function lerCardapioPublicado(): Promise<CardapioPublicoData> {
+  const supabase = createPublicClient();
+  const { data } = await supabase
+    .from("cardapio_publicado")
+    .select("dados")
+    .eq("id", 1)
+    .single();
+
+  if (!data?.dados) {
+    return { categorias: [], destaques: [], avisos: [], config: CONFIG_PADRAO };
+  }
+  return data.dados as unknown as CardapioPublicoData;
+}

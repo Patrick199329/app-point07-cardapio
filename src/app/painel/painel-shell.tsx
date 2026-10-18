@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/sheet";
 
 import { PainelNav } from "./painel-nav";
+import { PublicarButton } from "./publicar-button";
 
 function Marca({ logoUrl, className }: { logoUrl: string | null; className?: string }) {
   if (logoUrl) {
@@ -37,11 +38,13 @@ export function PainelShell({
   nome,
   perfil,
   logoUrl,
+  publicacaoPendente,
   children,
 }: {
   nome: string;
   perfil: string;
   logoUrl: string | null;
+  publicacaoPendente: boolean;
   children: ReactNode;
 }) {
   const [navOpen, setNavOpen] = useState(false);
@@ -68,7 +71,8 @@ export function PainelShell({
           <Menu className="size-5" />
         </Button>
         <Marca logoUrl={logoUrl} className="h-7" />
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-2">
+          <PublicarButton pendente={publicacaoPendente} />
           <SignOutButton />
         </div>
       </header>
@@ -99,7 +103,10 @@ export function PainelShell({
               <p className="text-muted-foreground">{perfil}</p>
             </div>
           </div>
-          <SignOutButton />
+          <div className="flex items-center gap-2">
+            <PublicarButton pendente={publicacaoPendente} />
+            <SignOutButton />
+          </div>
         </header>
         <main className="flex-1 p-4 md:p-6">{children}</main>
       </div>

@@ -136,6 +136,50 @@ export type Database = {
         }
         Relationships: []
       }
+      cardapio_publicado: {
+        Row: {
+          dados: Json
+          id: number
+          publicado_em: string
+          publicado_por: string | null
+        }
+        Insert: {
+          dados: Json
+          id?: number
+          publicado_em?: string
+          publicado_por?: string | null
+        }
+        Update: {
+          dados?: Json
+          id?: number
+          publicado_em?: string
+          publicado_por?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cardapio_publicado_publicado_por_fkey"
+            columns: ["publicado_por"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cardapio_rascunho_status: {
+        Row: {
+          alterado_em: string
+          id: number
+        }
+        Insert: {
+          alterado_em?: string
+          id?: number
+        }
+        Update: {
+          alterado_em?: string
+          id?: number
+        }
+        Relationships: []
+      }
       categorias: {
         Row: {
           ativo: boolean

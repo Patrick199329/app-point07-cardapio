@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 
 import { ChamarGarcomButton } from "@/app/cardapio/chamar-garcom-button";
+import { AtualizadorPublicacao } from "@/components/cardapio/atualizador-publicacao";
 import { CategoriaExpansivel } from "@/components/cardapio/categoria-expansivel";
 import { CategoriaNav } from "@/components/cardapio/categoria-nav";
 import { ConfirmarMesa } from "@/components/cardapio/confirmar-mesa";
@@ -330,6 +331,8 @@ export function CardapioPublico({
           </div>
         ) : null}
       </main>
+
+      <AtualizadorPublicacao />
 
       <VoltarAoTopo />
 

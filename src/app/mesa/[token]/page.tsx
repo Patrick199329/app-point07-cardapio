@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { CardapioPublico } from "@/components/cardapio/cardapio-publico";
-import { carregarCardapioPublico } from "@/lib/cardapio";
+import { lerCardapioPublicado } from "@/lib/cardapio";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -34,7 +34,7 @@ export default async function MesaPage({
     }
   }
 
-  const cardapio = await carregarCardapioPublico();
+  const cardapio = await lerCardapioPublicado();
 
   return (
     <CardapioPublico

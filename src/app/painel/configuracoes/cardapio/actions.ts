@@ -4,6 +4,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 
 import { requireRole } from "@/lib/auth";
 import { corValida } from "@/lib/cardapio-tema";
+import { marcarRascunhoAlterado } from "@/lib/cardapio-publicacao";
 import { removerImagemProduto, salvarLogoCardapio } from "@/lib/imagem";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/types/database";
@@ -176,7 +177,12 @@ export async function salvarAparencia(
   if (error) return { error: "Não foi possível salvar a aparência.", ok: false };
 
   revalidatePath("/painel/configuracoes/cardapio");
-  revalidatePath("/cardapio");
+  revalidatePath("/painel", "layout");
+  // "/cardapio" não revalida aqui de propósito — cores, logo etc. só valem
+  // pro público depois que o Administrador clicar em "Publicar" (ver
+  // src/app/painel/publicar-actions.ts). O nome do site na aba do navegador
+  // é a exceção: não é "conteúdo do cardápio", continua instantâneo.
+  await marcarRascunhoAlterado();
   revalidateTag("branding", { expire: 0 });
   return { error: null, ok: true };
 }

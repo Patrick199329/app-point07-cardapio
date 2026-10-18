@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { requireRole } from "@/lib/auth";
+import { marcarRascunhoAlterado } from "@/lib/cardapio-publicacao";
 import { parsePreco } from "@/lib/formato";
 import { removerImagemProduto, salvarImagemProduto } from "@/lib/imagem";
 import { createClient } from "@/lib/supabase/server";
@@ -16,9 +17,12 @@ export type CardapioState = { error: string | null; ok: boolean };
 const MODELOS: ProdutoModelo[] = ["simples", "tamanhos", "compartilhar"];
 const IMAGEM_LAYOUTS: ProdutoImagemLayout[] = ["miniatura", "grande"];
 
-function revalidarCardapio() {
-  revalidatePath("/painel/cardapio", "layout");
-  revalidatePath("/cardapio");
+// O painel (admin) continua refletindo a edição na hora — só o cardápio
+// público (/cardapio) que fica parado até o Administrador clicar em
+// "Publicar" (ver src/app/painel/publicar-actions.ts).
+async function revalidarCardapio() {
+  revalidatePath("/painel", "layout");
+  await marcarRascunhoAlterado();
 }
 
 /** Próximo valor de `ordem` (max + 1) para inserir no fim da lista. */
@@ -62,7 +66,7 @@ export async function criarCategoria(
     .insert({ nome, ordem: await proximaOrdem("categorias") });
   if (error) return { error: "Não foi possível criar a categoria.", ok: false };
 
-  revalidarCardapio();
+  await revalidarCardapio();
   return { error: null, ok: true };
 }
 
@@ -83,7 +87,7 @@ export async function atualizarCategoria(
     .eq("id", id);
   if (error) return { error: "Não foi possível salvar.", ok: false };
 
-  revalidarCardapio();
+  await revalidarCardapio();
   return { error: null, ok: true };
 }
 
@@ -94,7 +98,7 @@ export async function definirStatusCategoria(formData: FormData): Promise<void> 
   if (!id) return;
   const supabase = await createClient();
   await supabase.from("categorias").update({ ativo }).eq("id", id);
-  revalidarCardapio();
+  await revalidarCardapio();
 }
 
 // ===========================================================================
@@ -234,7 +238,7 @@ export async function criarProduto(
       .eq("id", criado.id);
   }
 
-  revalidarCardapio();
+  await revalidarCardapio();
   return { error: null, ok: true };
 }
 
@@ -275,7 +279,7 @@ export async function atualizarProduto(
     }
   }
 
-  revalidarCardapio();
+  await revalidarCardapio();
   return { error: null, ok: true };
 }
 
@@ -286,7 +290,7 @@ export async function definirStatusProduto(formData: FormData): Promise<void> {
   if (!id) return;
   const supabase = await createClient();
   await supabase.from("produtos").update({ ativo }).eq("id", id);
-  revalidarCardapio();
+  await revalidarCardapio();
 }
 
 // ===========================================================================
@@ -308,7 +312,7 @@ export async function criarAviso(
     .insert({ texto, fixo, ordem: await proximaOrdem("avisos") });
   if (error) return { error: "Não foi possível criar o aviso.", ok: false };
 
-  revalidarCardapio();
+  await revalidarCardapio();
   return { error: null, ok: true };
 }
 
@@ -330,7 +334,7 @@ export async function atualizarAviso(
     .eq("id", id);
   if (error) return { error: "Não foi possível salvar.", ok: false };
 
-  revalidarCardapio();
+  await revalidarCardapio();
   return { error: null, ok: true };
 }
 
@@ -341,7 +345,7 @@ export async function definirStatusAviso(formData: FormData): Promise<void> {
   if (!id) return;
   const supabase = await createClient();
   await supabase.from("avisos").update({ ativo }).eq("id", id);
-  revalidarCardapio();
+  await revalidarCardapio();
 }
 
 // ===========================================================================
@@ -411,7 +415,7 @@ export async function moverItem(formData: FormData): Promise<void> {
     .update({ ordem: irmaos[i].ordem })
     .eq("id", irmaos[j].id);
 
-  revalidarCardapio();
+  await revalidarCardapio();
 }
 
 /**
@@ -456,7 +460,7 @@ export async function reordenarItens(
     return { error: "Não foi possível salvar a nova ordem." };
   }
 
-  revalidarCardapio();
+  await revalidarCardapio();
   return { ok: true };
 }
 
@@ -477,5 +481,5 @@ export async function moverProdutoParaCategoria(formData: FormData): Promise<voi
     .eq("id", produtoId);
   if (error) return;
 
-  revalidarCardapio();
+  await revalidarCardapio();
 }
