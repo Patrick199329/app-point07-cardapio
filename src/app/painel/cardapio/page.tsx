@@ -15,7 +15,7 @@ export default async function CardapioPage() {
   const supabase = await createClient();
   const { data: categorias } = await supabase
     .from("categorias")
-    .select("id, nome, ativo, ordem, produtos(ativo)")
+    .select("id, nome, ativo, ordem, updated_at, produtos(ativo)")
     .order("ordem", { ascending: true });
 
   const lista = categorias ?? [];
@@ -47,7 +47,12 @@ export default async function CardapioPage() {
         </p>
       ) : (
         <ListaOrdenavel
-          key={lista.map((c) => c.id).join("|")}
+          key={lista
+            .map(
+              (c) =>
+                `${c.id}:${c.updated_at}:${(c.produtos ?? []).filter((p) => p.ativo).length}:${(c.produtos ?? []).length}`,
+            )
+            .join("|")}
           tabela="categorias"
           classeLista="space-y-3"
           classeLinha="flex items-center gap-2 rounded-lg border p-3 sm:p-4"
