@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { ROLE_LABEL, requireAnyRole } from "@/lib/auth";
+import { ehAdminInnovation, ROLE_LABEL, requireAnyRole } from "@/lib/auth";
 import { carregarLogoSistema } from "@/lib/sistema";
 
 import { PainelShell } from "./painel-shell";
@@ -23,6 +23,7 @@ export default async function PainelLayout({
       perfil={ROLE_LABEL[profile.role]}
       logoUrl={logoUrl}
       publicacaoPendente={pendente}
+      mostrarBackups={ehAdminInnovation(profile)}
     >
       {children}
     </PainelShell>

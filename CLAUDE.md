@@ -33,7 +33,10 @@ em tempo real). Documentação de escopo em `docs/`.
 - Após mudar o schema: `npm run db:reset` e depois `npm run db:types` para regenerar
   `src/lib/types/database.ts`.
 - RLS ativo em todas as tabelas. `public.is_admin()` / `public.is_garcom()` (SECURITY
-  DEFINER) são os helpers de autorização usados nas policies. Perfis: `admin`, `garcom`.
+  DEFINER) são os helpers de autorização usados nas policies. Perfis: `admin`, `gerente`,
+  `garcom` — `gerente` tem o mesmo nível de acesso do `admin` (decisão do cliente;
+  `is_admin()` retorna true pros dois, é o único helper usado em todas as policies do
+  projeto, então não precisa duplicar regra por tabela).
 - Escritas que envolvem o **cliente do salão sem login** (Módulo 3) passam por **RPCs
   SECURITY DEFINER** (`mesa_por_token`, `criar_chamado`, `status_chamado`,
   `cancelar_chamado`, `aceitar_chamado` — migration `20260910120000_chamados.sql`), nunca
@@ -48,8 +51,10 @@ em tempo real). Documentação de escopo em `docs/`.
 
 - `src/proxy.ts` → refresh de sessão + barra rotas protegidas de quem não está logado.
   `/cardapio`, `/mesa` e `/auth` são públicos (cliente do salão, sem login).
-- `src/lib/auth.ts` → `requireRole('admin' | 'garcom')` nos layouts faz o controle fino.
-- Server Actions sempre revalidam o perfil (`requireRole`) — não confiar só no proxy.
+- `src/lib/auth.ts` → `requireRole(role)` / `requireAnyRole(roles[])` nos layouts fazem o
+  controle fino. `/painel/*` aceita `admin` e `gerente`; `/fila` aceita os três perfis.
+- Server Actions sempre revalidam o perfil (`requireRole`/`requireAnyRole`) — não confiar
+  só no proxy.
 - O widget "chamar garçom" e a fila do garçom chamam as RPCs **direto do navegador**
   (`@/lib/supabase/client`), sem Server Action — a autorização vive inteira no banco
   (RLS + SECURITY DEFINER), então isso é seguro.
@@ -57,10 +62,13 @@ em tempo real). Documentação de escopo em `docs/`.
 ## Estrutura
 
 - `/login` — acesso da equipe
-- `/painel/*` — área do Administrador: usuários, mesas (+ `mesas/impressao` — gera os QR
-  para imprimir), cardápio, eventos (painel gerencial ainda não implementado)
+- `/painel/*` — área do Administrador (e Gerente, mesmo nível de acesso): usuários, mesas
+  (+ `mesas/impressao` — gera os QR para imprimir), cardápio, eventos, painel gerencial
+  (`/painel/gerencial` — KPIs e gráficos de atendimento por garçom/dia/mesa, a partir do
+  Registro de Eventos)
 - `/cardapio` — cardápio público; `/mesa/[token]` — idem, com contexto da mesa (QR)
-- `/fila` — área do Garçom: fila de chamados em tempo real
+- `/fila` — fila de chamados em tempo real (Garçom; Administrador e Gerente também
+  atendem, por isso também acessam essa rota)
 
 ## QR das mesas
 

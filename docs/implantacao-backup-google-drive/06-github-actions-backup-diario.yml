@@ -1,0 +1,51 @@
+name: Backup diário
+
+on:
+  schedule:
+    # Ajuste o horário — exemplo: 06:00 em Brasília (UTC-3) = 09:00 UTC.
+    - cron: '0 9 * * *'
+  workflow_dispatch: {}
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instala o cliente do Postgres 17 (pg_dump)
+        # O repositório padrão do Ubuntu só tem o postgresql-client 16 — se o
+        # Supabase (ou outro Postgres gerenciado) do projeto rodar uma versão
+        # mais nova, pg_dump recusa fazer o dump ("server version mismatch").
+        # Confirme a versão real do seu banco (Database → ... no painel do
+        # Supabase) e ajuste o "17" abaixo se for diferente.
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc --fail https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          sudo sh -c 'echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(. /etc/os-release && echo $VERSION_CODENAME)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-17
+          # A imagem do runner já vem com um pg_dump mais antigo em /usr/bin,
+          # na frente no PATH — sem isso, "pg_dump" continua resolvendo pro
+          # antigo mesmo com a versão certa instalada.
+          echo "/usr/lib/postgresql/17/bin" >> "$GITHUB_PATH"
+
+      - name: Instala as dependências do script de backup
+        run: npm install --no-save @supabase/supabase-js googleapis jszip
+
+      - name: Roda o backup
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_DRIVE_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}
+          BACKUP_RETENCAO_DIAS: '30'
+          DISPARADO_MANUALMENTE: ${{ github.event_name == 'workflow_dispatch' && 'true' || 'false' }}
+        # Ajuste o caminho se o script estiver em outro lugar no projeto alvo.
+        run: node scripts/backup-diario.mjs

@@ -79,3 +79,23 @@ export async function requireAnyRole(roles: UserRole[]) {
   }
   return result;
 }
+
+/**
+ * "Terceiro nível de admin": quem desenvolve a plataforma (Innovation),
+ * independente do perfil admin/gerente/garçom do cliente final. Controla só
+ * o mecanismo de backup (ver docs/implantacao-backup-google-drive/) — não é
+ * um UserRole, é um flag adicional e deliberadamente sem tela própria pra
+ * editar (ver migration 20261018140000_backup_admin_innovation.sql).
+ */
+export function ehAdminInnovation(profile: Profile | null): boolean {
+  return profile?.eh_admin_innovation === true;
+}
+
+/** Como requireRole, mas pro flag eh_admin_innovation em vez de um UserRole. */
+export async function requireAdminInnovation() {
+  const result = await requireProfile();
+  if (!ehAdminInnovation(result.profile)) {
+    redirect(homePathForRole(result.profile.role));
+  }
+  return result;
+}

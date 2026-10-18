@@ -64,6 +64,42 @@ export type Database = {
         }
         Relationships: []
       }
+      backup_logs: {
+        Row: {
+          concluido_em: string | null
+          disparado_manualmente: boolean
+          drive_arquivo_id: string | null
+          drive_arquivo_url: string | null
+          id: string
+          iniciado_em: string
+          mensagem_erro: string | null
+          status: string
+          tamanho_bytes: number | null
+        }
+        Insert: {
+          concluido_em?: string | null
+          disparado_manualmente?: boolean
+          drive_arquivo_id?: string | null
+          drive_arquivo_url?: string | null
+          id?: string
+          iniciado_em?: string
+          mensagem_erro?: string | null
+          status?: string
+          tamanho_bytes?: number | null
+        }
+        Update: {
+          concluido_em?: string | null
+          disparado_manualmente?: boolean
+          drive_arquivo_id?: string | null
+          drive_arquivo_url?: string | null
+          id?: string
+          iniciado_em?: string
+          mensagem_erro?: string | null
+          status?: string
+          tamanho_bytes?: number | null
+        }
+        Relationships: []
+      }
       cardapio_config: {
         Row: {
           agrupar_categorias: boolean
@@ -279,6 +315,35 @@ export type Database = {
         }
         Relationships: []
       }
+      integracao_google_drive: {
+        Row: {
+          atualizado_em: string | null
+          atualizado_por: string | null
+          id: boolean
+          refresh_token: string | null
+        }
+        Insert: {
+          atualizado_em?: string | null
+          atualizado_por?: string | null
+          id?: boolean
+          refresh_token?: string | null
+        }
+        Update: {
+          atualizado_em?: string | null
+          atualizado_por?: string | null
+          id?: boolean
+          refresh_token?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "integracao_google_drive_atualizado_por_fkey"
+            columns: ["atualizado_por"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mesas: {
         Row: {
           apelido: string | null
@@ -457,6 +522,7 @@ export type Database = {
         Row: {
           ativo: boolean
           created_at: string
+          eh_admin_innovation: boolean
           email: string | null
           id: string
           nome: string
@@ -466,6 +532,7 @@ export type Database = {
         Insert: {
           ativo?: boolean
           created_at?: string
+          eh_admin_innovation?: boolean
           email?: string | null
           id: string
           nome: string
@@ -475,6 +542,7 @@ export type Database = {
         Update: {
           ativo?: boolean
           created_at?: string
+          eh_admin_innovation?: boolean
           email?: string | null
           id?: string
           nome?: string
@@ -567,6 +635,7 @@ export type Database = {
           status: Database["public"]["Enums"]["chamado_status"]
         }[]
       }
+      eh_admin_innovation: { Args: never; Returns: boolean }
       is_admin: { Args: never; Returns: boolean }
       is_garcom: { Args: never; Returns: boolean }
       mesa_por_token: {

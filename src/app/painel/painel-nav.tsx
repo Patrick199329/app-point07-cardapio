@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   BellRing,
   CalendarDays,
+  DatabaseBackup,
   LayoutGrid,
   Settings,
   Table2,
@@ -15,7 +16,14 @@ import {
 
 import { cn } from "@/lib/utils";
 
-const ITEMS = [
+type ItemNav = {
+  href: string;
+  label: string;
+  icon: typeof LayoutGrid;
+  exact?: boolean;
+};
+
+const ITEMS: ItemNav[] = [
   { href: "/painel", label: "Visão geral", exact: true, icon: LayoutGrid },
   { href: "/fila", label: "Fila", icon: BellRing },
   { href: "/painel/cardapio", label: "Cardápio", icon: UtensilsCrossed },
@@ -26,12 +34,23 @@ const ITEMS = [
   { href: "/painel/configuracoes", label: "Configurações", icon: Settings },
 ];
 
-export function PainelNav({ onNavigate }: { onNavigate?: () => void }) {
+// Terceiro nível de admin (Innovation) — não aparece pro admin/gerente do
+// cliente final. Ver requireAdminInnovation() em src/lib/auth.ts.
+const ITEM_BACKUPS: ItemNav = { href: "/painel/backups", label: "Backups", icon: DatabaseBackup };
+
+export function PainelNav({
+  onNavigate,
+  mostrarBackups = false,
+}: {
+  onNavigate?: () => void;
+  mostrarBackups?: boolean;
+}) {
   const pathname = usePathname();
+  const itens = mostrarBackups ? [...ITEMS, ITEM_BACKUPS] : ITEMS;
 
   return (
     <nav className="flex flex-col gap-1">
-      {ITEMS.map((item) => {
+      {itens.map((item) => {
         const active = item.exact
           ? pathname === item.href
           : pathname.startsWith(item.href);
