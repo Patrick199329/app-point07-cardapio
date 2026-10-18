@@ -9,7 +9,7 @@ type InscricaoPush = {
 };
 
 export async function salvarInscricaoPush(sub: InscricaoPush, userAgent: string) {
-  const { user } = await requireAnyRole(["admin", "garcom"]);
+  const { user } = await requireAnyRole(["admin", "gerente", "garcom"]);
   const supabase = await createClient();
 
   const { error } = await supabase.from("push_inscricoes").upsert(
@@ -26,7 +26,7 @@ export async function salvarInscricaoPush(sub: InscricaoPush, userAgent: string)
 }
 
 export async function removerInscricaoPush(endpoint: string) {
-  const { user } = await requireAnyRole(["admin", "garcom"]);
+  const { user } = await requireAnyRole(["admin", "gerente", "garcom"]);
   const supabase = await createClient();
 
   await supabase

@@ -77,7 +77,6 @@ export type Database = {
           cor_fundo_cabecalho: string
           cor_texto_cabecalho: string
           descricao_caixa: Database["public"]["Enums"]["cardapio_descricao_caixa"]
-          tamanho_imagem_produto: "pequeno" | "medio" | "grande"
           id: number
           logo_path: string | null
           logo_posicao: Database["public"]["Enums"]["cardapio_logo_posicao"]
@@ -86,6 +85,7 @@ export type Database = {
           mostrar_nome_com_logo: boolean
           nome_estabelecimento: string
           sombra: boolean
+          tamanho_imagem_produto: string
           updated_at: string
         }
         Insert: {
@@ -100,7 +100,6 @@ export type Database = {
           cor_fundo_cabecalho?: string
           cor_texto_cabecalho?: string
           descricao_caixa?: Database["public"]["Enums"]["cardapio_descricao_caixa"]
-          tamanho_imagem_produto?: "pequeno" | "medio" | "grande"
           id?: number
           logo_path?: string | null
           logo_posicao?: Database["public"]["Enums"]["cardapio_logo_posicao"]
@@ -109,6 +108,7 @@ export type Database = {
           mostrar_nome_com_logo?: boolean
           nome_estabelecimento?: string
           sombra?: boolean
+          tamanho_imagem_produto?: string
           updated_at?: string
         }
         Update: {
@@ -123,7 +123,6 @@ export type Database = {
           cor_fundo_cabecalho?: string
           cor_texto_cabecalho?: string
           descricao_caixa?: Database["public"]["Enums"]["cardapio_descricao_caixa"]
-          tamanho_imagem_produto?: "pequeno" | "medio" | "grande"
           id?: number
           logo_path?: string | null
           logo_posicao?: Database["public"]["Enums"]["cardapio_logo_posicao"]
@@ -132,6 +131,7 @@ export type Database = {
           mostrar_nome_com_logo?: boolean
           nome_estabelecimento?: string
           sombra?: boolean
+          tamanho_imagem_produto?: string
           updated_at?: string
         }
         Relationships: []
@@ -385,10 +385,10 @@ export type Database = {
       produtos: {
         Row: {
           ativo: boolean
-          destaque: boolean
           categoria_id: string
           created_at: string
           descricao: string | null
+          destaque: boolean
           id: string
           imagem_layout: Database["public"]["Enums"]["produto_imagem_layout"]
           imagem_path: string | null
@@ -405,10 +405,10 @@ export type Database = {
         }
         Insert: {
           ativo?: boolean
-          destaque?: boolean
           categoria_id: string
           created_at?: string
           descricao?: string | null
+          destaque?: boolean
           id?: string
           imagem_layout?: Database["public"]["Enums"]["produto_imagem_layout"]
           imagem_path?: string | null
@@ -425,10 +425,10 @@ export type Database = {
         }
         Update: {
           ativo?: boolean
-          destaque?: boolean
           categoria_id?: string
           created_at?: string
           descricao?: string | null
+          destaque?: boolean
           id?: string
           imagem_layout?: Database["public"]["Enums"]["produto_imagem_layout"]
           imagem_path?: string | null
@@ -594,7 +594,7 @@ export type Database = {
       mesa_area: "interna" | "externa"
       produto_imagem_layout: "miniatura" | "grande"
       produto_modelo: "simples" | "tamanhos" | "compartilhar"
-      user_role: "admin" | "garcom"
+      user_role: "admin" | "garcom" | "gerente"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -733,7 +733,7 @@ export const Constants = {
       mesa_area: ["interna", "externa"],
       produto_imagem_layout: ["miniatura", "grande"],
       produto_modelo: ["simples", "tamanhos", "compartilhar"],
-      user_role: ["admin", "garcom"],
+      user_role: ["admin", "garcom", "gerente"],
     },
   },
 } as const

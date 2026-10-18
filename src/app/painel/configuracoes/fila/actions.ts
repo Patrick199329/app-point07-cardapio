@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { requireRole } from "@/lib/auth";
+import { requireAnyRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 export type FilaConfigState = { error: string | null; ok: boolean };
@@ -11,7 +11,7 @@ export async function salvarConfigFila(
   _prev: FilaConfigState,
   formData: FormData,
 ): Promise<FilaConfigState> {
-  await requireRole("admin");
+  await requireAnyRole(["admin", "gerente"]);
 
   const minutos = Number(formData.get("minutos"));
   const segundos = Number(formData.get("segundos"));

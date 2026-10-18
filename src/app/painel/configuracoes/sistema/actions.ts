@@ -2,7 +2,7 @@
 
 import { revalidatePath, revalidateTag } from "next/cache";
 
-import { requireRole } from "@/lib/auth";
+import { requireAnyRole } from "@/lib/auth";
 import {
   removerImagemProduto,
   salvarFaviconSistema,
@@ -24,7 +24,7 @@ export async function salvarIdentidadeSistema(
   _prev: SistemaState,
   formData: FormData,
 ): Promise<SistemaState> {
-  await requireRole("admin");
+  await requireAnyRole(["admin", "gerente"]);
 
   const supabase = await createClient();
   const update: { logo_path?: string | null; favicon_path?: string | null } = {};

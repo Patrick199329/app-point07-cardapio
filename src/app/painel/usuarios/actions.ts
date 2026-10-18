@@ -2,20 +2,20 @@
 
 import { revalidatePath } from "next/cache";
 
-import { requireRole } from "@/lib/auth";
+import { requireAnyRole } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 export type UsuarioState = { error: string | null; ok: boolean };
 
-const ROLES = ["admin", "garcom"] as const;
+const ROLES = ["admin", "gerente", "garcom"] as const;
 type Role = (typeof ROLES)[number];
 
 export async function criarUsuario(
   _prev: UsuarioState,
   formData: FormData,
 ): Promise<UsuarioState> {
-  await requireRole("admin");
+  await requireAnyRole(["admin", "gerente"]);
 
   const nome = String(formData.get("nome") ?? "").trim();
   const email = String(formData.get("email") ?? "")
@@ -60,7 +60,7 @@ export async function atualizarUsuario(
   _prev: UsuarioState,
   formData: FormData,
 ): Promise<UsuarioState> {
-  const { user } = await requireRole("admin");
+  const { user } = await requireAnyRole(["admin", "gerente"]);
 
   const id = String(formData.get("id") ?? "");
   const nome = String(formData.get("nome") ?? "").trim();
@@ -71,9 +71,9 @@ export async function atualizarUsuario(
   if (!ROLES.includes(role as Role)) {
     return { error: "Perfil inválido.", ok: false };
   }
-  if (id === user.id && role !== "admin") {
+  if (id === user.id && role === "garcom") {
     return {
-      error: "Você não pode rebaixar o seu próprio perfil de Administrador.",
+      error: "Você não pode remover o seu próprio acesso ao painel.",
       ok: false,
     };
   }
@@ -96,7 +96,7 @@ export async function redefinirSenha(
   _prev: UsuarioState,
   formData: FormData,
 ): Promise<UsuarioState> {
-  await requireRole("admin");
+  await requireAnyRole(["admin", "gerente"]);
 
   const id = String(formData.get("id") ?? "");
   const senha = String(formData.get("senha") ?? "");
@@ -119,7 +119,7 @@ export async function redefinirSenha(
 
 /** Ativa/desativa um usuário. Usada diretamente como `action` de um <form>. */
 export async function definirStatusUsuario(formData: FormData): Promise<void> {
-  const { user } = await requireRole("admin");
+  const { user } = await requireAnyRole(["admin", "gerente"]);
 
   const id = String(formData.get("id") ?? "");
   const ativo = formData.get("ativo") === "true";

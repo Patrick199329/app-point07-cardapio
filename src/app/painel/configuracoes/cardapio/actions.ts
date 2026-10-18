@@ -2,7 +2,7 @@
 
 import { revalidatePath, revalidateTag } from "next/cache";
 
-import { requireRole } from "@/lib/auth";
+import { requireAnyRole } from "@/lib/auth";
 import { corValida } from "@/lib/cardapio-tema";
 import { marcarRascunhoAlterado } from "@/lib/cardapio-publicacao";
 import { removerImagemProduto, salvarLogoCardapio } from "@/lib/imagem";
@@ -30,7 +30,7 @@ export async function salvarAparencia(
   _prev: AparenciaState,
   formData: FormData,
 ): Promise<AparenciaState> {
-  await requireRole("admin");
+  await requireAnyRole(["admin", "gerente"]);
 
   const nome_estabelecimento = String(
     formData.get("nome_estabelecimento") ?? "",

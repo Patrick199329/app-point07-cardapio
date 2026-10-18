@@ -25,7 +25,7 @@ type Usuario = {
   id: string;
   nome: string;
   email: string | null;
-  role: "admin" | "garcom";
+  role: "admin" | "gerente" | "garcom";
 };
 
 const INITIAL: UsuarioState = { error: null, ok: false };
@@ -112,6 +112,7 @@ export function UsuarioDialog({
               defaultValue={usuario?.role ?? "garcom"}
             >
               <option value="garcom">Garçom</option>
+              <option value="gerente">Gerente</option>
               <option value="admin">Administrador</option>
             </NativeSelect>
           </div>

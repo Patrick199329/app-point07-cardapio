@@ -147,7 +147,7 @@ export async function carregarCardapioPublico(): Promise<CardapioPublicoData> {
     categorias,
     destaques,
     avisos: avisos ?? [],
-    config: config ?? CONFIG_PADRAO,
+    config: (config as CardapioConfig | null) ?? CONFIG_PADRAO,
   };
 }
 

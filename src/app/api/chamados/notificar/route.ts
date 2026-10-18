@@ -33,7 +33,7 @@ export async function POST(request: Request) {
   const { data: inscricoes } = await supabase
     .from("push_inscricoes")
     .select("id, endpoint, p256dh, auth_key, profiles!inner(role, ativo)")
-    .in("profiles.role", ["garcom", "admin"])
+    .in("profiles.role", ["garcom", "admin", "gerente"])
     .eq("profiles.ativo", true);
 
   const payload = JSON.stringify({ mesa, chamadoId });

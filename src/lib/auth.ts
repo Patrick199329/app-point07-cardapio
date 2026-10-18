@@ -9,11 +9,12 @@ export type UserRole = Database["public"]["Enums"]["user_role"];
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
 export function homePathForRole(role: UserRole) {
-  return role === "admin" ? "/painel" : "/fila";
+  return role === "garcom" ? "/fila" : "/painel";
 }
 
 export const ROLE_LABEL: Record<UserRole, string> = {
   admin: "Administrador",
+  gerente: "Gerente",
   garcom: "Garçom",
 };
 

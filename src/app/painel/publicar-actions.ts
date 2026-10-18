@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { carregarCardapioPublico } from "@/lib/cardapio";
-import { requireRole } from "@/lib/auth";
+import { requireAnyRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 export type PublicarState = { error: string | null; ok: boolean };
@@ -18,7 +18,7 @@ export async function publicarCardapio(
   _prev: PublicarState,
   _formData: FormData,
 ): Promise<PublicarState> {
-  const { user } = await requireRole("admin");
+  const { user } = await requireAnyRole(["admin", "gerente"]);
 
   const dados = await carregarCardapioPublico();
   const supabase = await createClient();

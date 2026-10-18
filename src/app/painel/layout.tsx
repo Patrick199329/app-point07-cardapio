@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { ROLE_LABEL, requireRole } from "@/lib/auth";
+import { ROLE_LABEL, requireAnyRole } from "@/lib/auth";
 import { carregarLogoSistema } from "@/lib/sistema";
 
 import { PainelShell } from "./painel-shell";
@@ -12,7 +12,7 @@ export default async function PainelLayout({
   children: ReactNode;
 }) {
   const [{ profile }, logoUrl, pendente] = await Promise.all([
-    requireRole("admin"),
+    requireAnyRole(["admin", "gerente"]),
     carregarLogoSistema(),
     temAlteracoesPendentes(),
   ]);

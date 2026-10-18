@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { requireRole } from "@/lib/auth";
+import { requireAnyRole } from "@/lib/auth";
 import { marcarRascunhoAlterado } from "@/lib/cardapio-publicacao";
 import { createClient } from "@/lib/supabase/server";
 
@@ -29,7 +29,7 @@ export async function criarGrupo(
   _prev: OpcoesState,
   formData: FormData,
 ): Promise<OpcoesState> {
-  await requireRole("admin");
+  await requireAnyRole(["admin", "gerente"]);
   const produtoId = String(formData.get("produto_id") ?? "");
   const titulo = String(formData.get("titulo") ?? "").trim();
   const observacao = String(formData.get("observacao") ?? "").trim() || null;
@@ -54,7 +54,7 @@ export async function atualizarGrupo(
   _prev: OpcoesState,
   formData: FormData,
 ): Promise<OpcoesState> {
-  await requireRole("admin");
+  await requireAnyRole(["admin", "gerente"]);
   const id = String(formData.get("id") ?? "");
   const produtoId = String(formData.get("produto_id") ?? "");
   const titulo = String(formData.get("titulo") ?? "").trim();
@@ -76,7 +76,7 @@ export async function atualizarGrupo(
 
 /** Exclui o grupo (cascade remove as opções dele). */
 export async function excluirGrupo(formData: FormData): Promise<void> {
-  await requireRole("admin");
+  await requireAnyRole(["admin", "gerente"]);
   const id = String(formData.get("id") ?? "");
   const produtoId = String(formData.get("produto_id") ?? "");
   if (!id) return;
@@ -87,7 +87,7 @@ export async function excluirGrupo(formData: FormData): Promise<void> {
 }
 
 export async function adicionarOpcao(formData: FormData): Promise<void> {
-  await requireRole("admin");
+  await requireAnyRole(["admin", "gerente"]);
   const grupoId = String(formData.get("grupo_id") ?? "");
   const produtoId = String(formData.get("produto_id") ?? "");
   const nome = String(formData.get("nome") ?? "").trim();
@@ -107,7 +107,7 @@ export async function adicionarOpcao(formData: FormData): Promise<void> {
 }
 
 export async function removerOpcao(formData: FormData): Promise<void> {
-  await requireRole("admin");
+  await requireAnyRole(["admin", "gerente"]);
   const id = String(formData.get("id") ?? "");
   const produtoId = String(formData.get("produto_id") ?? "");
   if (!id) return;

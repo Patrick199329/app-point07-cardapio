@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { requireRole } from "@/lib/auth";
+import { requireAnyRole } from "@/lib/auth";
 import { marcarRascunhoAlterado } from "@/lib/cardapio-publicacao";
 import { parsePreco } from "@/lib/formato";
 import { removerImagemProduto, salvarImagemProduto } from "@/lib/imagem";
@@ -56,7 +56,7 @@ export async function criarCategoria(
   _prev: CardapioState,
   formData: FormData,
 ): Promise<CardapioState> {
-  await requireRole("admin");
+  await requireAnyRole(["admin", "gerente"]);
   const nome = String(formData.get("nome") ?? "").trim();
   if (!nome) return { error: "Informe o nome da categoria.", ok: false };
 
@@ -74,7 +74,7 @@ export async function atualizarCategoria(
   _prev: CardapioState,
   formData: FormData,
 ): Promise<CardapioState> {
-  await requireRole("admin");
+  await requireAnyRole(["admin", "gerente"]);
   const id = String(formData.get("id") ?? "");
   const nome = String(formData.get("nome") ?? "").trim();
   if (!id) return { error: "Categoria não identificada.", ok: false };
@@ -92,7 +92,7 @@ export async function atualizarCategoria(
 }
 
 export async function definirStatusCategoria(formData: FormData): Promise<void> {
-  await requireRole("admin");
+  await requireAnyRole(["admin", "gerente"]);
   const id = String(formData.get("id") ?? "");
   const ativo = formData.get("ativo") === "true";
   if (!id) return;
@@ -209,7 +209,7 @@ export async function criarProduto(
   _prev: CardapioState,
   formData: FormData,
 ): Promise<CardapioState> {
-  await requireRole("admin");
+  await requireAnyRole(["admin", "gerente"]);
   const parsed = parseProdutoForm(formData);
   if (!parsed.ok) return { error: parsed.error, ok: false };
 
@@ -246,7 +246,7 @@ export async function atualizarProduto(
   _prev: CardapioState,
   formData: FormData,
 ): Promise<CardapioState> {
-  await requireRole("admin");
+  await requireAnyRole(["admin", "gerente"]);
   const id = String(formData.get("id") ?? "");
   if (!id) return { error: "Produto não identificado.", ok: false };
 
@@ -284,7 +284,7 @@ export async function atualizarProduto(
 }
 
 export async function definirStatusProduto(formData: FormData): Promise<void> {
-  await requireRole("admin");
+  await requireAnyRole(["admin", "gerente"]);
   const id = String(formData.get("id") ?? "");
   const ativo = formData.get("ativo") === "true";
   if (!id) return;
@@ -301,7 +301,7 @@ export async function criarAviso(
   _prev: CardapioState,
   formData: FormData,
 ): Promise<CardapioState> {
-  await requireRole("admin");
+  await requireAnyRole(["admin", "gerente"]);
   const texto = String(formData.get("texto") ?? "").trim();
   const fixo = formData.get("fixo") === "true";
   if (!texto) return { error: "Escreva o texto do aviso.", ok: false };
@@ -320,7 +320,7 @@ export async function atualizarAviso(
   _prev: CardapioState,
   formData: FormData,
 ): Promise<CardapioState> {
-  await requireRole("admin");
+  await requireAnyRole(["admin", "gerente"]);
   const id = String(formData.get("id") ?? "");
   const texto = String(formData.get("texto") ?? "").trim();
   const fixo = formData.get("fixo") === "true";
@@ -339,7 +339,7 @@ export async function atualizarAviso(
 }
 
 export async function definirStatusAviso(formData: FormData): Promise<void> {
-  await requireRole("admin");
+  await requireAnyRole(["admin", "gerente"]);
   const id = String(formData.get("id") ?? "");
   const ativo = formData.get("ativo") === "true";
   if (!id) return;
@@ -365,7 +365,7 @@ type Ordenavel = (typeof ORDENAVEIS)[number];
  * Concorrência entre dois administradores é aceitável para este cliente.
  */
 export async function moverItem(formData: FormData): Promise<void> {
-  await requireRole("admin");
+  await requireAnyRole(["admin", "gerente"]);
   const tabela = String(formData.get("tabela") ?? "") as Ordenavel;
   const id = String(formData.get("id") ?? "");
   const direcao = String(formData.get("direcao") ?? "");
@@ -428,7 +428,7 @@ export async function reordenarItens(
   idsNovaOrdem: string[],
   categoriaId?: string,
 ): Promise<{ error: string } | { ok: true }> {
-  await requireRole("admin");
+  await requireAnyRole(["admin", "gerente"]);
   if (!Array.isArray(idsNovaOrdem) || idsNovaOrdem.length === 0) {
     return { error: "Lista vazia." };
   }
@@ -466,7 +466,7 @@ export async function reordenarItens(
 
 /** Move um produto pra outra categoria, no fim da lista de destino. */
 export async function moverProdutoParaCategoria(formData: FormData): Promise<void> {
-  await requireRole("admin");
+  await requireAnyRole(["admin", "gerente"]);
   const produtoId = String(formData.get("produto_id") ?? "");
   const destinoId = String(formData.get("categoria_destino_id") ?? "");
   if (!produtoId || !destinoId) return;

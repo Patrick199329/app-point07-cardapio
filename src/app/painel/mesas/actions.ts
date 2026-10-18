@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { requireRole } from "@/lib/auth";
+import { requireAnyRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 export type MesaState = { error: string | null; ok: boolean };
@@ -36,7 +36,7 @@ export async function criarMesa(
   _prev: MesaState,
   formData: FormData,
 ): Promise<MesaState> {
-  await requireRole("admin");
+  await requireAnyRole(["admin", "gerente"]);
 
   const parsed = parseMesaForm(formData);
   if (!parsed.ok) return { error: parsed.error, ok: false };
@@ -59,7 +59,7 @@ export async function atualizarMesa(
   _prev: MesaState,
   formData: FormData,
 ): Promise<MesaState> {
-  await requireRole("admin");
+  await requireAnyRole(["admin", "gerente"]);
 
   const id = String(formData.get("id") ?? "");
   if (!id) return { error: "Mesa não identificada.", ok: false };
@@ -86,7 +86,7 @@ export async function atualizarMesa(
 
 /** Ativa/desativa uma mesa. Usada diretamente como `action` de um <form>. */
 export async function definirStatusMesa(formData: FormData): Promise<void> {
-  await requireRole("admin");
+  await requireAnyRole(["admin", "gerente"]);
 
   const id = String(formData.get("id") ?? "");
   const ativo = formData.get("ativo") === "true";

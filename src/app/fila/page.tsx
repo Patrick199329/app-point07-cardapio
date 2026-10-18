@@ -11,7 +11,7 @@ export const metadata = { title: "Fila" };
 export const dynamic = "force-dynamic";
 
 export default async function FilaPage() {
-  const { profile, user } = await requireAnyRole(["admin", "garcom"]);
+  const { profile, user } = await requireAnyRole(["admin", "gerente", "garcom"]);
   const supabase = await createClient();
 
   const inicioHoje = new Date();
@@ -69,7 +69,7 @@ export default async function FilaPage() {
               {ROLE_LABEL[profile.role]}
             </span>
           </div>
-          {profile.role === "admin" ? (
+          {profile.role === "admin" || profile.role === "gerente" ? (
             <Link href="/painel" className="text-muted-foreground underline underline-offset-2">
               Voltar ao painel
             </Link>

@@ -21,7 +21,7 @@ type Usuario = {
   id: string;
   nome: string;
   email: string | null;
-  role: "admin" | "garcom";
+  role: "admin" | "gerente" | "garcom";
   ativo: boolean;
 };
 
@@ -87,7 +87,7 @@ export default async function UsuariosPage() {
         <div>
           <h1 className="text-xl font-semibold">Usuários</h1>
           <p className="text-sm text-muted-foreground">
-            Contas internas com login individual (Administrador e Garçom).
+            Contas internas com login individual (Administrador, Gerente e Garçom).
           </p>
         </div>
         <UsuarioDialog trigger={<Button>Novo usuário</Button>} />
