@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import {
+  BellRing,
   CalendarDays,
   LayoutGrid,
   Settings,
@@ -16,6 +17,7 @@ import { cn } from "@/lib/utils";
 
 const ITEMS = [
   { href: "/painel", label: "Visão geral", exact: true, icon: LayoutGrid },
+  { href: "/fila", label: "Fila", icon: BellRing },
   { href: "/painel/cardapio", label: "Cardápio", icon: UtensilsCrossed },
   { href: "/painel/eventos", label: "Eventos", icon: CalendarDays },
   { href: "/painel/gerencial", label: "Painel gerencial", icon: LayoutGrid },

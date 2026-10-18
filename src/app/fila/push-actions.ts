@@ -1,6 +1,6 @@
 "use server";
 
-import { requireRole } from "@/lib/auth";
+import { requireAnyRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 type InscricaoPush = {
@@ -9,7 +9,7 @@ type InscricaoPush = {
 };
 
 export async function salvarInscricaoPush(sub: InscricaoPush, userAgent: string) {
-  const { user } = await requireRole("garcom");
+  const { user } = await requireAnyRole(["admin", "garcom"]);
   const supabase = await createClient();
 
   const { error } = await supabase.from("push_inscricoes").upsert(
@@ -26,7 +26,7 @@ export async function salvarInscricaoPush(sub: InscricaoPush, userAgent: string)
 }
 
 export async function removerInscricaoPush(endpoint: string) {
-  const { user } = await requireRole("garcom");
+  const { user } = await requireAnyRole(["admin", "garcom"]);
   const supabase = await createClient();
 
   await supabase

@@ -65,3 +65,16 @@ export async function requireRole(role: UserRole) {
   }
   return result;
 }
+
+/**
+ * Como requireRole, mas aceita mais de um perfil — usado em /fila: o
+ * Administrador também atende chamados (a RPC aceitar_chamado já permite
+ * is_admin() desde o início), só o Garçom não acessa /painel.
+ */
+export async function requireAnyRole(roles: UserRole[]) {
+  const result = await requireProfile();
+  if (!roles.includes(result.profile.role)) {
+    redirect(homePathForRole(result.profile.role));
+  }
+  return result;
+}

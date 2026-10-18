@@ -4,7 +4,8 @@ import webpush from "web-push";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
- * Disparo de push pros garçons (bônus não contratual — ver
+ * Disparo de push pra garçons e administradores inscritos (bônus não
+ * contratual — ver
  * docs/Push-Notificacoes-Garcom-Bonus.md). Chamado pelo próprio cliente do
  * salão (anon, sem login) logo depois que criar_chamado() responde — por
  * isso é rota pública (ver PUBLIC_PATHS em src/lib/supabase/proxy.ts) e usa
@@ -32,7 +33,7 @@ export async function POST(request: Request) {
   const { data: inscricoes } = await supabase
     .from("push_inscricoes")
     .select("id, endpoint, p256dh, auth_key, profiles!inner(role, ativo)")
-    .eq("profiles.role", "garcom")
+    .in("profiles.role", ["garcom", "admin"])
     .eq("profiles.ativo", true);
 
   const payload = JSON.stringify({ mesa, chamadoId });

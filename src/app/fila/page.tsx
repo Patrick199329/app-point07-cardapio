@@ -1,5 +1,7 @@
+import Link from "next/link";
+
 import { SignOutButton } from "@/components/sign-out-button";
-import { requireRole } from "@/lib/auth";
+import { ROLE_LABEL, requireAnyRole } from "@/lib/auth";
 import { carregarLogoSistema } from "@/lib/sistema";
 import { createClient } from "@/lib/supabase/server";
 
@@ -9,7 +11,7 @@ export const metadata = { title: "Fila" };
 export const dynamic = "force-dynamic";
 
 export default async function FilaPage() {
-  const { profile, user } = await requireRole("garcom");
+  const { profile, user } = await requireAnyRole(["admin", "garcom"]);
   const supabase = await createClient();
 
   const inicioHoje = new Date();
@@ -60,9 +62,18 @@ export default async function FilaPage() {
           )}
           <SignOutButton />
         </div>
-        <div className="px-4 pb-3 text-sm">
-          <span className="font-medium">{profile.nome}</span>
-          <span className="ml-2 text-muted-foreground">Garçom</span>
+        <div className="flex items-center justify-between px-4 pb-3 text-sm">
+          <div>
+            <span className="font-medium">{profile.nome}</span>
+            <span className="ml-2 text-muted-foreground">
+              {ROLE_LABEL[profile.role]}
+            </span>
+          </div>
+          {profile.role === "admin" ? (
+            <Link href="/painel" className="text-muted-foreground underline underline-offset-2">
+              Voltar ao painel
+            </Link>
+          ) : null}
         </div>
       </header>
 
