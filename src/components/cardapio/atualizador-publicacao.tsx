@@ -19,6 +19,8 @@ export function AtualizadorPublicacao() {
 
   useEffect(() => {
     function recarregarQuandoLivre() {
+      // eslint-disable-next-line no-console
+      console.log("[atualizador] evento recebido");
       if (!chamadoEstaOcupado()) {
         window.location.reload();
         return;
@@ -38,7 +40,10 @@ export function AtualizadorPublicacao() {
         { event: "UPDATE", schema: "public", table: "cardapio_publicado" },
         recarregarQuandoLivre,
       )
-      .subscribe();
+      .subscribe((status) => {
+        // eslint-disable-next-line no-console
+        console.log("[atualizador] status da inscrição:", status);
+      });
 
     return () => {
       void supabase.removeChannel(canal);
