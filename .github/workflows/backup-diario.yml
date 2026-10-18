@@ -2,8 +2,8 @@ name: Backup diário
 
 on:
   schedule:
-    # Ajuste o horário — exemplo: 06:00 em Brasília (UTC-3) = 09:00 UTC.
-    - cron: '0 9 * * *'
+    # 05:00 em São Paulo (UTC-3, sem horário de verão desde 2019) = 08:00 UTC.
+    - cron: '0 8 * * *'
   workflow_dispatch: {}
 
 jobs:
