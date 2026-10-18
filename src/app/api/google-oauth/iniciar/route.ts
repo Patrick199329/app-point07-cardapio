@@ -33,7 +33,11 @@ export async function GET(request: NextRequest) {
   url.searchParams.set("response_type", "code");
   url.searchParams.set("scope", "https://www.googleapis.com/auth/drive.file");
   url.searchParams.set("access_type", "offline");
-  url.searchParams.set("prompt", "consent");
+  // select_account: sempre mostra o seletor de conta do Google, mesmo que o
+  // navegador já tenha uma sessão ativa em outra conta — evita autorizar com
+  // a conta errada quando a pessoa tem mais de uma conta Google logada.
+  // consent: garante um refresh_token novo mesmo numa reautorização.
+  url.searchParams.set("prompt", "select_account consent");
 
   return NextResponse.redirect(url);
 }
