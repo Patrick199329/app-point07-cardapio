@@ -344,6 +344,47 @@ export type Database = {
           },
         ]
       }
+      logs_auditoria: {
+        Row: {
+          antes: Json | null
+          criado_em: string
+          depois: Json | null
+          id: string
+          registro_id: string | null
+          tabela: string | null
+          tipo: Database["public"]["Enums"]["auditoria_tipo"]
+          usuario_id: string | null
+        }
+        Insert: {
+          antes?: Json | null
+          criado_em?: string
+          depois?: Json | null
+          id?: string
+          registro_id?: string | null
+          tabela?: string | null
+          tipo: Database["public"]["Enums"]["auditoria_tipo"]
+          usuario_id?: string | null
+        }
+        Update: {
+          antes?: Json | null
+          criado_em?: string
+          depois?: Json | null
+          id?: string
+          registro_id?: string | null
+          tabela?: string | null
+          tipo?: Database["public"]["Enums"]["auditoria_tipo"]
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "logs_auditoria_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mesas: {
         Row: {
           apelido: string | null
@@ -645,6 +686,16 @@ export type Database = {
           identificador: string
         }[]
       }
+      registrar_auditoria_manual: {
+        Args: {
+          p_antes?: Json
+          p_depois?: Json
+          p_registro_id?: string
+          p_tabela?: string
+          p_tipo: Database["public"]["Enums"]["auditoria_tipo"]
+        }
+        Returns: undefined
+      }
       status_chamado: {
         Args: { p_id: string; p_origem_token: string }
         Returns: {
@@ -655,6 +706,7 @@ export type Database = {
       }
     }
     Enums: {
+      auditoria_tipo: "criacao" | "edicao" | "exclusao" | "entrada" | "saida"
       cardapio_arredondamento: "nenhum" | "pequeno" | "medio" | "grande"
       cardapio_descricao_caixa: "original" | "maiusculo" | "frase"
       cardapio_logo_posicao: "esquerda" | "centro" | "direita"
@@ -794,6 +846,7 @@ export const Constants = {
   },
   public: {
     Enums: {
+      auditoria_tipo: ["criacao", "edicao", "exclusao", "entrada", "saida"],
       cardapio_arredondamento: ["nenhum", "pequeno", "medio", "grande"],
       cardapio_descricao_caixa: ["original", "maiusculo", "frase"],
       cardapio_logo_posicao: ["esquerda", "centro", "direita"],

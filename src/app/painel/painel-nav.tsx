@@ -8,6 +8,7 @@ import {
   CalendarDays,
   DatabaseBackup,
   LayoutGrid,
+  ScrollText,
   Settings,
   Table2,
   UtensilsCrossed,
@@ -34,19 +35,22 @@ const ITEMS: ItemNav[] = [
   { href: "/painel/configuracoes", label: "Configurações", icon: Settings },
 ];
 
-// Terceiro nível de admin (Innovation) — não aparece pro admin/gerente do
+// Terceiro nível de admin (Innovation) — não aparecem pro admin/gerente do
 // cliente final. Ver requireAdminInnovation() em src/lib/auth.ts.
-const ITEM_BACKUPS: ItemNav = { href: "/painel/backups", label: "Backups", icon: DatabaseBackup };
+const ITENS_INNOVATION: ItemNav[] = [
+  { href: "/painel/backups", label: "Backups", icon: DatabaseBackup },
+  { href: "/painel/logs", label: "Logs de auditoria", icon: ScrollText },
+];
 
 export function PainelNav({
   onNavigate,
-  mostrarBackups = false,
+  mostrarInnovation = false,
 }: {
   onNavigate?: () => void;
-  mostrarBackups?: boolean;
+  mostrarInnovation?: boolean;
 }) {
   const pathname = usePathname();
-  const itens = mostrarBackups ? [...ITEMS, ITEM_BACKUPS] : ITEMS;
+  const itens = mostrarInnovation ? [...ITEMS, ...ITENS_INNOVATION] : ITEMS;
 
   return (
     <nav className="flex flex-col gap-1">

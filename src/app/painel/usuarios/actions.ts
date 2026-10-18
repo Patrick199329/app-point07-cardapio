@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { requireAnyRole } from "@/lib/auth";
+import { registrarAuditoria } from "@/lib/auditoria";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -34,7 +35,7 @@ export async function criarUsuario(
   }
 
   const admin = createAdminClient();
-  const { error } = await admin.auth.admin.createUser({
+  const { data, error } = await admin.auth.admin.createUser({
     email,
     password: senha,
     email_confirm: true,
@@ -51,6 +52,17 @@ export async function criarUsuario(
     }
     return { error: "Não foi possível criar o usuário.", ok: false };
   }
+
+  // Criado via Admin API (sem contexto de auth.uid() pro trigger genérico
+  // de profiles — ver migration 20261018150100) — registra manualmente,
+  // com o autor da própria sessão que chamou essa Server Action.
+  const supabase = await createClient();
+  await registrarAuditoria(supabase, {
+    tipo: "criacao",
+    tabela: "profiles",
+    registroId: data.user.id,
+    depois: { nome, email, role },
+  });
 
   revalidatePath("/painel/usuarios");
   return { error: null, ok: true };
@@ -113,6 +125,15 @@ export async function redefinirSenha(
   if (error) {
     return { error: "Não foi possível redefinir a senha.", ok: false };
   }
+
+  // Nunca loga a senha em si — só que a ação aconteceu e em quem.
+  const supabase = await createClient();
+  await registrarAuditoria(supabase, {
+    tipo: "edicao",
+    tabela: "profiles",
+    registroId: id,
+    depois: { acao: "senha_redefinida" },
+  });
 
   return { error: null, ok: true };
 }

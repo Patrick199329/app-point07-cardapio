@@ -39,14 +39,14 @@ export function PainelShell({
   perfil,
   logoUrl,
   publicacaoPendente,
-  mostrarBackups,
+  mostrarInnovation,
   children,
 }: {
   nome: string;
   perfil: string;
   logoUrl: string | null;
   publicacaoPendente: boolean;
-  mostrarBackups: boolean;
+  mostrarInnovation: boolean;
   children: ReactNode;
 }) {
   const [navOpen, setNavOpen] = useState(false);
@@ -58,7 +58,7 @@ export function PainelShell({
         <div className="mb-6 px-3 pt-1">
           <Marca logoUrl={logoUrl} className="h-8" />
         </div>
-        <PainelNav mostrarBackups={mostrarBackups} />
+        <PainelNav mostrarInnovation={mostrarInnovation} />
       </aside>
 
       {/* Barra superior — mobile */}
@@ -90,7 +90,7 @@ export function PainelShell({
             </SheetDescription>
           </SheetHeader>
           <div className="p-3">
-            <PainelNav onNavigate={() => setNavOpen(false)} mostrarBackups={mostrarBackups} />
+            <PainelNav onNavigate={() => setNavOpen(false)} mostrarInnovation={mostrarInnovation} />
           </div>
         </SheetContent>
       </Sheet>

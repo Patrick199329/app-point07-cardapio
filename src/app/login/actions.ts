@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 
 import { getProfile, homePathForRole } from "@/lib/auth";
+import { registrarAuditoria } from "@/lib/auditoria";
 import { createClient } from "@/lib/supabase/server";
 
 export type LoginState = { error: string | null };
@@ -35,6 +36,8 @@ export async function login(
       error: "Este acesso está inativo. Procure o administrador do Point07.",
     };
   }
+
+  await registrarAuditoria(supabase, { tipo: "entrada" });
 
   redirect(homePathForRole(result.profile.role));
 }

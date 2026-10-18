@@ -23,7 +23,7 @@ export default async function PainelLayout({
       perfil={ROLE_LABEL[profile.role]}
       logoUrl={logoUrl}
       publicacaoPendente={pendente}
-      mostrarBackups={ehAdminInnovation(profile)}
+      mostrarInnovation={ehAdminInnovation(profile)}
     >
       {children}
     </PainelShell>
