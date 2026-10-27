@@ -6,13 +6,24 @@
 -- Colunas e constraints
 -- ---------------------------------------------------------------------------
 alter table public.chamados
-  add column finalizado_em   timestamptz,
-  add column finalizado_auto boolean not null default false;
+  add column if not exists finalizado_em   timestamptz,
+  add column if not exists finalizado_auto boolean not null default false;
 
 comment on column public.chamados.finalizado_em is
   'Quando o atendimento foi finalizado (pelo garçom, por Admin/Gerente ou automaticamente).';
 comment on column public.chamados.finalizado_auto is
   'True se a finalização foi automática (tempo máximo excedido). Fica fora das médias de tempo de atendimento.';
+
+-- Encerra atendimentos 'aceito' antigos antes das travas (senão o índice único abaixo
+-- falha se o mesmo garçom tiver mais de um). Entram como automáticos: fora das médias.
+update public.chamados
+set status = 'finalizado',
+    finalizado_em = aceito_em,
+    finalizado_auto = true
+where status = 'aceito';
+
+alter table public.chamados
+  drop constraint if exists chamados_finalizado_consistente;
 
 alter table public.chamados
   add constraint chamados_finalizado_consistente check (
@@ -21,17 +32,17 @@ alter table public.chamados
   );
 
 -- Garantia no banco: um garçom só tem UM atendimento em andamento por vez.
-create unique index chamados_um_atendimento_por_garcom_idx
+create unique index if not exists chamados_um_atendimento_por_garcom_idx
   on public.chamados (garcom_id)
   where status = 'aceito';
 
-create index chamados_finalizado_idx on public.chamados (garcom_id, finalizado_em desc);
+create index if not exists chamados_finalizado_idx on public.chamados (garcom_id, finalizado_em desc);
 
 -- ---------------------------------------------------------------------------
 -- Configuração: tempo máximo de um atendimento (padrão 10 min)
 -- ---------------------------------------------------------------------------
 alter table public.fila_config
-  add column atendimento_max_minutos integer not null default 10
+  add column if not exists atendimento_max_minutos integer not null default 10
     check (atendimento_max_minutos > 0);
 
 comment on column public.fila_config.atendimento_max_minutos is
