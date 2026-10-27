@@ -161,9 +161,9 @@ begin
   insert into public.chamados (mesa_id, criado_em)
   values (m_02, now() - interval '2 minutes');
 
-  -- aceito (histórico — Módulo 4)
-  insert into public.chamados (mesa_id, status, criado_em, aceito_em, garcom_id)
-  values (m_03, 'aceito', now() - interval '40 minutes', now() - interval '38 minutes', g_joao);
+  -- finalizado (histórico — Módulo 4)
+  insert into public.chamados (mesa_id, status, criado_em, aceito_em, finalizado_em, garcom_id)
+  values (m_03, 'finalizado', now() - interval '40 minutes', now() - interval '38 minutes', now() - interval '35 minutes', g_joao);
 
   -- cancelado pelo cliente
   insert into public.chamados (mesa_id, status, criado_em, cancelado_em)

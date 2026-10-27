@@ -54,7 +54,7 @@ export default async function PainelHome() {
     supabase
       .from("chamados")
       .select("*", { count: "exact", head: true })
-      .eq("status", "aceito")
+      .in("status", ["aceito", "finalizado"])
       .gte("criado_em", desdeHoje),
   ]);
 

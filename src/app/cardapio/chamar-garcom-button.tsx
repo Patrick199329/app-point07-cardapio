@@ -62,7 +62,8 @@ export function ChamarGarcomButton({
       if (parado) return;
       const row = data?.[0];
       if (!row) return;
-      if (row.status === "aceito") {
+      // `finalizado`: o garçom aceitou e já finalizou entre dois polls.
+      if (row.status === "aceito" || row.status === "finalizado") {
         setGarcom(row.garcom_nome ?? null);
         setEstado("aceito");
       } else if (row.status === "cancelado") {

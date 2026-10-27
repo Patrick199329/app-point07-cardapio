@@ -249,6 +249,8 @@ export type Database = {
           cancelado_em: string | null
           created_at: string
           criado_em: string
+          finalizado_auto: boolean
+          finalizado_em: string | null
           garcom_id: string | null
           id: string
           mesa_id: string
@@ -261,6 +263,8 @@ export type Database = {
           cancelado_em?: string | null
           created_at?: string
           criado_em?: string
+          finalizado_auto?: boolean
+          finalizado_em?: string | null
           garcom_id?: string | null
           id?: string
           mesa_id: string
@@ -273,6 +277,8 @@ export type Database = {
           cancelado_em?: string | null
           created_at?: string
           criado_em?: string
+          finalizado_auto?: boolean
+          finalizado_em?: string | null
           garcom_id?: string | null
           id?: string
           mesa_id?: string
@@ -300,16 +306,19 @@ export type Database = {
       fila_config: {
         Row: {
           alerta_atraso_segundos: number
+          atendimento_max_minutos: number
           id: number
           updated_at: string
         }
         Insert: {
           alerta_atraso_segundos?: number
+          atendimento_max_minutos?: number
           id?: number
           updated_at?: string
         }
         Update: {
           alerta_atraso_segundos?: number
+          atendimento_max_minutos?: number
           id?: number
           updated_at?: string
         }
@@ -677,6 +686,14 @@ export type Database = {
         }[]
       }
       eh_admin_innovation: { Args: never; Returns: boolean }
+      finalizar_chamado: {
+        Args: { p_id: string }
+        Returns: {
+          motivo: string
+          ok: boolean
+        }[]
+      }
+      finalizar_chamados_expirados: { Args: never; Returns: number }
       is_admin: { Args: never; Returns: boolean }
       is_garcom: { Args: never; Returns: boolean }
       mesa_por_token: {
@@ -711,7 +728,7 @@ export type Database = {
       cardapio_descricao_caixa: "original" | "maiusculo" | "frase"
       cardapio_logo_posicao: "esquerda" | "centro" | "direita"
       cardapio_logo_tamanho: "pequeno" | "medio" | "grande"
-      chamado_status: "pendente" | "aceito" | "cancelado"
+      chamado_status: "pendente" | "aceito" | "cancelado" | "finalizado"
       mesa_area: "interna" | "externa"
       produto_imagem_layout: "miniatura" | "grande"
       produto_modelo: "simples" | "tamanhos" | "compartilhar"
@@ -851,7 +868,7 @@ export const Constants = {
       cardapio_descricao_caixa: ["original", "maiusculo", "frase"],
       cardapio_logo_posicao: ["esquerda", "centro", "direita"],
       cardapio_logo_tamanho: ["pequeno", "medio", "grande"],
-      chamado_status: ["pendente", "aceito", "cancelado"],
+      chamado_status: ["pendente", "aceito", "cancelado", "finalizado"],
       mesa_area: ["interna", "externa"],
       produto_imagem_layout: ["miniatura", "grande"],
       produto_modelo: ["simples", "tamanhos", "compartilhar"],

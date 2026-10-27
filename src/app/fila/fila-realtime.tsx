@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 
-import { BellRing, Check, Volume2, VolumeX } from "lucide-react";
+import { BellRing, Check, CircleCheck, Volume2, VolumeX } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,17 @@ export type ChamadoFila = {
   mesaId: string;
   identificador: string;
   criadoEm: string;
+  /** `aceito` no banco = "Em atendimento" na tela. */
+  status: "pendente" | "aceito";
+  garcomId: string | null;
+  aceitoEm: string | null;
 };
+
+// Com que frequência a fila pede ao banco para finalizar atendimentos que
+// estouraram o tempo máximo (fila_config.atendimento_max_minutos). Não há
+// pg_cron — qualquer fila aberta serve de relógio, e o UPDATE chega a todos
+// via Realtime.
+const INTERVALO_EXPIRAR_MS = 30_000;
 
 // Padrão de vibração do alerta — repetido, pra se notar num bar barulhento.
 // Só funciona em Android (iPhone não deixa site nenhum controlar vibração).
@@ -73,22 +83,49 @@ export function FilaRealtime({
   mesas,
   meusHoje,
   alertaAtrasoSegundos,
+  userId,
+  veTodos,
+  nomesGarcons,
 }: {
   inicial: ChamadoFila[];
   mesas: Record<string, string>;
   meusHoje: number;
   alertaAtrasoSegundos: number;
+  userId: string;
+  /** Admin/Gerente: enxerga os atendimentos de todos os garçons. */
+  veTodos: boolean;
+  nomesGarcons: Record<string, string>;
 }) {
   const supabase = useMemo(() => createClient(), []);
   const [fila, setFila] = useState<ChamadoFila[]>(inicial);
+  const [nomes, setNomes] = useState(nomesGarcons);
   const [atendidos, setAtendidos] = useState(meusHoje);
   const [somAtivo, setSomAtivo] = useState(true);
   const [agora, setAgora] = useState(() => Date.now());
+  const [processando, setProcessando] = useState<string | null>(null);
   const somRef = useRef(true);
+
+  const meuAtendimento = fila.find(
+    (c) => c.status === "aceito" && c.garcomId === userId,
+  );
+  // Quem está em atendimento não é avisado de chamado novo (regra do cliente).
+  const ocupadoRef = useRef(false);
 
   useEffect(() => {
     somRef.current = somAtivo;
   }, [somAtivo]);
+
+  useEffect(() => {
+    ocupadoRef.current = !!meuAtendimento;
+  }, [meuAtendimento]);
+
+  // Finaliza no banco os atendimentos que passaram do tempo máximo.
+  useEffect(() => {
+    const iv = setInterval(() => {
+      void supabase.rpc("finalizar_chamados_expirados");
+    }, INTERVALO_EXPIRAR_MS);
+    return () => clearInterval(iv);
+  }, [supabase]);
 
   // Cronômetro mm:ss de cada chamado — precisa de tique por segundo.
   useEffect(() => {
@@ -96,11 +133,16 @@ export function FilaRealtime({
     return () => clearInterval(iv);
   }, []);
 
-  // Título da aba com o contador.
+  const pendentes = fila.filter((c) => c.status === "pendente");
+  const emAtendimento = fila.filter((c) => c.status === "aceito");
+
+  // Título da aba com o contador de chamados aguardando.
   useEffect(() => {
     document.title =
-      fila.length > 0 ? `(${fila.length}) Fila — Point07` : "Fila — Point07";
-  }, [fila.length]);
+      pendentes.length > 0
+        ? `(${pendentes.length}) Fila — Point07`
+        : "Fila — Point07";
+  }, [pendentes.length]);
 
   // Assinatura Realtime dos chamados.
   useEffect(() => {
@@ -126,19 +168,66 @@ export function FilaRealtime({
                 mesaId: nova.mesa_id,
                 identificador: mesas[nova.mesa_id] ?? "Mesa",
                 criadoEm: nova.criado_em,
+                status: "pendente",
+                garcomId: null,
+                aceitoEm: null,
               },
             ];
           });
-          if (somRef.current) tocarBip();
+          if (somRef.current && !ocupadoRef.current) tocarBip();
         },
       )
       .on(
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "chamados" },
         (payload) => {
-          const linha = payload.new as { id: string; status: string };
-          if (linha.status !== "pendente") {
+          const linha = payload.new as {
+            id: string;
+            mesa_id: string;
+            status: string;
+            criado_em: string;
+            garcom_id: string | null;
+            aceito_em: string | null;
+          };
+
+          if (linha.status !== "aceito") {
+            // cancelado / finalizado (ou pendente, que não volta a acontecer)
+            if (linha.status !== "pendente") {
+              setFila((atual) => atual.filter((c) => c.id !== linha.id));
+            }
+            return;
+          }
+
+          // Em atendimento: o garçom só acompanha o próprio; Admin/Gerente, todos.
+          if (!veTodos && linha.garcom_id !== userId) {
             setFila((atual) => atual.filter((c) => c.id !== linha.id));
+            return;
+          }
+          setFila((atual) => {
+            const virou: ChamadoFila = {
+              id: linha.id,
+              mesaId: linha.mesa_id,
+              identificador: mesas[linha.mesa_id] ?? "Mesa",
+              criadoEm: linha.criado_em,
+              status: "aceito",
+              garcomId: linha.garcom_id,
+              aceitoEm: linha.aceito_em,
+            };
+            return atual.some((c) => c.id === linha.id)
+              ? atual.map((c) => (c.id === linha.id ? virou : c))
+              : [...atual, virou];
+          });
+
+          const gid = linha.garcom_id;
+          if (veTodos && gid) {
+            void supabase
+              .from("profiles")
+              .select("nome")
+              .eq("id", gid)
+              .single()
+              .then(({ data }) => {
+                if (data) setNomes((n) => ({ ...n, [gid]: data.nome }));
+              });
           }
         },
       )
@@ -147,31 +236,74 @@ export function FilaRealtime({
     return () => {
       void supabase.removeChannel(canal);
     };
-  }, [supabase, mesas]);
+  }, [supabase, mesas, userId, veTodos]);
 
   const aceitar = useCallback(
     async (chamado: ChamadoFila) => {
-      setFila((atual) => atual.filter((c) => c.id !== chamado.id));
+      setProcessando(chamado.id);
       const { data, error } = await supabase.rpc("aceitar_chamado", {
         p_id: chamado.id,
       });
+      setProcessando(null);
       const res = data?.[0];
       if (error || !res?.ok) {
-        toast.error(
-          res?.motivo === "ja_aceito"
-            ? "Outro garçom já pegou esse chamado."
-            : "Não foi possível aceitar o chamado.",
-        );
+        if (res?.motivo === "ja_aceito") {
+          setFila((atual) => atual.filter((c) => c.id !== chamado.id));
+          toast.error("Outro garçom já pegou esse chamado.");
+        } else if (res?.motivo === "em_atendimento") {
+          toast.error("Finalize o atendimento em andamento antes de aceitar outro.");
+        } else {
+          toast.error("Não foi possível aceitar o chamado.");
+        }
         return;
       }
+      setFila((atual) =>
+        atual.map((c) =>
+          c.id === chamado.id
+            ? {
+                ...c,
+                status: "aceito",
+                garcomId: userId,
+                aceitoEm: new Date().toISOString(),
+              }
+            : c,
+        ),
+      );
       setAtendidos((n) => n + 1);
       toast.success(`Chamado da ${chamado.identificador} — pode ir.`);
+    },
+    [supabase, userId],
+  );
+
+  const finalizar = useCallback(
+    async (chamado: ChamadoFila) => {
+      setProcessando(chamado.id);
+      const { data, error } = await supabase.rpc("finalizar_chamado", {
+        p_id: chamado.id,
+      });
+      setProcessando(null);
+      const res = data?.[0];
+      if (error || !res?.ok) {
+        // Já finalizado (ex.: automaticamente) — o card some de qualquer forma.
+        if (res?.motivo === "nao_esta_em_atendimento") {
+          setFila((atual) => atual.filter((c) => c.id !== chamado.id));
+        }
+        toast.error("Não foi possível finalizar o atendimento.");
+        return;
+      }
+      setFila((atual) => atual.filter((c) => c.id !== chamado.id));
+      toast.success(`Atendimento da ${chamado.identificador} finalizado.`);
     },
     [supabase],
   );
 
-  const ordenada = [...fila].sort(
+  const ordenada = [...pendentes].sort(
     (a, b) => new Date(a.criadoEm).getTime() - new Date(b.criadoEm).getTime(),
+  );
+  const atendimentos = [...emAtendimento].sort(
+    (a, b) =>
+      new Date(a.aceitoEm ?? a.criadoEm).getTime() -
+      new Date(b.aceitoEm ?? b.criadoEm).getTime(),
   );
 
   return (
@@ -198,6 +330,57 @@ export function FilaRealtime({
         </div>
       </div>
 
+      {atendimentos.length > 0 ? (
+        <section className="space-y-2">
+          <h2 className="text-sm font-semibold text-muted-foreground">
+            Em atendimento ({atendimentos.length})
+          </h2>
+          <ul className="space-y-3">
+            {atendimentos.map((c) => {
+              const meu = c.garcomId === userId;
+              return (
+                <li
+                  key={c.id}
+                  className="flex items-center justify-between gap-3 rounded-xl border border-primary/40 bg-primary/5 p-4"
+                >
+                  <div>
+                    <p className="text-lg font-semibold">{c.identificador}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {meu
+                        ? "Você está atendendo"
+                        : `Atendendo: ${(c.garcomId && nomes[c.garcomId]) || "Garçom"}`}
+                    </p>
+                    <p className="font-mono text-sm text-muted-foreground tabular-nums">
+                      {formatarCronometro(c.aceitoEm ?? c.criadoEm, agora)}
+                    </p>
+                  </div>
+                  <Button
+                    size="lg"
+                    variant={meu ? "default" : "outline"}
+                    className="h-12 rounded-xl px-6"
+                    disabled={processando === c.id}
+                    onClick={() => finalizar(c)}
+                  >
+                    <CircleCheck className="size-5" />
+                    Finalizar
+                  </Button>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ) : null}
+
+      {meuAtendimento ? (
+        <p className="rounded-lg border border-dashed px-3 py-2 text-xs text-muted-foreground">
+          Você está em atendimento: finalize para aceitar novos chamados e
+          voltar a receber avisos.
+        </p>
+      ) : null}
+
+      <h2 className="text-sm font-semibold text-muted-foreground">
+        Aguardando ({ordenada.length})
+      </h2>
       {ordenada.length === 0 ? (
         <div className="rounded-xl border py-16 text-center">
           <BellRing className="mx-auto size-8 text-muted-foreground/40" />
@@ -242,6 +425,7 @@ export function FilaRealtime({
                 <Button
                   size="lg"
                   className="h-12 rounded-xl px-6"
+                  disabled={!!meuAtendimento || processando === chamado.id}
                   onClick={() => aceitar(chamado)}
                 >
                   <Check className="size-5" />

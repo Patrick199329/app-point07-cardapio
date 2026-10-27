@@ -20,20 +20,25 @@ import { EventosFiltros } from "./eventos-filtros";
 export const metadata = { title: "Eventos" };
 export const dynamic = "force-dynamic";
 
+type StatusChamado = "pendente" | "aceito" | "cancelado" | "finalizado";
+
 const STATUS: Record<
-  "pendente" | "aceito" | "cancelado",
+  StatusChamado,
   { label: string; variant: "default" | "secondary" | "outline" }
 > = {
   pendente: { label: "Pendente", variant: "outline" },
-  aceito: { label: "Aceito", variant: "default" },
+  aceito: { label: "Em atendimento", variant: "default" },
+  finalizado: { label: "Finalizado", variant: "secondary" },
   cancelado: { label: "Cancelado", variant: "secondary" },
 };
 
 type Chamado = {
   id: string;
-  status: "pendente" | "aceito" | "cancelado";
+  status: StatusChamado;
   criado_em: string;
   aceito_em: string | null;
+  finalizado_em: string | null;
+  finalizado_auto: boolean;
   mesas: { identificador: string } | null;
   profiles: { nome: string } | null;
 };
@@ -64,14 +69,19 @@ export default async function EventosPage({
   let query = supabase
     .from("chamados")
     .select(
-      "id, status, criado_em, aceito_em, mesas(identificador), profiles(nome)",
+      "id, status, criado_em, aceito_em, finalizado_em, finalizado_auto, mesas(identificador), profiles(nome)",
     )
     .order("criado_em", { ascending: false })
     .limit(300);
 
   const desde = desdeQuando(periodo);
   if (desde) query = query.gte("criado_em", desde);
-  if (sp.status === "pendente" || sp.status === "aceito" || sp.status === "cancelado") {
+  if (
+    sp.status === "pendente" ||
+    sp.status === "aceito" ||
+    sp.status === "finalizado" ||
+    sp.status === "cancelado"
+  ) {
     query = query.eq("status", sp.status);
   }
   if (sp.garcom && sp.garcom !== "all") query = query.eq("garcom_id", sp.garcom);
@@ -80,7 +90,9 @@ export default async function EventosPage({
   const { data } = await query;
   const chamados = (data ?? []) as unknown as Chamado[];
 
-  const aceitos = chamados.filter((c) => c.status === "aceito");
+  const aceitos = chamados.filter(
+    (c) => c.status === "aceito" || c.status === "finalizado",
+  );
   const esperaMedia =
     aceitos.length > 0
       ? aceitos.reduce(
@@ -90,6 +102,18 @@ export default async function EventosPage({
               new Date(c.criado_em).getTime()),
           0,
         ) / aceitos.length
+      : null;
+
+  // Duração só das finalizações manuais (a automática não mede o atendimento).
+  const duracoes = chamados
+    .filter((c) => c.status === "finalizado" && !c.finalizado_auto && c.finalizado_em)
+    .map(
+      (c) =>
+        new Date(c.finalizado_em!).getTime() - new Date(c.aceito_em!).getTime(),
+    );
+  const atendimentoMedio =
+    duracoes.length > 0
+      ? duracoes.reduce((a, b) => a + b, 0) / duracoes.length
       : null;
 
   return (
@@ -110,8 +134,12 @@ export default async function EventosPage({
         <span>{chamados.length} chamado(s)</span>
         <span>{aceitos.length} aceito(s)</span>
         <span>
-          Tempo médio de atendimento:{" "}
+          Espera média:{" "}
           {esperaMedia === null ? "—" : formatarDuracaoMs(esperaMedia)}
+        </span>
+        <span>
+          Atendimento médio:{" "}
+          {atendimentoMedio === null ? "—" : formatarDuracaoMs(atendimentoMedio)}
         </span>
       </div>
 
@@ -138,7 +166,7 @@ export default async function EventosPage({
                   <dd className="text-right text-foreground">
                     {formatarDataHora(c.criado_em)}
                   </dd>
-                  <dt>Atendido</dt>
+                  <dt>Aceito</dt>
                   <dd className="text-right text-foreground">
                     {formatarDataHora(c.aceito_em)}
                   </dd>
@@ -149,6 +177,15 @@ export default async function EventosPage({
                   <dt>Espera</dt>
                   <dd className="text-right text-foreground">
                     {formatarDuracao(c.criado_em, c.aceito_em)}
+                  </dd>
+                  <dt>Finalizado</dt>
+                  <dd className="text-right text-foreground">
+                    {formatarDataHora(c.finalizado_em)}
+                    {c.finalizado_auto ? " (auto)" : ""}
+                  </dd>
+                  <dt>Atendimento</dt>
+                  <dd className="text-right text-foreground">
+                    {formatarDuracao(c.aceito_em, c.finalizado_em)}
                   </dd>
                 </dl>
               </li>
@@ -162,9 +199,11 @@ export default async function EventosPage({
                 <TableRow>
                   <TableHead>Mesa</TableHead>
                   <TableHead>Chamado</TableHead>
-                  <TableHead>Atendido</TableHead>
+                  <TableHead>Aceito</TableHead>
                   <TableHead>Garçom</TableHead>
                   <TableHead>Espera</TableHead>
+                  <TableHead>Finalizado</TableHead>
+                  <TableHead>Atendimento</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
               </TableHeader>
@@ -179,6 +218,13 @@ export default async function EventosPage({
                     <TableCell>{c.profiles?.nome ?? "—"}</TableCell>
                     <TableCell>
                       {formatarDuracao(c.criado_em, c.aceito_em)}
+                    </TableCell>
+                    <TableCell>
+                      {formatarDataHora(c.finalizado_em)}
+                      {c.finalizado_auto ? " (auto)" : ""}
+                    </TableCell>
+                    <TableCell>
+                      {formatarDuracao(c.aceito_em, c.finalizado_em)}
                     </TableCell>
                     <TableCell>
                       <Badge variant={STATUS[c.status].variant}>

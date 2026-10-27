@@ -17,38 +17,73 @@ export default async function FilaPage() {
   const inicioHoje = new Date();
   inicioHoje.setHours(0, 0, 0, 0);
 
-  const [pendentes, mesasRes, meusHoje, logoUrl, filaConfig] = await Promise.all([
-    supabase
-      .from("chamados")
-      .select("id, mesa_id, criado_em")
-      .eq("status", "pendente")
-      .order("criado_em", { ascending: true }),
-    supabase.from("mesas").select("id, identificador"),
-    supabase
-      .from("chamados")
-      .select("*", { count: "exact", head: true })
-      .eq("garcom_id", user.id)
-      .eq("status", "aceito")
-      .gte("aceito_em", inicioHoje.toISOString()),
-    carregarLogoSistema(),
-    supabase
-      .from("fila_config")
-      .select("alerta_atraso_segundos")
-      .eq("id", 1)
-      .single(),
-  ]);
+  const veTodos = profile.role === "admin" || profile.role === "gerente";
+
+  // Fecha o que já passou do tempo máximo antes de ler a fila.
+  await supabase.rpc("finalizar_chamados_expirados");
+
+  let emAtendimentoQuery = supabase
+    .from("chamados")
+    .select("id, mesa_id, criado_em, garcom_id, aceito_em")
+    .eq("status", "aceito")
+    .order("aceito_em", { ascending: true });
+  // Garçom só acompanha o próprio atendimento; Admin/Gerente veem todos.
+  if (!veTodos) emAtendimentoQuery = emAtendimentoQuery.eq("garcom_id", user.id);
+
+  const [pendentes, emAtendimento, mesasRes, meusHoje, logoUrl, filaConfig, garconsRes] =
+    await Promise.all([
+      supabase
+        .from("chamados")
+        .select("id, mesa_id, criado_em")
+        .eq("status", "pendente")
+        .order("criado_em", { ascending: true }),
+      emAtendimentoQuery,
+      supabase.from("mesas").select("id, identificador"),
+      supabase
+        .from("chamados")
+        .select("*", { count: "exact", head: true })
+        .eq("garcom_id", user.id)
+        .in("status", ["aceito", "finalizado"])
+        .gte("aceito_em", inicioHoje.toISOString()),
+      carregarLogoSistema(),
+      supabase
+        .from("fila_config")
+        .select("alerta_atraso_segundos")
+        .eq("id", 1)
+        .single(),
+      veTodos
+        ? supabase.from("profiles").select("id, nome")
+        : Promise.resolve({ data: null }),
+    ]);
 
   const alertaAtrasoSegundos = filaConfig.data?.alerta_atraso_segundos ?? 300;
 
   const mesas: Record<string, string> = {};
   for (const m of mesasRes.data ?? []) mesas[m.id] = m.identificador;
 
-  const inicial: ChamadoFila[] = (pendentes.data ?? []).map((c) => ({
-    id: c.id,
-    mesaId: c.mesa_id,
-    identificador: mesas[c.mesa_id] ?? "Mesa",
-    criadoEm: c.criado_em,
-  }));
+  const nomesGarcons: Record<string, string> = {};
+  for (const g of garconsRes.data ?? []) nomesGarcons[g.id] = g.nome;
+
+  const inicial: ChamadoFila[] = [
+    ...(pendentes.data ?? []).map((c) => ({
+      id: c.id,
+      mesaId: c.mesa_id,
+      identificador: mesas[c.mesa_id] ?? "Mesa",
+      criadoEm: c.criado_em,
+      status: "pendente" as const,
+      garcomId: null,
+      aceitoEm: null,
+    })),
+    ...(emAtendimento.data ?? []).map((c) => ({
+      id: c.id,
+      mesaId: c.mesa_id,
+      identificador: mesas[c.mesa_id] ?? "Mesa",
+      criadoEm: c.criado_em,
+      status: "aceito" as const,
+      garcomId: c.garcom_id,
+      aceitoEm: c.aceito_em,
+    })),
+  ];
 
   return (
     <main className="mx-auto flex min-h-svh w-full max-w-lg flex-col">
@@ -84,6 +119,9 @@ export default async function FilaPage() {
           mesas={mesas}
           meusHoje={meusHoje.count ?? 0}
           alertaAtrasoSegundos={alertaAtrasoSegundos}
+          userId={user.id}
+          veTodos={veTodos}
+          nomesGarcons={nomesGarcons}
         />
       </div>
     </main>

@@ -31,9 +31,16 @@ export default async function PainelGerencialPage({
 
   const kpis = [
     {
-      titulo: "Tempo médio de atendimento",
+      titulo: "Tempo médio de espera",
       valor:
         dados.tempoMedioMs === null ? "—" : formatarDuracaoMs(dados.tempoMedioMs),
+    },
+    {
+      titulo: "Tempo médio de atendimento",
+      valor:
+        dados.atendimentoMedioMs === null
+          ? "—"
+          : formatarDuracaoMs(dados.atendimentoMedioMs),
     },
     { titulo: "Chamados no período", valor: String(dados.totalChamados) },
     {
@@ -48,6 +55,14 @@ export default async function PainelGerencialPage({
 
   const maxGarcom = Math.max(1, ...dados.porGarcom.map((g) => g.aceitos));
   const maxTempoGarcom = Math.max(1, ...dados.porGarcom.map((g) => g.tempoMedioMs));
+  const maxAtendimentoGarcom = Math.max(
+    1,
+    ...dados.porGarcom.map((g) => g.atendimentoMedioMs ?? 0),
+  );
+  const maxMesaDuracao = Math.max(
+    1,
+    ...dados.mesasComDuracao.map((m) => m.atendimentoMedioMs),
+  );
   const maxMesaEspera = Math.max(1, ...dados.mesasComEspera.map((m) => m.tempoMedioMs));
   const maxMesaAtendimentos = Math.max(
     1,
@@ -73,7 +88,7 @@ export default async function PainelGerencialPage({
         </div>
       ) : null}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {kpis.map((kpi) => (
           <Card key={kpi.titulo}>
             <CardHeader className="pb-2">
@@ -115,7 +130,7 @@ export default async function PainelGerencialPage({
       <Card>
         <CardHeader>
           <CardTitle className="text-base">
-            Tempo médio de atendimento por garçom
+            Tempo médio de espera por garçom
           </CardTitle>
           <CardDescription>
             Média entre o chamado e o aceite, por garçom.
@@ -136,6 +151,38 @@ export default async function PainelGerencialPage({
                 exibirValor={formatarDuracaoMs(g.tempoMedioMs)}
               />
             ))
+          )}
+        </div>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">
+            Duração média do atendimento por garçom
+          </CardTitle>
+          <CardDescription>
+            Do aceite até o botão Finalizar. Atendimentos finalizados
+            automaticamente (tempo máximo excedido) ficam fora da média.
+          </CardDescription>
+        </CardHeader>
+        <div className="space-y-3 px-6 pb-6">
+          {dados.porGarcom.filter((g) => g.atendimentoMedioMs !== null).length ===
+          0 ? (
+            <p className="text-sm text-muted-foreground">
+              Nenhum atendimento finalizado no período.
+            </p>
+          ) : (
+            dados.porGarcom
+              .filter((g) => g.atendimentoMedioMs !== null)
+              .map((g) => (
+                <Barra
+                  key={g.nome}
+                  rotulo={g.nome}
+                  valor={g.atendimentoMedioMs!}
+                  maximo={maxAtendimentoGarcom}
+                  exibirValor={formatarDuracaoMs(g.atendimentoMedioMs!)}
+                />
+              ))
           )}
         </div>
       </Card>
@@ -197,6 +244,35 @@ export default async function PainelGerencialPage({
                 valor={m.tempoMedioMs}
                 maximo={maxMesaEspera}
                 exibirValor={formatarDuracaoMs(m.tempoMedioMs)}
+              />
+            ))
+          )}
+        </div>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">
+            Duração do atendimento por mesa
+          </CardTitle>
+          <CardDescription>
+            Tempo médio entre o aceite e a finalização, por mesa — da mais
+            demorada para a mais rápida.
+          </CardDescription>
+        </CardHeader>
+        <div className="space-y-3 px-6 pb-6">
+          {dados.mesasComDuracao.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              Nenhum atendimento finalizado no período.
+            </p>
+          ) : (
+            dados.mesasComDuracao.map((m) => (
+              <Barra
+                key={m.identificador}
+                rotulo={m.identificador}
+                valor={m.atendimentoMedioMs}
+                maximo={maxMesaDuracao}
+                exibirValor={formatarDuracaoMs(m.atendimentoMedioMs)}
               />
             ))
           )}

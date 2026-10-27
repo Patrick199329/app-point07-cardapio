@@ -48,7 +48,8 @@ export function EventosFiltros({
         >
           <option value="all">Todos</option>
           <option value="pendente">Pendente</option>
-          <option value="aceito">Aceito</option>
+          <option value="aceito">Em atendimento</option>
+          <option value="finalizado">Finalizado</option>
           <option value="cancelado">Cancelado</option>
         </NativeSelect>
       </div>

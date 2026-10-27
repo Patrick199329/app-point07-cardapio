@@ -29,10 +29,25 @@ export async function salvarConfigFila(
     return { error: "O tempo precisa ser maior que zero.", ok: false };
   }
 
+  const atendimentoMinutos = Number(formData.get("atendimento_minutos"));
+  if (
+    !Number.isInteger(atendimentoMinutos) ||
+    atendimentoMinutos < 1 ||
+    atendimentoMinutos > 240
+  ) {
+    return {
+      error: "Informe o tempo máximo de atendimento (1 a 240 minutos).",
+      ok: false,
+    };
+  }
+
   const supabase = await createClient();
   const { error } = await supabase
     .from("fila_config")
-    .update({ alerta_atraso_segundos: total })
+    .update({
+      alerta_atraso_segundos: total,
+      atendimento_max_minutos: atendimentoMinutos,
+    })
     .eq("id", 1);
   if (error) return { error: "Não foi possível salvar.", ok: false };
 

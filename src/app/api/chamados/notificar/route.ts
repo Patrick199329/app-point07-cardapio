@@ -30,16 +30,35 @@ export async function POST(request: Request) {
   webpush.setVapidDetails(vapidSubject, vapidPublicKey, vapidPrivateKey);
 
   const supabase = createAdminClient();
-  const { data: inscricoes } = await supabase
+  // Quem está em atendimento não recebe o aviso (os demais, sim). Atendimento
+  // que já passou do tempo máximo conta como encerrado — a finalização
+  // automática ainda pode não ter rodado.
+  const { data: config } = await supabase
+    .from("fila_config")
+    .select("atendimento_max_minutos")
+    .eq("id", 1)
+    .single();
+  const limiteMs = (config?.atendimento_max_minutos ?? 10) * 60_000;
+  const { data: emAtendimento } = await supabase
+    .from("chamados")
+    .select("garcom_id")
+    .eq("status", "aceito")
+    .gte("aceito_em", new Date(Date.now() - limiteMs).toISOString());
+  const ocupados = new Set(
+    (emAtendimento ?? []).map((c) => c.garcom_id).filter((id): id is string => !!id),
+  );
+
+  const { data: todas } = await supabase
     .from("push_inscricoes")
-    .select("id, endpoint, p256dh, auth_key, profiles!inner(role, ativo)")
+    .select("id, usuario_id, endpoint, p256dh, auth_key, profiles!inner(role, ativo)")
     .in("profiles.role", ["garcom", "admin", "gerente"])
     .eq("profiles.ativo", true);
+  const inscricoes = (todas ?? []).filter((i) => !ocupados.has(i.usuario_id));
 
   const payload = JSON.stringify({ mesa, chamadoId });
 
   await Promise.all(
-    (inscricoes ?? []).map(async (inscricao) => {
+    inscricoes.map(async (inscricao) => {
       try {
         await webpush.sendNotification(
           {
@@ -57,5 +76,5 @@ export async function POST(request: Request) {
     }),
   );
 
-  return NextResponse.json({ ok: true, enviados: inscricoes?.length ?? 0 });
+  return NextResponse.json({ ok: true, enviados: inscricoes.length });
 }

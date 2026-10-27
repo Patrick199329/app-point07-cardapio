@@ -16,9 +16,11 @@ const INITIAL: FilaConfigState = { error: null, ok: false };
 export function FilaConfigForm({
   minutosIniciais,
   segundosIniciais,
+  atendimentoMinutosInicial,
 }: {
   minutosIniciais: number;
   segundosIniciais: number;
+  atendimentoMinutosInicial: number;
 }) {
   const router = useRouter();
 
@@ -73,6 +75,32 @@ export function FilaConfigForm({
         <p className="text-xs text-muted-foreground">
           Quando um chamado pendente passar desse tempo sem ser aceito, o
           cartão dele fica em vermelho na fila do garçom.
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="atendimento_minutos">
+          Tempo máximo de um atendimento
+        </Label>
+        <div className="flex items-end gap-3">
+          <Input
+            id="atendimento_minutos"
+            name="atendimento_minutos"
+            type="number"
+            inputMode="numeric"
+            min={1}
+            max={240}
+            defaultValue={atendimentoMinutosInicial}
+            className="h-10 w-20 md:h-9"
+          />
+          <span className="pb-2 text-sm text-muted-foreground md:pb-1.5">
+            minutos
+          </span>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Se o garçom esquecer de finalizar, o atendimento é encerrado
+          automaticamente depois desse tempo (e fica fora das médias de
+          duração).
         </p>
       </div>
 

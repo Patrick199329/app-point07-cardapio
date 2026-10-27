@@ -43,6 +43,13 @@ em tempo real). Documentação de escopo em `docs/`.
   por policy de INSERT/UPDATE direta em `chamados`. O aceite exclusivo (`aceitar_chamado`)
   é um único `UPDATE ... WHERE status='pendente'` — a atomicidade vem do banco, não de
   lógica na aplicação.
+- Ciclo do atendimento: `pendente → aceito → finalizado` (`aceito` = "Em atendimento" na
+  UI). `finalizar_chamado` (só quem atende, ou admin/gerente) e
+  `finalizar_chamados_expirados` (tempo máximo em `fila_config.atendimento_max_minutos`,
+  padrão 10 min; sem pg_cron — a fila chama a cada 30s). Índice parcial único garante 1
+  atendimento `aceito` por garçom; quem está em atendimento não recebe push. Finalização
+  automática (`finalizado_auto`) fica fora das médias de duração. Migrations
+  `20261026120000`/`20261026120100`.
 - `chamados` está na publication `supabase_realtime` — a fila do garçom (`/fila`) assina
   `postgres_changes` com o cliente autenticado; a RLS de SELECT (`is_admin() or
   is_garcom()`) também vale para o que o Realtime entrega.

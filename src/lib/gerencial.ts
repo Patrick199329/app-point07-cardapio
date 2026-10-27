@@ -8,8 +8,17 @@ export type IndicadoresGerenciais = {
   totalChamados: number;
   totalAceitos: number;
   pendentesAgora: number;
+  /** Espera média: do chamado até o aceite. */
   tempoMedioMs: number | null;
-  porGarcom: { nome: string; aceitos: number; tempoMedioMs: number }[];
+  /** Duração média do atendimento: do aceite até a finalização (sem as automáticas). */
+  atendimentoMedioMs: number | null;
+  porGarcom: {
+    nome: string;
+    aceitos: number;
+    tempoMedioMs: number;
+    atendimentoMedioMs: number | null;
+  }[];
+  mesasComDuracao: { identificador: string; atendimentoMedioMs: number; amostras: number }[];
   porDia: { dia: string; rotulo: string; valor: number }[];
   mesasComEspera: { identificador: string; tempoMedioMs: number; amostras: number }[];
   mesasPorAtendimentos: { identificador: string; aceitos: number }[];
@@ -18,9 +27,11 @@ export type IndicadoresGerenciais = {
 };
 
 type ChamadoRow = {
-  status: "pendente" | "aceito" | "cancelado";
+  status: "pendente" | "aceito" | "cancelado" | "finalizado";
   criado_em: string;
   aceito_em: string | null;
+  finalizado_em: string | null;
+  finalizado_auto: boolean;
   mesas: { identificador: string } | null;
   profiles: { nome: string } | null;
 };
@@ -88,7 +99,9 @@ export async function carregarIndicadores(
 
   let query = supabase
     .from("chamados")
-    .select("status, criado_em, aceito_em, mesas(identificador), profiles(nome)")
+    .select(
+      "status, criado_em, aceito_em, finalizado_em, finalizado_auto, mesas(identificador), profiles(nome)",
+    )
     .order("criado_em", { ascending: true });
   if (desde) query = query.gte("criado_em", desde);
 
@@ -103,8 +116,22 @@ export async function carregarIndicadores(
   const chamados = (data ?? []) as unknown as ChamadoRow[];
   const aceitos = chamados.filter(
     (c): c is ChamadoRow & { aceito_em: string } =>
-      c.status === "aceito" && c.aceito_em !== null,
+      (c.status === "aceito" || c.status === "finalizado") && c.aceito_em !== null,
   );
+
+  // Duração do atendimento: só finalizações manuais — a automática (esquecimento
+  // do garçom) é, por definição, um tempo que não mede o atendimento real.
+  const duracaoMs = (c: ChamadoRow & { aceito_em: string }): number | null =>
+    c.status === "finalizado" && !c.finalizado_auto && c.finalizado_em
+      ? new Date(c.finalizado_em).getTime() - new Date(c.aceito_em).getTime()
+      : null;
+  const mediaDuracao = (itens: (ChamadoRow & { aceito_em: string })[]) => {
+    const valores = itens.map(duracaoMs).filter((v): v is number => v !== null);
+    return valores.length > 0
+      ? valores.reduce((a, b) => a + b, 0) / valores.length
+      : null;
+  };
+  const atendimentoMedioMs = mediaDuracao(aceitos);
 
   const tempoMedioMs =
     aceitos.length > 0
@@ -116,18 +143,42 @@ export async function carregarIndicadores(
         ) / aceitos.length
       : null;
 
-  const porGarcomMap = new Map<string, { aceitos: number; somaMs: number }>();
+  const porGarcomMap = new Map<
+    string,
+    { aceitos: number; somaMs: number; itens: (ChamadoRow & { aceito_em: string })[] }
+  >();
   for (const c of aceitos) {
     const nome = c.profiles?.nome ?? "—";
     const ms = new Date(c.aceito_em).getTime() - new Date(c.criado_em).getTime();
-    const atual = porGarcomMap.get(nome) ?? { aceitos: 0, somaMs: 0 };
+    const atual = porGarcomMap.get(nome) ?? { aceitos: 0, somaMs: 0, itens: [] };
     atual.aceitos += 1;
     atual.somaMs += ms;
+    atual.itens.push(c);
     porGarcomMap.set(nome, atual);
   }
   const porGarcom = [...porGarcomMap.entries()]
-    .map(([nome, g]) => ({ nome, aceitos: g.aceitos, tempoMedioMs: g.somaMs / g.aceitos }))
+    .map(([nome, g]) => ({
+      nome,
+      aceitos: g.aceitos,
+      tempoMedioMs: g.somaMs / g.aceitos,
+      atendimentoMedioMs: mediaDuracao(g.itens),
+    }))
     .sort((a, b) => b.aceitos - a.aceitos);
+
+  const duracaoMesaMap = new Map<string, (ChamadoRow & { aceito_em: string })[]>();
+  for (const c of aceitos) {
+    const identificador = c.mesas?.identificador ?? "Mesa";
+    duracaoMesaMap.set(identificador, [...(duracaoMesaMap.get(identificador) ?? []), c]);
+  }
+  const mesasComDuracao = [...duracaoMesaMap.entries()]
+    .flatMap(([identificador, itens]) => {
+      const media = mediaDuracao(itens);
+      const amostras = itens.filter((c) => duracaoMs(c) !== null).length;
+      return media === null
+        ? []
+        : [{ identificador, atendimentoMedioMs: media, amostras }];
+    })
+    .sort((a, b) => b.atendimentoMedioMs - a.atendimentoMedioMs);
 
   const mesaMap = new Map<string, { somaMs: number; amostras: number }>();
   for (const c of aceitos) {
@@ -155,7 +206,9 @@ export async function carregarIndicadores(
     totalAceitos: aceitos.length,
     pendentesAgora: pendentesRes.count ?? 0,
     tempoMedioMs,
+    atendimentoMedioMs,
     porGarcom,
+    mesasComDuracao,
     porDia: construirSeriePorDia(chamados, desde),
     mesasComEspera,
     mesasPorAtendimentos,
