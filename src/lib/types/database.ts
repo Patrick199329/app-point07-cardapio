@@ -308,18 +308,21 @@ export type Database = {
           alerta_atraso_segundos: number
           atendimento_max_minutos: number
           id: number
+          intervalo_novo_chamado_segundos: number
           updated_at: string
         }
         Insert: {
           alerta_atraso_segundos?: number
           atendimento_max_minutos?: number
           id?: number
+          intervalo_novo_chamado_segundos?: number
           updated_at?: string
         }
         Update: {
           alerta_atraso_segundos?: number
           atendimento_max_minutos?: number
           id?: number
+          intervalo_novo_chamado_segundos?: number
           updated_at?: string
         }
         Relationships: []

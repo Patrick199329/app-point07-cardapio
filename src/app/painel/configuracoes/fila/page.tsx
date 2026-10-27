@@ -10,11 +10,14 @@ export default async function ConfiguracoesFilaPage() {
   const supabase = await createClient();
   const { data } = await supabase
     .from("fila_config")
-    .select("alerta_atraso_segundos, atendimento_max_minutos")
+    .select(
+      "alerta_atraso_segundos, atendimento_max_minutos, intervalo_novo_chamado_segundos",
+    )
     .eq("id", 1)
     .single();
 
   const atendimentoMaxMinutos = data?.atendimento_max_minutos ?? 10;
+  const intervaloSegundos = data?.intervalo_novo_chamado_segundos ?? 60;
   const totalSegundos = data?.alerta_atraso_segundos ?? 300;
   const minutosIniciais = Math.floor(totalSegundos / 60);
   const segundosIniciais = totalSegundos % 60;
@@ -39,6 +42,7 @@ export default async function ConfiguracoesFilaPage() {
         minutosIniciais={minutosIniciais}
         segundosIniciais={segundosIniciais}
         atendimentoMinutosInicial={atendimentoMaxMinutos}
+        intervaloSegundosInicial={intervaloSegundos}
       />
     </div>
   );

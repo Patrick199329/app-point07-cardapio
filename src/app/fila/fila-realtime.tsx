@@ -275,6 +275,25 @@ export function FilaRealtime({
     [supabase, userId],
   );
 
+  // Aceite vindo do botão "Aceitar" da notificação push (/fila?aceitar=<id>),
+  // quando o service worker não conseguiu aceitar sozinho.
+  const aceitePushTratado = useRef(false);
+  useEffect(() => {
+    if (aceitePushTratado.current) return;
+    aceitePushTratado.current = true;
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("aceitar");
+    if (!id) return;
+    window.history.replaceState(null, "", window.location.pathname);
+
+    const chamado = inicial.find((c) => c.id === id && c.status === "pendente");
+    if (chamado) {
+      setTimeout(() => void aceitar(chamado), 0);
+    } else {
+      toast.info("Esse chamado já foi atendido ou cancelado.");
+    }
+  }, [inicial, aceitar]);
+
   const finalizar = useCallback(
     async (chamado: ChamadoFila) => {
       setProcessando(chamado.id);

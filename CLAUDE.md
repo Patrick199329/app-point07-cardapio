@@ -50,6 +50,11 @@ em tempo real). Documentação de escopo em `docs/`.
   atendimento `aceito` por garçom; quem está em atendimento não recebe push. Finalização
   automática (`finalizado_auto`) fica fora das médias de duração. Migrations
   `20261026120000`/`20261026120100`.
+- Intervalo da mesa: `criar_chamado` recusa (`chamado_recente`, segundos restantes em
+  `hint`) nova chamada da mesma mesa até `fila_config.intervalo_novo_chamado_segundos`
+  (padrão 60s) após o último aceite. Migration `20261026130000`.
+- Push "Aceitar": o service worker aceita via `/api/chamados/aceitar`; em falha técnica
+  abre `/fila?aceitar=<id>`, e a fila tenta o aceite de dentro do navegador.
 - `chamados` está na publication `supabase_realtime` — a fila do garçom (`/fila`) assina
   `postgres_changes` com o cliente autenticado; a RLS de SELECT (`is_admin() or
   is_garcom()`) também vale para o que o Realtime entrega.

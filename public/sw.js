@@ -43,9 +43,19 @@ self.addEventListener("notificationclick", (event) => {
   const { mesa, chamadoId } = event.notification.data ?? {};
 
   if (event.action === "aceitar" && chamadoId) {
-    // Aceita direto da notificação, sem abrir nada — só cai pra fila se der
-    // errado (outro garçom já aceitou, sessão expirada etc.), pro garçom ver
-    // o que aconteceu e agir na mão.
+    // Aceita direto da notificação, sem abrir nada. Se o aceite não rolar por
+    // motivo de regra (outro garçom pegou, garçom já em atendimento), avisa
+    // por notificação. Se for falha técnica (sessão, rede), abre a fila com
+    // ?aceitar=<id> — a própria fila tenta o aceite de dentro do navegador.
+    const avisar = (titulo, corpo) =>
+      self.registration.showNotification(titulo, {
+        body: corpo,
+        icon: "/marca/logo-point07-preta.png",
+        tag: chamadoId,
+      });
+    const abrirFilaAceitando = () =>
+      self.clients.openWindow(`/fila?aceitar=${encodeURIComponent(chamadoId)}`);
+
     event.waitUntil(
       fetch("/api/chamados/aceitar", {
         method: "POST",
@@ -54,16 +64,28 @@ self.addEventListener("notificationclick", (event) => {
         body: JSON.stringify({ chamadoId }),
       })
         .then((res) => res.json().catch(() => ({ ok: false })))
-        .then((resultado) =>
-          resultado.ok
-            ? self.registration.showNotification(`${mesa ?? "Mesa"} — aceito`, {
-                body: "Chamado aceito. Pode ir até a mesa.",
-                icon: "/marca/logo-point07-preta.png",
-                tag: chamadoId,
-              })
-            : self.clients.openWindow("/fila"),
-        )
-        .catch(() => self.clients.openWindow("/fila")),
+        .then((resultado) => {
+          if (resultado.ok) {
+            return avisar(
+              `${mesa ?? "Mesa"} — aceito`,
+              "Chamado aceito. Pode ir até a mesa.",
+            );
+          }
+          if (resultado.motivo === "ja_aceito") {
+            return avisar(
+              `${mesa ?? "Mesa"} — já atendida`,
+              "Outro garçom já pegou esse chamado.",
+            );
+          }
+          if (resultado.motivo === "em_atendimento") {
+            return avisar(
+              "Você está em atendimento",
+              "Finalize o atendimento em andamento na fila para aceitar outro.",
+            );
+          }
+          return abrirFilaAceitando();
+        })
+        .catch(() => abrirFilaAceitando()),
     );
     return;
   }

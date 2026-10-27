@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { marcarChamadoOcupado } from "@/lib/chamado-ocupado";
 import { createClient } from "@/lib/supabase/client";
 
-type Estado = "idle" | "enviando" | "pendente" | "aceito" | "erro";
+type Estado = "idle" | "enviando" | "pendente" | "aceito" | "erro" | "aguardando";
 
 /**
  * Widget "Chamar garçom" do cardápio público (Módulo 3). Funciona direto do
@@ -39,12 +39,25 @@ export function ChamarGarcomButton({
   const [estado, setEstado] = useState<Estado>("idle");
   const [garcom, setGarcom] = useState<string | null>(null);
   const chamadoRef = useRef<{ id: string; origem: string } | null>(null);
+  // Segundos que faltam para a mesa poder chamar de novo (regra do banco:
+  // intervalo mínimo depois do aceite — ver criar_chamado).
+  const [restanteSeg, setRestanteSeg] = useState(0);
+
+  const aguardando = estado === "aguardando" && restanteSeg > 0;
+
+  useEffect(() => {
+    if (!aguardando) return;
+    const iv = setInterval(() => setRestanteSeg((s) => s - 1), 1000);
+    return () => clearInterval(iv);
+  }, [aguardando]);
 
   // Impede o atualizador automático de publicação (ver chamado-ocupado.ts) de
   // recarregar a página no meio de uma chamada ao garçom — da requisição em
   // andamento até o chamado ser aceito/cancelado.
   useEffect(() => {
-    marcarChamadoOcupado(estado !== "idle" && estado !== "erro");
+    marcarChamadoOcupado(
+      estado !== "idle" && estado !== "erro" && estado !== "aguardando",
+    );
     return () => marcarChamadoOcupado(false);
   }, [estado]);
 
@@ -98,6 +111,12 @@ export function ChamarGarcomButton({
       p_token: mesaToken,
     });
     const row = data?.[0];
+    if (error?.message === "chamado_recente") {
+      const segundos = Number(error.hint);
+      setRestanteSeg(Number.isFinite(segundos) && segundos > 0 ? segundos : 60);
+      setEstado("aguardando");
+      return;
+    }
     if (error || !row) {
       setEstado("erro");
       return;
@@ -155,6 +174,11 @@ export function ChamarGarcomButton({
               <Check className="size-4" style={{ color: corDestaque }} />
               {garcom ? `${garcom} está a caminho` : "Um garçom está a caminho"} 🎉
             </p>
+          ) : aguardando ? (
+            <Button className="h-12 w-full rounded-xl text-base" disabled>
+              <BellRing className="size-5" />
+              Chamar novamente em {restanteSeg}s
+            </Button>
           ) : (
             <>
               <Button

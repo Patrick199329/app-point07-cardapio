@@ -17,10 +17,12 @@ export function FilaConfigForm({
   minutosIniciais,
   segundosIniciais,
   atendimentoMinutosInicial,
+  intervaloSegundosInicial,
 }: {
   minutosIniciais: number;
   segundosIniciais: number;
   atendimentoMinutosInicial: number;
+  intervaloSegundosInicial: number;
 }) {
   const router = useRouter();
 
@@ -101,6 +103,31 @@ export function FilaConfigForm({
           Se o garçom esquecer de finalizar, o atendimento é encerrado
           automaticamente depois desse tempo (e fica fora das médias de
           duração).
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="intervalo_segundos">
+          Intervalo para a mesa chamar de novo
+        </Label>
+        <div className="flex items-end gap-3">
+          <Input
+            id="intervalo_segundos"
+            name="intervalo_segundos"
+            type="number"
+            inputMode="numeric"
+            min={0}
+            max={3600}
+            defaultValue={intervaloSegundosInicial}
+            className="h-10 w-24 md:h-9"
+          />
+          <span className="pb-2 text-sm text-muted-foreground md:pb-1.5">
+            segundos
+          </span>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Depois que um garçom aceita o chamado, a mesa só consegue chamar de
+          novo após esse tempo. Use 0 para não ter intervalo.
         </p>
       </div>
 
