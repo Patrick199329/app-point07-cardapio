@@ -12,6 +12,11 @@ export function urlDaMesa(qrToken: string): string {
   return `${BASE}/mesa/${qrToken}`;
 }
 
+/** URL do QR universal: o cliente escolhe a mesa e segue para /mesa/<token da mesa>. */
+export function urlQrUniversal(token: string): string {
+  return `${BASE}/mesa/escolher/${token}`;
+}
+
 /** True quando a base ainda é local — não deve imprimir para produção assim. */
 export function baseEhLocal(): boolean {
   return (

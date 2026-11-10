@@ -53,6 +53,12 @@ em tempo real). Documentação de escopo em `docs/`.
 - Intervalo da mesa: `criar_chamado` recusa (`chamado_recente`, segundos restantes em
   `hint`) nova chamada da mesma mesa até `fila_config.intervalo_novo_chamado_segundos`
   (padrão 60s) após o último aceite. Migration `20261026130000`.
+- QR universal (mesas juntadas): tabela singleton `qr_universal` (token fixo + `ativo`, só
+  admin/gerente enxergam), URL `<base>/mesa/escolher/<token>`. O cliente escolhe a mesa e
+  é levado a `/mesa/<qr_token da mesa>` (fluxo normal). RPCs anon: `mesas_por_qr_universal`
+  (só nomes) e `mesa_token_por_qr_universal` (token de UMA mesa). O token universal nunca
+  muda (não há UI/RPC para trocar — QR impresso vale para sempre); só liga/desliga na
+  impressão. Migration `20261109120000`.
 - Push "Aceitar": o service worker aceita via `/api/chamados/aceitar`; em falha técnica
   abre `/fila?aceitar=<id>`, e a fila tenta o aceite de dentro do navegador.
 - `chamados` está na publication `supabase_realtime` — a fila do garçom (`/fila`) assina

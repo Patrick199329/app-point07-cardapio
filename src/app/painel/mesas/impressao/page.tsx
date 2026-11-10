@@ -1,9 +1,10 @@
 import Link from "next/link";
 
 import { createClient } from "@/lib/supabase/server";
-import { baseAtual, baseEhLocal, qrSvg, urlDaMesa } from "@/lib/qr";
+import { baseAtual, baseEhLocal, qrSvg, urlDaMesa, urlQrUniversal } from "@/lib/qr";
 
 import { type CartaoMesa, ImpressaoCliente } from "./impressao-cliente";
+import { QrUniversalToggle } from "./qr-universal-toggle";
 
 export const metadata = { title: "Imprimir QR das mesas" };
 export const dynamic = "force-dynamic";
@@ -16,13 +17,32 @@ export default async function ImpressaoQrPage() {
     .eq("ativo", true)
     .order("identificador", { ascending: true });
 
-  const cartoes: CartaoMesa[] = await Promise.all(
+  const { data: universal } = await supabase
+    .from("qr_universal")
+    .select("token, ativo")
+    .eq("id", 1)
+    .single();
+
+  const cartoesMesas: CartaoMesa[] = await Promise.all(
     (mesas ?? []).map(async (m) => ({
       id: m.id,
       identificador: m.identificador,
       svg: await qrSvg(urlDaMesa(m.qr_token)),
     })),
   );
+
+  // O QR universal vai como o primeiro cartão (mesmo layout), mas começa
+  // desmarcado — não entra de carona numa impressão "selecionar todas as mesas".
+  const cartaoUniversal: CartaoMesa | null = universal
+    ? {
+        id: "universal",
+        identificador: "QR universal (cliente escolhe a mesa)",
+        rotuloImpresso: "Cardápio",
+        svg: await qrSvg(urlQrUniversal(universal.token)),
+        iniciaDesmarcado: true,
+      }
+    : null;
+  const cartoes = cartaoUniversal ? [cartaoUniversal, ...cartoesMesas] : cartoesMesas;
 
   return (
     <div className="space-y-6">
@@ -51,6 +71,8 @@ export default async function ImpressaoQrPage() {
           URL base dos QR: <code>{baseAtual()}</code>
         </p>
       )}
+
+      {universal ? <QrUniversalToggle ativo={universal.ativo} /> : null}
 
       {cartoes.length === 0 ? (
         <p className="rounded-lg border py-10 text-center text-sm text-muted-foreground">

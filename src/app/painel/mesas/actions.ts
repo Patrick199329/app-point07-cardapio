@@ -32,6 +32,24 @@ function parseMesaForm(formData: FormData): ParseResult {
   };
 }
 
+/**
+ * Liga/desliga o QR universal. NÃO troca o token (o QR impresso continua o
+ * mesmo ao religar) — de propósito não existe ação de gerar token novo.
+ */
+export async function alternarQrUniversal(ativo: boolean): Promise<MesaState> {
+  await requireAnyRole(["admin", "gerente"]);
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("qr_universal")
+    .update({ ativo })
+    .eq("id", 1);
+  if (error) return { error: "Não foi possível alterar o QR universal.", ok: false };
+
+  revalidatePath("/painel/mesas/impressao");
+  return { error: null, ok: true };
+}
+
 export async function criarMesa(
   _prev: MesaState,
   formData: FormData,

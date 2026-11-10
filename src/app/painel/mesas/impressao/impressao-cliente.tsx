@@ -8,11 +8,15 @@ export type CartaoMesa = {
   id: string;
   identificador: string;
   svg: string;
+  /** Texto impresso no cartão, se diferente do identificador (ex.: QR universal). */
+  rotuloImpresso?: string;
+  /** Começa fora da seleção (não entra num "Selecionar todas" automático). */
+  iniciaDesmarcado?: boolean;
 };
 
 export function ImpressaoCliente({ cartoes }: { cartoes: CartaoMesa[] }) {
   const [selecionadas, setSelecionadas] = useState<Set<string>>(
-    () => new Set(cartoes.map((c) => c.id)),
+    () => new Set(cartoes.filter((c) => !c.iniciaDesmarcado).map((c) => c.id)),
   );
 
   function alternar(id: string) {
@@ -35,10 +39,12 @@ export function ImpressaoCliente({ cartoes }: { cartoes: CartaoMesa[] }) {
             variant="outline"
             size="sm"
             onClick={() =>
-              setSelecionadas(new Set(cartoes.map((c) => c.id)))
+              setSelecionadas(
+                new Set(cartoes.filter((c) => !c.iniciaDesmarcado).map((c) => c.id)),
+              )
             }
           >
-            Selecionar todas
+            Selecionar todas as mesas
           </Button>
           <Button
             variant="outline"
@@ -80,7 +86,7 @@ export function ImpressaoCliente({ cartoes }: { cartoes: CartaoMesa[] }) {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/mesas/modelo-cartao.png" alt="" className="fundo" />
             <div className="qr-area" dangerouslySetInnerHTML={{ __html: c.svg }} />
-            <p className="mesa-label">{c.identificador}</p>
+            <p className="mesa-label">{c.rotuloImpresso ?? c.identificador}</p>
           </article>
         ))}
       </div>

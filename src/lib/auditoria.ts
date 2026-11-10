@@ -26,6 +26,7 @@ export const TIPO_BADGE: Record<AuditoriaTipo, "success" | "outline" | "destruct
 export const AREA_LABEL: Record<string, string> = {
   profiles: "Usuários",
   mesas: "Mesas",
+  qr_universal: "Mesas — QR universal",
   categorias: "Cardápio — categorias",
   produtos: "Cardápio — produtos",
   produto_grupos_opcoes: "Cardápio — opções",
@@ -39,7 +40,7 @@ export const AREA_LABEL: Record<string, string> = {
 /** Agrupamento mais grosso, usado no filtro "Área" da tela (dropdown menor que a lista de tabelas). */
 export const AREA_GRUPOS: { key: string; label: string; tabelas: string[] }[] = [
   { key: "usuarios", label: "Usuários", tabelas: ["profiles"] },
-  { key: "mesas", label: "Mesas", tabelas: ["mesas"] },
+  { key: "mesas", label: "Mesas", tabelas: ["mesas", "qr_universal"] },
   {
     key: "cardapio",
     label: "Cardápio",

@@ -642,6 +642,27 @@ export type Database = {
           },
         ]
       }
+      qr_universal: {
+        Row: {
+          ativo: boolean
+          id: number
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          id?: number
+          token?: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          id?: number
+          token?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       sistema_config: {
         Row: {
           favicon_path: string | null
@@ -700,6 +721,17 @@ export type Database = {
       is_admin: { Args: never; Returns: boolean }
       is_garcom: { Args: never; Returns: boolean }
       mesa_por_token: {
+        Args: { p_token: string }
+        Returns: {
+          id: string
+          identificador: string
+        }[]
+      }
+      mesa_token_por_qr_universal: {
+        Args: { p_mesa_id: string; p_token: string }
+        Returns: string
+      }
+      mesas_por_qr_universal: {
         Args: { p_token: string }
         Returns: {
           id: string
