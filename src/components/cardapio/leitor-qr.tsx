@@ -113,7 +113,7 @@ export function LeitorQr({
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-black">
       <div className="flex items-center justify-between p-4 text-white">
-        <p className="text-sm font-medium">Aponte a câmera para o QR code da mesa</p>
+        <p className="text-sm font-medium">Aponte a câmera para o QR code da mesa ou do cardápio</p>
         <Button variant="ghost" size="icon" className="text-white hover:bg-white/10" onClick={onFechar}>
           <X className="size-5" />
         </Button>

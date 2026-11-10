@@ -70,10 +70,12 @@ export function ConfirmarMesa({
 
   function aoDetectarQr(conteudo: string) {
     try {
-      // Confia no caminho (/mesa/<token>), não exige que o domínio bata: um
-      // QR impresso antes de uma troca de domínio ainda tem que funcionar.
+      // Confia no caminho, não exige que o domínio bata: um QR impresso antes
+      // de uma troca de domínio ainda tem que funcionar. Aceita o QR da mesa
+      // (/mesa/<token>) e o QR universal (/mesa/escolher/<token>), que leva o
+      // cliente a escolher a mesa na lista.
       const url = new URL(conteudo, window.location.origin);
-      if (/^\/mesa\/[^/]+$/.test(url.pathname)) {
+      if (/^\/mesa\/(escolher\/)?[^/]+$/.test(url.pathname)) {
         window.location.href = url.pathname;
         return;
       }
