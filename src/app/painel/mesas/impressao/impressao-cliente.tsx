@@ -29,11 +29,45 @@ export function ImpressaoCliente({ cartoes }: { cartoes: CartaoMesa[] }) {
   }
 
   const paraImprimir = cartoes.filter((c) => selecionadas.has(c.id));
+  // "totem": cada página tem o tamanho exato do totem (100 x 150 mm) — é o que
+  // se manda para a gráfica ou se imprime em papel já cortado. "a4": cartões
+  // soltos na folha (2 por folha) para recortar.
+  const [formato, setFormato] = useState<"totem" | "a4">("totem");
 
   return (
     <div className="space-y-6">
       {/* Controles — escondidos na impressão */}
       <div className="print:hidden">
+        <fieldset className="mb-4 space-y-1.5 text-sm">
+          <legend className="mb-1 font-medium">Formato da impressão</legend>
+          <label className="flex cursor-pointer items-start gap-2">
+            <input
+              type="radio"
+              name="formato"
+              checked={formato === "totem"}
+              onChange={() => setFormato("totem")}
+              className="mt-1 size-4"
+            />
+            <span>
+              Totem 10 × 15 cm — uma página por cartão, no tamanho exato (para
+              gráfica ou papel já cortado). Na janela de impressão, escolha o
+              papel <strong>10 × 15 cm</strong> e escala <strong>100%</strong>.
+            </span>
+          </label>
+          <label className="flex cursor-pointer items-start gap-2">
+            <input
+              type="radio"
+              name="formato"
+              checked={formato === "a4"}
+              onChange={() => setFormato("a4")}
+              className="mt-1 size-4"
+            />
+            <span>
+              Folha A4 — 2 cartões de 10 × 15 cm por folha, para recortar. Escala{" "}
+              <strong>100%</strong>.
+            </span>
+          </label>
+        </fieldset>
         <div className="flex flex-wrap items-center gap-2">
           <Button
             variant="outline"
@@ -92,13 +126,15 @@ export function ImpressaoCliente({ cartoes }: { cartoes: CartaoMesa[] }) {
       </div>
 
       <style>{`
-        /* Tamanho de impressão real que o cliente definiu pra essa arte —
-           não é A4 inteira, é um cartão de mesa (108 x 146mm). */
+        /* Totem físico do cliente: 100 x 150mm (10 x 15cm). A arte é 1276x1713
+           (proporção 0,745; o totem é 0,667), então ela é escalada pela ALTURA
+           (sem deformar) e centralizada com object-fit: cover — corta ~5,9mm de
+           cada lado, só decoração (conferido numa prévia). */
         .cartao-mesa {
           position: relative;
           container-type: inline-size;
-          width: 108mm;
-          height: 146mm;
+          width: 100mm;
+          height: 150mm;
           break-inside: avoid;
           overflow: hidden;
         }
@@ -108,16 +144,20 @@ export function ImpressaoCliente({ cartoes }: { cartoes: CartaoMesa[] }) {
           width: 100%;
           height: 100%;
           display: block;
-          object-fit: fill;
+          object-fit: cover;
+          object-position: center;
         }
         /* Coordenadas do quadrado branco medidas por pixel no modelo
-           (1276x1713: x 674-1044, y 919-1306) — não é um chute visual.
+           (1276x1713: x 674-1044, y 919-1306), convertidas para a área visível
+           depois do corte lateral (x 67-1209, 1142px de largura):
+           left = (674-67)/1142, width = 370/1142; top/height não mudam
+           (a altura inteira da arte continua visível).
            padding dá uma margininha pro QR não encostar no canto arredondado. */
         .cartao-mesa .qr-area {
           position: absolute;
-          left: 52.82%;
+          left: 53.15%;
           top: 53.65%;
-          width: 29%;
+          width: 32.4%;
           height: 22.59%;
           padding: 1.5%;
           box-sizing: border-box;
@@ -129,8 +169,8 @@ export function ImpressaoCliente({ cartoes }: { cartoes: CartaoMesa[] }) {
         }
         .cartao-mesa .mesa-label {
           position: absolute;
-          left: 52.82%;
-          width: 29%;
+          left: 53.15%;
+          width: 32.4%;
           top: 78%;
           margin: 0;
           text-align: center;
@@ -144,7 +184,7 @@ export function ImpressaoCliente({ cartoes }: { cartoes: CartaoMesa[] }) {
         .area-impressao {
           display: flex;
           flex-wrap: wrap;
-          gap: 4mm;
+          gap: ${formato === "a4" ? "0" : "4mm"};
         }
         @media screen {
           .area-impressao {
@@ -155,7 +195,15 @@ export function ImpressaoCliente({ cartoes }: { cartoes: CartaoMesa[] }) {
           }
         }
         @media print {
-          @page { size: A4 portrait; margin: 5mm; }
+          ${
+            formato === "totem"
+              ? `@page { size: 100mm 150mm; margin: 0; }
+          .cartao-mesa { break-after: page; }
+          .cartao-mesa:last-child { break-after: auto; }
+          .area-impressao { display: block; }`
+              : `/* A4 com 4mm de margem: 202mm úteis = 2 cartões de 100mm lado a lado. */
+          @page { size: A4 portrait; margin: 4mm; }`
+          }
           body * { visibility: hidden !important; }
           .area-impressao, .area-impressao * { visibility: visible !important; }
           .area-impressao {

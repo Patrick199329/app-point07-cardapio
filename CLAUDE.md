@@ -96,6 +96,11 @@ em tempo real). Documentação de escopo em `docs/`.
   `http://localhost:3000`; o domínio real do cliente entra nas Fases 6/7 — até lá,
   `/painel/mesas/impressao` mostra um aviso de que a base ainda é local.
 - Geração é interna (`qrcode` + `sharp`, sem serviço externo) — `src/lib/qr.ts`.
+- Cartão impresso = totem físico do cliente, **100 x 150 mm** (10 x 15 cm). A arte
+  `public/mesas/modelo-cartao.png` (1276x1713) é escalada pela altura com `object-fit:
+  cover` (corta ~5,9 mm de cada lado, só decoração); as posições do QR em
+  `impressao-cliente.tsx` são a medição em pixels da arte convertida para essa área visível.
+  Se a arte ou o tamanho do totem mudarem, recalcular essas porcentagens.
 
 ## Padrão de engenharia
 
