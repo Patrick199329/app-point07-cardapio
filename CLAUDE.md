@@ -100,7 +100,9 @@ em tempo real). Documentação de escopo em `docs/`.
   `public/mesas/modelo-cartao.png` (1276x1713) é escalada pela altura com `object-fit:
   cover` (corta ~5,9 mm de cada lado, só decoração); as posições do QR em
   `impressao-cliente.tsx` são a medição em pixels da arte convertida para essa área visível.
-  Se a arte ou o tamanho do totem mudarem, recalcular essas porcentagens.
+  Se a arte ou o tamanho do totem mudarem, recalcular essas porcentagens. O formato "A4"
+  da impressão sai a 95% (95 x 142,5 mm, 4 por folha) — 2 x 150mm não cabe nos 297mm da
+  A4; o formato "Totem" mantém 100 x 150 mm exatos (uma página por cartão, para gráfica).
 
 ## Padrão de engenharia
 

@@ -31,8 +31,12 @@ export function ImpressaoCliente({ cartoes }: { cartoes: CartaoMesa[] }) {
   const paraImprimir = cartoes.filter((c) => selecionadas.has(c.id));
   // "totem": cada página tem o tamanho exato do totem (100 x 150 mm) — é o que
   // se manda para a gráfica ou se imprime em papel já cortado. "a4": cartões
-  // soltos na folha (2 por folha) para recortar.
+  // soltos na folha, 4 por folha, para recortar — reduzidos a 95% (95 x 142,5 mm)
+  // porque 2 x 150mm = 300mm não cabe nos 297mm da A4 (o cliente aceitou ~0,5 cm
+  // a menos nesse formato).
   const [formato, setFormato] = useState<"totem" | "a4">("totem");
+  const larguraCartao = formato === "a4" ? "95mm" : "100mm";
+  const alturaCartao = formato === "a4" ? "142.5mm" : "150mm";
 
   return (
     <div className="space-y-6">
@@ -63,7 +67,8 @@ export function ImpressaoCliente({ cartoes }: { cartoes: CartaoMesa[] }) {
               className="mt-1 size-4"
             />
             <span>
-              Folha A4 — 2 cartões de 10 × 15 cm por folha, para recortar. Escala{" "}
+              Folha A4 — 4 cartões por folha, para recortar. Cada cartão sai com{" "}
+              <strong>9,5 × 14,25 cm</strong> (0,5 cm menor que o totem). Escala{" "}
               <strong>100%</strong>.
             </span>
           </label>
@@ -133,8 +138,8 @@ export function ImpressaoCliente({ cartoes }: { cartoes: CartaoMesa[] }) {
         .cartao-mesa {
           position: relative;
           container-type: inline-size;
-          width: 100mm;
-          height: 150mm;
+          width: ${larguraCartao};
+          height: ${alturaCartao};
           break-inside: avoid;
           overflow: hidden;
         }
@@ -201,7 +206,7 @@ export function ImpressaoCliente({ cartoes }: { cartoes: CartaoMesa[] }) {
           .cartao-mesa { break-after: page; }
           .cartao-mesa:last-child { break-after: auto; }
           .area-impressao { display: block; }`
-              : `/* A4 com 4mm de margem: 202mm úteis = 2 cartões de 100mm lado a lado. */
+              : `/* A4 com 4mm de margem = 202 x 289mm úteis: 2 colunas (190mm) x 2 linhas (285mm) = 4 por folha. */
           @page { size: A4 portrait; margin: 4mm; }`
           }
           body * { visibility: hidden !important; }
