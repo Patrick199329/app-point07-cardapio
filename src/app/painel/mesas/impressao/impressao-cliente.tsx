@@ -42,36 +42,29 @@ export function ImpressaoCliente({ cartoes }: { cartoes: CartaoMesa[] }) {
     <div className="space-y-6">
       {/* Controles — escondidos na impressão */}
       <div className="print:hidden">
-        <fieldset className="mb-4 space-y-1.5 text-sm">
-          <legend className="mb-1 font-medium">Formato da impressão</legend>
-          <label className="flex cursor-pointer items-start gap-2">
+        <fieldset className="mb-4 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm">
+          <legend className="mb-1 font-medium">Formato</legend>
+          <label className="flex cursor-pointer items-center gap-2">
             <input
               type="radio"
               name="formato"
               checked={formato === "totem"}
               onChange={() => setFormato("totem")}
-              className="mt-1 size-4"
+              className="size-4"
             />
-            <span>
-              Totem 10 × 15 cm — uma página por cartão, no tamanho exato (para
-              gráfica ou papel já cortado). Na janela de impressão, escolha o
-              papel <strong>10 × 15 cm</strong> e escala <strong>100%</strong>.
-            </span>
+            Totem 10 × 15 cm
           </label>
-          <label className="flex cursor-pointer items-start gap-2">
+          <label className="flex cursor-pointer items-center gap-2">
             <input
               type="radio"
               name="formato"
               checked={formato === "a4"}
               onChange={() => setFormato("a4")}
-              className="mt-1 size-4"
+              className="size-4"
             />
-            <span>
-              Folha A4 — 4 cartões por folha, para recortar. Cada cartão sai com{" "}
-              <strong>9,5 × 14,25 cm</strong> (0,5 cm menor que o totem). Escala{" "}
-              <strong>100%</strong>.
-            </span>
+            Folha A4 (4 por folha)
           </label>
+          <span className="text-xs text-muted-foreground">Imprimir em escala 100%</span>
         </fieldset>
         <div className="flex flex-wrap items-center gap-2">
           <Button
