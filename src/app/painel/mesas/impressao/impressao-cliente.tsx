@@ -182,7 +182,9 @@ export function ImpressaoCliente({ cartoes }: { cartoes: CartaoMesa[] }) {
         .area-impressao {
           display: flex;
           flex-wrap: wrap;
-          gap: ${formato === "a4" ? "0" : "4mm"};
+          /* A4: 3mm entre os cartões (nos dois sentidos) pra passar a tesoura.
+             Altura: 2 x 142,5 + 3 = 288mm ≤ 289mm úteis; largura: 2 x 95 + 3 = 193mm. */
+          gap: ${formato === "a4" ? "3mm" : "4mm"};
         }
         @media screen {
           .area-impressao {
