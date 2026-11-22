@@ -92,6 +92,18 @@ export function ProdutoDialog({
     INITIAL,
   );
 
+  // O diálogo é reaproveitado entre aberturas (o mesmo botão "Novo produto"):
+  // sem reiniciar aqui, a prévia da foto do produto criado antes continuava
+  // aparecendo no próximo, com o campo de arquivo vazio.
+  function aoAlterarAberto(aberto: boolean) {
+    setOpen(aberto);
+    if (aberto) {
+      setPreview(produto?.imagemUrl ?? null);
+      setRemovida(false);
+      setModelo(produto?.modelo ?? "simples");
+    }
+  }
+
   function resetImagem() {
     if (fileRef.current) fileRef.current.value = "";
     setPreview(null);
@@ -99,7 +111,7 @@ export function ProdutoDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={aoAlterarAberto}>
       <DialogTrigger render={trigger} />
       <DialogContent className="max-h-[92svh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>

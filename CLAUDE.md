@@ -81,6 +81,11 @@ em tempo real). Documentação de escopo em `docs/`.
   reduzem no navegador antes de enviar (`src/lib/imagem-cliente.ts`); o servidor converte
   para WebP (`src/lib/imagem.ts`, máx. 4MB). Campo de imagem novo = usar
   `prepararArquivoDoInput` no `onChange`.
+- Foto de produto: nome **único por envio** (`produtos/<id>-<timestamp>.webp`) — com nome
+  fixo o navegador/CDN serviam a foto antiga do cache e a troca valia antes do Publicar.
+  Arquivos sem uso (foto trocada/removida, produto excluído) **não** são apagados na hora
+  (o cardápio publicado ainda aponta para eles); `limparImagensOrfasProdutos` apaga os com
+  +1h sem uso depois de cada `publicarCardapio`.
 
 ## Autorização na aplicação
 

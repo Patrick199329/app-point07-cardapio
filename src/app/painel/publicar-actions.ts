@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { carregarCardapioPublico } from "@/lib/cardapio";
 import { requireAnyRole } from "@/lib/auth";
+import { limparImagensOrfasProdutos } from "@/lib/imagem";
 import { createClient } from "@/lib/supabase/server";
 
 export type PublicarState = { error: string | null; ok: boolean };
@@ -35,6 +36,10 @@ export async function publicarCardapio(
   if (error) {
     return { error: "Não foi possível publicar o cardápio.", ok: false };
   }
+
+  // Fotos trocadas/removidas/de produtos excluídos: agora que o público passou a
+  // ver o rascunho, os arquivos antigos não servem mais a ninguém.
+  await limparImagensOrfasProdutos().catch(() => {});
 
   revalidatePath("/cardapio");
   revalidatePath("/painel", "layout");

@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { requireAnyRole } from "@/lib/auth";
 import { marcarRascunhoAlterado } from "@/lib/cardapio-publicacao";
 import { parsePreco } from "@/lib/formato";
-import { removerImagemProduto, salvarImagemProduto } from "@/lib/imagem";
+import { salvarImagemProduto } from "@/lib/imagem";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/types/database";
 
@@ -290,12 +290,8 @@ export async function atualizarProduto(
   if (error) return { error: "Não foi possível salvar o produto.", ok: false };
 
   if (formData.get("remover_imagem") === "true") {
-    const { data } = await supabase
-      .from("produtos")
-      .select("imagem_path")
-      .eq("id", id)
-      .single();
-    if (data?.imagem_path) await removerImagemProduto(data.imagem_path);
+    // O arquivo em si só é apagado na próxima publicação (limparImagensOrfasProdutos):
+    // até lá o cardápio publicado ainda aponta pra ele.
     await supabase.from("produtos").update({ imagem_path: null }).eq("id", id);
   } else {
     const img = await aplicarImagem(formData, id);
@@ -324,8 +320,8 @@ export async function definirStatusProduto(formData: FormData): Promise<void> {
 
 /**
  * Exclui o produto de vez: o banco remove junto os grupos/opções dele
- * (`on delete cascade`) e aqui a foto é apagada do storage. Sem volta — pra
- * tirar um item do cardápio por um tempo, o caminho é "Desativar".
+ * (`on delete cascade`); a foto sai do storage na próxima publicação. Sem
+ * volta — pra tirar um item do cardápio por um tempo, o caminho é "Desativar".
  */
 export async function excluirProduto(formData: FormData): Promise<CardapioState> {
   await requireAnyRole(["admin", "gerente"]);
@@ -333,18 +329,11 @@ export async function excluirProduto(formData: FormData): Promise<CardapioState>
   if (!id) return { error: "Produto inválido.", ok: false };
 
   const supabase = await createClient();
-  const { data: produto } = await supabase
-    .from("produtos")
-    .select("imagem_path")
-    .eq("id", id)
-    .single();
-
   const { error } = await supabase.from("produtos").delete().eq("id", id);
   if (error) return { error: "Não foi possível excluir o produto.", ok: false };
 
-  // Só depois do delete dar certo — se falhasse, o produto ficaria sem foto.
-  if (produto?.imagem_path) await removerImagemProduto(produto.imagem_path);
-
+  // A foto não é apagada aqui: o cardápio publicado ainda mostra o produto até
+  // o próximo "Publicar", que também limpa os arquivos sem uso.
   await revalidarCardapio();
   return { error: null, ok: true };
 }

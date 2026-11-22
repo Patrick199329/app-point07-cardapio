@@ -2,6 +2,7 @@ import "server-only";
 
 import sharp from "sharp";
 
+import { selecionarImagensOrfas } from "@/lib/imagem-orfas";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 const BUCKET = "cardapio";
@@ -39,8 +40,15 @@ async function converterParaWebp(
 
 /**
  * Converte o arquivo enviado para WebP (redimensionado, com correção de EXIF) e
- * grava no bucket `cardapio` em `produtos/<produtoId>.webp` (upsert).
+ * grava no bucket `cardapio` em `produtos/<produtoId>-<timestamp>.webp`.
  * Regra de negócio do Módulo 1: todo upload de imagem vira WebP automaticamente.
+ *
+ * Nome ÚNICO a cada envio, de propósito: com o nome fixo (`<produtoId>.webp`) a
+ * foto nova substituía a antiga no mesmo endereço, e navegador/CDN seguiam
+ * servindo a antiga do cache (~1h); além disso a troca valia na hora, sem
+ * esperar o "Publicar". A foto antiga fica no storage até a próxima publicação
+ * (o cardápio publicado ainda aponta pra ela) e aí é apagada por
+ * `limparImagensOrfasProdutos`.
  */
 export async function salvarImagemProduto(
   produtoId: string,
@@ -49,7 +57,7 @@ export async function salvarImagemProduto(
   const convertido = await converterParaWebp(file, LARGURA_MAX);
   if (!convertido.ok) return convertido;
 
-  const path = `produtos/${produtoId}.webp`;
+  const path = `produtos/${produtoId}-${Date.now()}.webp`;
   const supabase = createAdminClient();
   const { error } = await supabase.storage
     .from(BUCKET)
@@ -111,6 +119,31 @@ export async function salvarLogoSistema(file: File): Promise<ResultadoImagem> {
   if (error) return { ok: false, error: "Falha ao enviar a logo." };
 
   return { ok: true, path };
+}
+
+/**
+ * Apaga de `produtos/` os arquivos que nenhum produto usa mais (fotos
+ * trocadas, removidas ou de produtos excluídos). Chamada depois de publicar:
+ * nesse momento o cardápio publicado passa a ser igual ao rascunho, então o
+ * que o rascunho não referencia também não é mais necessário ao público.
+ * Best-effort — falhar aqui não pode impedir a publicação.
+ */
+export async function limparImagensOrfasProdutos(): Promise<void> {
+  const supabase = createAdminClient();
+  // `limit` alto de uma vez só: um restaurante tem dezenas/poucas centenas de fotos.
+  const { data: arquivos } = await supabase.storage
+    .from(BUCKET)
+    .list("produtos", { limit: 1000 });
+  if (!arquivos || arquivos.length === 0) return;
+
+  const { data: usados } = await supabase
+    .from("produtos")
+    .select("imagem_path")
+    .not("imagem_path", "is", null);
+  const emUso = new Set((usados ?? []).map((p) => p.imagem_path as string));
+
+  const orfas = selecionarImagensOrfas(arquivos, emUso, Date.now());
+  if (orfas.length > 0) await supabase.storage.from(BUCKET).remove(orfas);
 }
 
 /** Remove um objeto do bucket `cardapio` (ignora se não existir). */
