@@ -23,6 +23,7 @@ import {
   type LogoTamanho,
   RAIO_PX,
 } from "@/lib/cardapio-tema";
+import { prepararArquivoDoInput } from "@/lib/imagem-cliente";
 
 import { type AparenciaState, salvarAparencia } from "./actions";
 
@@ -389,10 +390,17 @@ export function AparenciaForm({ config }: { config: AparenciaConfig }) {
             type="file"
             accept="image/*"
             className={INPUT}
-            onChange={(e) => {
-              const f = e.target.files?.[0];
-              if (f) {
-                setLogoPreview(URL.createObjectURL(f));
+            onChange={async (e) => {
+              const { file, grandeDemais } = await prepararArquivoDoInput(
+                e.currentTarget,
+                960,
+              );
+              if (grandeDemais) {
+                toast.error("Imagem muito grande. Escolha uma menor (até ~3 MB).");
+                return;
+              }
+              if (file) {
+                setLogoPreview(URL.createObjectURL(file));
                 setLogoRemovida(false);
               }
             }}

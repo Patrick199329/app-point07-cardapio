@@ -5,7 +5,9 @@ import sharp from "sharp";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 const BUCKET = "cardapio";
-const MAX_UPLOAD_BYTES = 8 * 1024 * 1024; // 8 MB antes da conversão
+// 4 MB antes da conversão: é o teto da Server Action (next.config.ts) e da Vercel
+// (4,5MB por requisição). O navegador já reduz a foto antes de enviar.
+const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
 const LARGURA_MAX = 1280;
 
 export type ResultadoImagem =
@@ -21,7 +23,7 @@ async function converterParaWebp(
     return { ok: false, error: "Envie um arquivo de imagem." };
   }
   if (file.size > MAX_UPLOAD_BYTES) {
-    return { ok: false, error: "Imagem muito grande (máx. 8 MB)." };
+    return { ok: false, error: "Imagem muito grande (máx. 4 MB)." };
   }
   try {
     const buffer = await sharp(Buffer.from(await file.arrayBuffer()))

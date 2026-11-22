@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { prepararArquivoDoInput } from "@/lib/imagem-cliente";
 
 import { salvarIdentidadeSistema, type SistemaState } from "./actions";
 
@@ -86,10 +87,17 @@ export function SistemaForm({
           type="file"
           accept="image/*"
           className="h-10 md:h-9"
-          onChange={(e) => {
-            const f = e.target.files?.[0];
-            if (f) {
-              setPreview(URL.createObjectURL(f));
+          onChange={async (e) => {
+            const { file, grandeDemais } = await prepararArquivoDoInput(
+              e.currentTarget,
+              960,
+            );
+            if (grandeDemais) {
+              toast.error("Imagem muito grande. Escolha uma menor (até ~3 MB).");
+              return;
+            }
+            if (file) {
+              setPreview(URL.createObjectURL(file));
               setRemovida(false);
             }
           }}
@@ -122,10 +130,17 @@ export function SistemaForm({
           type="file"
           accept="image/*"
           className="h-10 md:h-9"
-          onChange={(e) => {
-            const f = e.target.files?.[0];
-            if (f) {
-              setFaviconPreview(URL.createObjectURL(f));
+          onChange={async (e) => {
+            const { file, grandeDemais } = await prepararArquivoDoInput(
+              e.currentTarget,
+              512,
+            );
+            if (grandeDemais) {
+              toast.error("Imagem muito grande. Escolha uma menor (até ~3 MB).");
+              return;
+            }
+            if (file) {
+              setFaviconPreview(URL.createObjectURL(file));
               setFaviconRemovido(false);
             }
           }}

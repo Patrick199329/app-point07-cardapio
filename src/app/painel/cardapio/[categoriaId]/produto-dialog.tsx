@@ -24,6 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Textarea } from "@/components/ui/textarea";
+import { prepararArquivoDoInput } from "@/lib/imagem-cliente";
 
 import {
   atualizarProduto,
@@ -262,16 +263,22 @@ export function ProdutoDialog({
               type="file"
               accept="image/*"
               className={INPUT}
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) {
-                  setPreview(URL.createObjectURL(f));
+              onChange={async (e) => {
+                const { file, grandeDemais } = await prepararArquivoDoInput(
+                  e.currentTarget,
+                );
+                if (grandeDemais) {
+                  toast.error("Imagem muito grande. Escolha uma menor (até ~3 MB).");
+                  return;
+                }
+                if (file) {
+                  setPreview(URL.createObjectURL(file));
                   setRemovida(false);
                 }
               }}
             />
             <p className="text-xs text-muted-foreground">
-              A imagem é convertida automaticamente para WebP.
+              A imagem é reduzida e convertida automaticamente para WebP.
             </p>
           </div>
 

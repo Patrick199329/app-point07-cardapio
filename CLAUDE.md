@@ -65,6 +65,15 @@ em tempo real). Documentação de escopo em `docs/`.
   `postgres_changes` com o cliente autenticado; a RLS de SELECT (`is_admin() or
   is_garcom()`) também vale para o que o Realtime entrega.
 
+## Upload de imagens
+
+- Server Action no Next tem teto de **1MB por padrão**; `next.config.ts` sobe para 4MB
+  (a Vercel recusa >4,5MB por requisição, não dá para passar disso). Foto de celular é
+  maior, então os campos de imagem (produto, logo do cardápio, logo/favicon do sistema)
+  reduzem no navegador antes de enviar (`src/lib/imagem-cliente.ts`); o servidor converte
+  para WebP (`src/lib/imagem.ts`, máx. 4MB). Campo de imagem novo = usar
+  `prepararArquivoDoInput` no `onChange`.
+
 ## Autorização na aplicação
 
 - `src/proxy.ts` → refresh de sessão + barra rotas protegidas de quem não está logado.
