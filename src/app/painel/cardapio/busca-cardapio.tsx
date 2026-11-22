@@ -9,7 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import { definirStatusProduto } from "./actions";
+import { definirStatusProduto, excluirProduto } from "./actions";
+import { ExcluirButton } from "./excluir-button";
 import { ProdutoDialog, type ProdutoForm } from "./[categoriaId]/produto-dialog";
 import {
   type Filtro,
@@ -173,6 +174,13 @@ export function BuscaCardapio({
                         {p.ativo ? "Desativar" : "Ativar"}
                       </Button>
                     </form>
+                    <ExcluirButton
+                      id={p.form.id}
+                      acao={excluirProduto}
+                      titulo={`Excluir "${p.form.nome}"?`}
+                      descricao="O produto, a foto e as opções dele serão removidos de vez, inclusive do cardápio público depois de publicar. Não dá para desfazer. Se for só tirar do cardápio por um tempo, use Desativar."
+                      sucesso="Produto excluído."
+                    />
                   </div>
                 </div>
               </li>

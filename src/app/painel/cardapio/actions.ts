@@ -101,6 +101,35 @@ export async function definirStatusCategoria(formData: FormData): Promise<void> 
   await revalidarCardapio();
 }
 
+/**
+ * Exclui a categoria — só se estiver VAZIA. O banco também barra (produtos.
+ * categoria_id é `on delete restrict`), mas conferimos antes pra dar uma
+ * mensagem clara em vez de um erro de chave estrangeira.
+ */
+export async function excluirCategoria(formData: FormData): Promise<CardapioState> {
+  await requireAnyRole(["admin", "gerente"]);
+  const id = String(formData.get("id") ?? "");
+  if (!id) return { error: "Categoria inválida.", ok: false };
+
+  const supabase = await createClient();
+  const { count } = await supabase
+    .from("produtos")
+    .select("*", { count: "exact", head: true })
+    .eq("categoria_id", id);
+  if ((count ?? 0) > 0) {
+    return {
+      error: `Esta categoria ainda tem ${count} produto(s). Mova ou exclua os produtos antes.`,
+      ok: false,
+    };
+  }
+
+  const { error } = await supabase.from("categorias").delete().eq("id", id);
+  if (error) return { error: "Não foi possível excluir a categoria.", ok: false };
+
+  await revalidarCardapio();
+  return { error: null, ok: true };
+}
+
 // ===========================================================================
 // Produtos
 // ===========================================================================
@@ -293,6 +322,33 @@ export async function definirStatusProduto(formData: FormData): Promise<void> {
   await revalidarCardapio();
 }
 
+/**
+ * Exclui o produto de vez: o banco remove junto os grupos/opções dele
+ * (`on delete cascade`) e aqui a foto é apagada do storage. Sem volta — pra
+ * tirar um item do cardápio por um tempo, o caminho é "Desativar".
+ */
+export async function excluirProduto(formData: FormData): Promise<CardapioState> {
+  await requireAnyRole(["admin", "gerente"]);
+  const id = String(formData.get("id") ?? "");
+  if (!id) return { error: "Produto inválido.", ok: false };
+
+  const supabase = await createClient();
+  const { data: produto } = await supabase
+    .from("produtos")
+    .select("imagem_path")
+    .eq("id", id)
+    .single();
+
+  const { error } = await supabase.from("produtos").delete().eq("id", id);
+  if (error) return { error: "Não foi possível excluir o produto.", ok: false };
+
+  // Só depois do delete dar certo — se falhasse, o produto ficaria sem foto.
+  if (produto?.imagem_path) await removerImagemProduto(produto.imagem_path);
+
+  await revalidarCardapio();
+  return { error: null, ok: true };
+}
+
 // ===========================================================================
 // Avisos
 // ===========================================================================
@@ -346,6 +402,19 @@ export async function definirStatusAviso(formData: FormData): Promise<void> {
   const supabase = await createClient();
   await supabase.from("avisos").update({ ativo }).eq("id", id);
   await revalidarCardapio();
+}
+
+export async function excluirAviso(formData: FormData): Promise<CardapioState> {
+  await requireAnyRole(["admin", "gerente"]);
+  const id = String(formData.get("id") ?? "");
+  if (!id) return { error: "Aviso inválido.", ok: false };
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("avisos").delete().eq("id", id);
+  if (error) return { error: "Não foi possível excluir o aviso.", ok: false };
+
+  await revalidarCardapio();
+  return { error: null, ok: true };
 }
 
 // ===========================================================================

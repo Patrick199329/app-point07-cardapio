@@ -4,7 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 
-import { definirStatusAviso } from "../actions";
+import { definirStatusAviso, excluirAviso } from "../actions";
+import { ExcluirButton } from "../excluir-button";
 import { ReorderButtons } from "../reorder-buttons";
 import { AvisoDialog } from "./aviso-dialog";
 
@@ -84,6 +85,13 @@ export default async function AvisosPage() {
                       {aviso.ativo ? "Desativar" : "Ativar"}
                     </Button>
                   </form>
+                  <ExcluirButton
+                    id={aviso.id}
+                    acao={excluirAviso}
+                    titulo="Excluir este aviso?"
+                    descricao="O aviso será removido de vez, inclusive do cardápio público depois de publicar. Não dá para desfazer. Se for só tirar por um tempo, use Desativar."
+                    sucesso="Aviso excluído."
+                  />
                 </div>
               </div>
             </li>

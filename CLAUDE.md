@@ -65,6 +65,14 @@ em tempo real). Documentação de escopo em `docs/`.
   `postgres_changes` com o cliente autenticado; a RLS de SELECT (`is_admin() or
   is_garcom()`) também vale para o que o Realtime entrega.
 
+## Exclusão no cardápio
+
+- Produto, categoria e aviso podem ser excluídos no painel (botão Excluir com confirmação,
+  `excluir-button.tsx`); a alternativa reversível continua sendo Desativar. Categoria só
+  exclui se estiver **vazia** (`produtos.categoria_id` é `on delete restrict`); excluir
+  produto leva junto as opções (`cascade`) e a foto do storage. Toda exclusão chama
+  `revalidarCardapio()` (acende o "Publicar") e fica no log de auditoria como `exclusao`.
+
 ## Upload de imagens
 
 - Server Action no Next tem teto de **1MB por padrão**; `next.config.ts` sobe para 4MB

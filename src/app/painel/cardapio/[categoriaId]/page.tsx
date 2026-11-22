@@ -6,7 +6,12 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { urlImagemProduto } from "@/lib/imagem";
 import { createClient } from "@/lib/supabase/server";
 
-import { definirStatusProduto, moverProdutoParaCategoria } from "../actions";
+import {
+  definirStatusProduto,
+  excluirProduto,
+  moverProdutoParaCategoria,
+} from "../actions";
+import { ExcluirButton } from "../excluir-button";
 import { ListaOrdenavel } from "../lista-ordenavel";
 import { MODELO_LABEL, precoResumo } from "../produto-resumo";
 import { ReorderButtons } from "../reorder-buttons";
@@ -184,6 +189,13 @@ export default async function CategoriaProdutosPage({
                           {produto.ativo ? "Desativar" : "Ativar"}
                         </Button>
                       </form>
+                      <ExcluirButton
+                        id={produto.id}
+                        acao={excluirProduto}
+                        titulo={`Excluir "${produto.nome}"?`}
+                        descricao="O produto, a foto e as opções dele serão removidos de vez, inclusive do cardápio público depois de publicar. Não dá para desfazer. Se for só tirar do cardápio por um tempo, use Desativar."
+                        sucesso="Produto excluído."
+                      />
                     </div>
 
                     {(outrasCategorias ?? []).length > 0 ? (

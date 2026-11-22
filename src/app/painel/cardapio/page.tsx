@@ -5,9 +5,10 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { urlImagemProduto } from "@/lib/imagem";
 import { createClient } from "@/lib/supabase/server";
 
-import { definirStatusCategoria } from "./actions";
+import { definirStatusCategoria, excluirCategoria } from "./actions";
 import { BuscaCardapio, type ProdutoBusca } from "./busca-cardapio";
 import { CategoriaDialog } from "./categoria-dialog";
+import { ExcluirButton } from "./excluir-button";
 import { ListaOrdenavel } from "./lista-ordenavel";
 import { precoResumo } from "./produto-resumo";
 import { ReorderButtons } from "./reorder-buttons";
@@ -158,6 +159,18 @@ export default async function CardapioPage() {
                           {categoria.ativo ? "Desativar" : "Ativar"}
                         </Button>
                       </form>
+                      <ExcluirButton
+                        id={categoria.id}
+                        acao={excluirCategoria}
+                        titulo={`Excluir a categoria "${categoria.nome}"?`}
+                        descricao="A categoria será removida de vez, inclusive do cardápio público depois de publicar. Não dá para desfazer."
+                        sucesso="Categoria excluída."
+                        bloqueio={
+                          produtos.length > 0
+                            ? `"${categoria.nome}" ainda tem ${produtos.length} produto(s). Mova os produtos para outra categoria ou exclua-os antes. Se for só tirar do cardápio por um tempo, use Desativar.`
+                            : undefined
+                        }
+                      />
                     </div>
                   </>
                 ),
