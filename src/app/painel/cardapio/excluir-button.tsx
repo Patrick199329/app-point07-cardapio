@@ -62,12 +62,13 @@ export function ExcluirButton({
       <Button
         type="button"
         variant="ghost"
-        size="sm"
+        size="icon-sm"
         className="text-destructive hover:text-destructive"
         onClick={() => setOpen(true)}
+        aria-label="Excluir"
+        title="Excluir"
       >
         <Trash2 className="size-4" />
-        Excluir
       </Button>
 
       <Dialog open={open} onOpenChange={(v) => !pending && setOpen(v)}>

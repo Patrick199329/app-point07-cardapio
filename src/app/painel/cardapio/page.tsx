@@ -122,55 +122,59 @@ export default async function CardapioPage() {
                       ultimo={i === lista.length - 1}
                     />
 
-                    <Link
-                      href={`/painel/cardapio/${categoria.id}`}
-                      className="min-w-0 flex-1"
-                    >
-                      <span className="flex items-center gap-2">
-                        <span className="truncate font-medium">{categoria.nome}</span>
-                        {!categoria.ativo ? (
-                          <Badge variant="secondary">Inativa</Badge>
-                        ) : null}
-                      </span>
-                      <span className="text-sm text-muted-foreground">
-                        {produtos.length === 0
-                          ? "sem produtos"
-                          : `${ativos} de ${produtos.length} ativo(s)`}
-                      </span>
-                    </Link>
+                    {/* Título e botões em bloco que QUEBRA LINHA: em tela estreita os
+                        botões descem pra baixo do título em vez de espremê-lo. */}
+                    <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1">
+                      <Link
+                        href={`/painel/cardapio/${categoria.id}`}
+                        className="min-w-[9rem] flex-1"
+                      >
+                        <span className="flex items-center gap-2">
+                          <span className="truncate font-medium">{categoria.nome}</span>
+                          {!categoria.ativo ? (
+                            <Badge variant="secondary">Inativa</Badge>
+                          ) : null}
+                        </span>
+                        <span className="text-sm text-muted-foreground">
+                          {produtos.length === 0
+                            ? "sem produtos"
+                            : `${ativos} de ${produtos.length} ativo(s)`}
+                        </span>
+                      </Link>
 
-                    <div className="flex shrink-0 items-center gap-1">
-                      <CategoriaDialog
-                        categoria={categoria}
-                        trigger={
-                          <Button variant="outline" size="sm">
-                            Editar
-                          </Button>
-                        }
-                      />
-                      <form action={definirStatusCategoria}>
-                        <input type="hidden" name="id" value={categoria.id} />
-                        <input
-                          type="hidden"
-                          name="ativo"
-                          value={categoria.ativo ? "false" : "true"}
+                      <div className="flex shrink-0 items-center gap-1">
+                        <CategoriaDialog
+                          categoria={categoria}
+                          trigger={
+                            <Button variant="outline" size="sm">
+                              Editar
+                            </Button>
+                          }
                         />
-                        <Button variant="ghost" size="sm" type="submit">
-                          {categoria.ativo ? "Desativar" : "Ativar"}
-                        </Button>
-                      </form>
-                      <ExcluirButton
-                        id={categoria.id}
-                        acao={excluirCategoria}
-                        titulo={`Excluir a categoria "${categoria.nome}"?`}
-                        descricao="A categoria será removida de vez, inclusive do cardápio público depois de publicar. Não dá para desfazer."
-                        sucesso="Categoria excluída."
-                        bloqueio={
-                          produtos.length > 0
-                            ? `"${categoria.nome}" ainda tem ${produtos.length} produto(s). Mova os produtos para outra categoria ou exclua-os antes. Se for só tirar do cardápio por um tempo, use Desativar.`
-                            : undefined
-                        }
-                      />
+                        <form action={definirStatusCategoria}>
+                          <input type="hidden" name="id" value={categoria.id} />
+                          <input
+                            type="hidden"
+                            name="ativo"
+                            value={categoria.ativo ? "false" : "true"}
+                          />
+                          <Button variant="ghost" size="sm" type="submit">
+                            {categoria.ativo ? "Desativar" : "Ativar"}
+                          </Button>
+                        </form>
+                        <ExcluirButton
+                          id={categoria.id}
+                          acao={excluirCategoria}
+                          titulo={`Excluir a categoria "${categoria.nome}"?`}
+                          descricao="A categoria será removida de vez, inclusive do cardápio público depois de publicar. Não dá para desfazer."
+                          sucesso="Categoria excluída."
+                          bloqueio={
+                            produtos.length > 0
+                              ? `"${categoria.nome}" ainda tem ${produtos.length} produto(s). Mova os produtos para outra categoria ou exclua-os antes. Se for só tirar do cardápio por um tempo, use Desativar.`
+                              : undefined
+                          }
+                        />
+                      </div>
                     </div>
                   </>
                 ),
