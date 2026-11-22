@@ -2,10 +2,10 @@
 
 import { type ReactNode, useState } from "react";
 
-import { Menu } from "lucide-react";
+import { ExternalLink, Menu } from "lucide-react";
 
 import { SignOutButton } from "@/components/sign-out-button";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
@@ -23,6 +23,25 @@ function Marca({ logoUrl, className }: { logoUrl: string | null; className?: str
     return <img src={logoUrl} alt="Point07" className={`w-auto object-contain ${className ?? "h-7"}`} />;
   }
   return <span className="text-base font-semibold">Point07</span>;
+}
+
+/**
+ * Abre o cardápio público (o que o cliente vê, já publicado) numa nova aba —
+ * pra conferir o resultado sem sair do painel. No celular só o ícone.
+ */
+function VerCardapioLink() {
+  return (
+    <a
+      href="/cardapio"
+      target="_blank"
+      rel="noopener noreferrer"
+      className={buttonVariants({ variant: "outline", size: "sm" })}
+      title="Abrir o cardápio público em uma nova aba"
+    >
+      <ExternalLink className="size-4" />
+      <span className="max-sm:sr-only">Ver cardápio</span>
+    </a>
+  );
 }
 
 function AvatarIniciais({ nome }: { nome: string }) {
@@ -74,6 +93,7 @@ export function PainelShell({
         </Button>
         <Marca logoUrl={logoUrl} className="h-7" />
         <div className="ml-auto flex items-center gap-2">
+          <VerCardapioLink />
           <PublicarButton pendente={publicacaoPendente} />
           <SignOutButton />
         </div>
@@ -106,6 +126,7 @@ export function PainelShell({
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <VerCardapioLink />
             <PublicarButton pendente={publicacaoPendente} />
             <SignOutButton />
           </div>

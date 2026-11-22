@@ -3,40 +3,14 @@ import { notFound } from "next/navigation";
 
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { formatarPreco } from "@/lib/formato";
 import { urlImagemProduto } from "@/lib/imagem";
 import { createClient } from "@/lib/supabase/server";
 
 import { definirStatusProduto, moverProdutoParaCategoria } from "../actions";
 import { ListaOrdenavel } from "../lista-ordenavel";
+import { MODELO_LABEL, precoResumo } from "../produto-resumo";
 import { ReorderButtons } from "../reorder-buttons";
 import { ProdutoDialog, type ProdutoForm } from "./produto-dialog";
-
-const MODELO_LABEL = {
-  simples: "Simples",
-  tamanhos: "Tamanhos",
-  compartilhar: "Compartilhar",
-} as const;
-
-function precoResumo(p: {
-  modelo: "simples" | "tamanhos" | "compartilhar";
-  preco: number | null;
-  preco_medio: number | null;
-  preco_grande: number | null;
-  preco_medio_label: string | null;
-  preco_grande_label: string | null;
-  serve_ate: number | null;
-}) {
-  if (p.modelo === "tamanhos") {
-    return `${p.preco_medio_label} ${formatarPreco(p.preco_medio)} · ${p.preco_grande_label} ${formatarPreco(p.preco_grande)}`;
-  }
-  if (p.modelo === "compartilhar") {
-    return p.serve_ate
-      ? `${formatarPreco(p.preco)} · serve até ${p.serve_ate}`
-      : formatarPreco(p.preco);
-  }
-  return formatarPreco(p.preco);
-}
 
 export async function generateMetadata({
   params,
