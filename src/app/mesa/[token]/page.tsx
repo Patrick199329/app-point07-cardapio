@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { CardapioPublico } from "@/components/cardapio/cardapio-publico";
 import { lerCardapioPublicado } from "@/lib/cardapio";
+import { chamadaGarcomAtiva } from "@/lib/chamada-garcom";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -34,13 +35,17 @@ export default async function MesaPage({
     }
   }
 
-  const cardapio = await lerCardapioPublicado();
+  const [cardapio, chamadaAtiva] = await Promise.all([
+    lerCardapioPublicado(),
+    chamadaGarcomAtiva(),
+  ]);
 
   return (
     <CardapioPublico
       {...cardapio}
       mesaToken={mesaTokenValido}
       mesaIdentificador={mesaIdentificador}
+      chamadaAtiva={chamadaAtiva}
     />
   );
 }

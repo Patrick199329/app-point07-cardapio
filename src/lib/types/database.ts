@@ -310,6 +310,7 @@ export type Database = {
         Row: {
           alerta_atraso_segundos: number
           atendimento_max_minutos: number
+          chamada_garcom_ativa: boolean
           id: number
           intervalo_novo_chamado_segundos: number
           updated_at: string
@@ -317,6 +318,7 @@ export type Database = {
         Insert: {
           alerta_atraso_segundos?: number
           atendimento_max_minutos?: number
+          chamada_garcom_ativa?: boolean
           id?: number
           intervalo_novo_chamado_segundos?: number
           updated_at?: string
@@ -324,6 +326,7 @@ export type Database = {
         Update: {
           alerta_atraso_segundos?: number
           atendimento_max_minutos?: number
+          chamada_garcom_ativa?: boolean
           id?: number
           intervalo_novo_chamado_segundos?: number
           updated_at?: string
@@ -699,6 +702,7 @@ export type Database = {
           ok: boolean
         }[]
       }
+      chamada_garcom_ativa: { Args: never; Returns: boolean }
       cancelar_chamado: {
         Args: { p_id: string; p_origem_token: string }
         Returns: boolean

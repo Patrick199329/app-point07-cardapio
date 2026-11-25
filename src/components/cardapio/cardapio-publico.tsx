@@ -181,9 +181,12 @@ export function CardapioPublico({
   config,
   mesaToken,
   mesaIdentificador,
+  chamadaAtiva = true,
 }: CardapioPublicoData & {
   mesaToken: string | null;
   mesaIdentificador?: string;
+  /** `fila_config.chamada_garcom_ativa`: desligada, some o botão e o selo da mesa. */
+  chamadaAtiva?: boolean;
 }) {
   const raio = RAIO_PX[config.arredondamento];
   const vars = {
@@ -233,7 +236,7 @@ export function CardapioPublico({
               </h1>
             ) : null}
           </div>
-          {mesaIdentificador && mesaToken ? (
+          {chamadaAtiva && mesaIdentificador && mesaToken ? (
             // Sem opacity: cor_texto_cabecalho já é a escolha do Administrador
             // pra ter contraste com cor_fundo_cabecalho — baixar a opacidade
             // aqui diluía esse contraste de novo, ficando ilegível quando as
@@ -354,6 +357,7 @@ export function CardapioPublico({
         mesaIdentificador={mesaIdentificador}
         corDestaque={config.cor_destaque}
         avisos={avisos.filter((a) => a.fixo)}
+        chamadaAtiva={chamadaAtiva}
       />
     </div>
   );

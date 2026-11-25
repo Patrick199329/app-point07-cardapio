@@ -53,6 +53,12 @@ em tempo real). Documentação de escopo em `docs/`.
 - Intervalo da mesa: `criar_chamado` recusa (`chamado_recente`, segundos restantes em
   `hint`) nova chamada da mesma mesa até `fila_config.intervalo_novo_chamado_segundos`
   (padrão 60s) após o último aceite. Migration `20261026130000`.
+- Chamada de garçom ligada/desligada: `fila_config.chamada_garcom_ativa` (padrão true; chave
+  em Configurações → Fila do garçom). Desligada, o botão e o selo da mesa somem do cardápio
+  (`CardapioPublico` prop `chamadaAtiva`) **e** `criar_chamado` recusa (`chamada_desativada`);
+  o público lê por `chamada_garcom_ativa()` (RPC anon que expõe só o booleano). O botão
+  também reconfere no navegador ao carregar (a `/cardapio` é cacheada). Chamados já na fila
+  seguem normais. Migration `20261126120000`.
 - QR universal (mesas juntadas): tabela singleton `qr_universal` (token fixo + `ativo`, só
   admin/gerente enxergam), URL `<base>/mesa/escolher/<token>`. O cliente escolhe a mesa e
   é levado a `/mesa/<qr_token da mesa>` (fluxo normal). RPCs anon: `mesas_por_qr_universal`

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { CardapioPublico } from "@/components/cardapio/cardapio-publico";
 import { lerCardapioPublicado } from "@/lib/cardapio";
+import { chamadaGarcomAtiva } from "@/lib/chamada-garcom";
 
 // Cacheado (ISR) em vez de force-dynamic: a página não usa cookies/sessão
 // (RLS entrega os mesmos dados pra `anon` de qualquer jeito — ver
@@ -17,6 +18,9 @@ export const metadata: Metadata = {
 };
 
 export default async function CardapioPublicoPage() {
-  const data = await lerCardapioPublicado();
-  return <CardapioPublico {...data} mesaToken={null} />;
+  const [data, chamadaAtiva] = await Promise.all([
+    lerCardapioPublicado(),
+    chamadaGarcomAtiva(),
+  ]);
+  return <CardapioPublico {...data} mesaToken={null} chamadaAtiva={chamadaAtiva} />;
 }

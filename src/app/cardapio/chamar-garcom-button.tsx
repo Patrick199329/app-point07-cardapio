@@ -23,6 +23,7 @@ export function ChamarGarcomButton({
   mesaIdentificador,
   corDestaque,
   avisos,
+  chamadaAtiva = true,
 }: {
   mesaToken: string | null;
   mesaIdentificador?: string;
@@ -34,8 +35,24 @@ export function ChamarGarcomButton({
    * antes de pedir. Texto pequeno de propósito, pra não tomar espaço da tela.
    */
   avisos?: { id: string; texto: string }[];
+  /** Estado de `fila_config.chamada_garcom_ativa` na hora em que a página foi montada. */
+  chamadaAtiva?: boolean;
 }) {
   const supabase = useMemo(() => createClient(), []);
+  // A página pode ter vindo de cache (/cardapio) ou estar aberta há tempo: confere
+  // de novo no navegador e só ESCONDE se estiver desligada. Quem barra de verdade
+  // é criar_chamado() no banco (erro `chamada_desativada`).
+  const [ativa, setAtiva] = useState(chamadaAtiva);
+  useEffect(() => {
+    if (!chamadaAtiva) return;
+    let cancelado = false;
+    void supabase.rpc("chamada_garcom_ativa").then(({ data }) => {
+      if (!cancelado && data === false) setAtiva(false);
+    });
+    return () => {
+      cancelado = true;
+    };
+  }, [chamadaAtiva, supabase]);
   const [estado, setEstado] = useState<Estado>("idle");
   const [garcom, setGarcom] = useState<string | null>(null);
   const chamadoRef = useRef<{ id: string; origem: string } | null>(null);
@@ -111,6 +128,10 @@ export function ChamarGarcomButton({
       p_token: mesaToken,
     });
     const row = data?.[0];
+    if (error?.message === "chamada_desativada") {
+      setAtiva(false);
+      return;
+    }
     if (error?.message === "chamado_recente") {
       const segundos = Number(error.hint);
       setRestanteSeg(Number.isFinite(segundos) && segundos > 0 ? segundos : 60);
@@ -150,6 +171,19 @@ export function ChamarGarcomButton({
       });
     }
   }, [supabase]);
+
+  // Chamada desligada: some o quadro de chamar, mas os avisos fixos (que moram
+  // nesta mesma faixa) continuam aparecendo.
+  if (!ativa) {
+    if (!avisos || avisos.length === 0) return null;
+    return (
+      <div className="fixed inset-x-0 bottom-0 z-40 flex flex-col items-center">
+        <div className="w-full overflow-x-auto border-t bg-background/95 px-4 pt-1.5 pb-2 text-center text-[11px] whitespace-nowrap text-[#5a5a5a] backdrop-blur">
+          {avisos.map((a) => a.texto).join("  •  ")}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-40 flex flex-col items-center">

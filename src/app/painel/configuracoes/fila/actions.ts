@@ -53,10 +53,13 @@ export async function salvarConfigFila(
     };
   }
 
+  const chamadaAtiva = formData.get("chamada_ativa") === "true";
+
   const supabase = await createClient();
   const { error } = await supabase
     .from("fila_config")
     .update({
+      chamada_garcom_ativa: chamadaAtiva,
       alerta_atraso_segundos: total,
       atendimento_max_minutos: atendimentoMinutos,
       intervalo_novo_chamado_segundos: intervaloSegundos,
@@ -66,5 +69,7 @@ export async function salvarConfigFila(
 
   revalidatePath("/painel/configuracoes/fila");
   revalidatePath("/fila");
+  // Cardápio público (guarda em cache): o botão some/volta sem esperar a revalidação padrão.
+  revalidatePath("/cardapio");
   return { error: null, ok: true };
 }

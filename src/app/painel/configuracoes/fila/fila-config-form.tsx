@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 import { salvarConfigFila, type FilaConfigState } from "./actions";
 
@@ -18,11 +19,13 @@ export function FilaConfigForm({
   segundosIniciais,
   atendimentoMinutosInicial,
   intervaloSegundosInicial,
+  chamadaAtivaInicial,
 }: {
   minutosIniciais: number;
   segundosIniciais: number;
   atendimentoMinutosInicial: number;
   intervaloSegundosInicial: number;
+  chamadaAtivaInicial: boolean;
 }) {
   const router = useRouter();
 
@@ -38,8 +41,28 @@ export function FilaConfigForm({
     INITIAL,
   );
 
+  const [chamadaAtiva, setChamadaAtiva] = useState(chamadaAtivaInicial);
+
   return (
     <form action={formAction} className="max-w-sm space-y-5">
+      <input type="hidden" name="chamada_ativa" value={chamadaAtiva ? "true" : "false"} />
+
+      <div className="flex items-start justify-between gap-3 rounded-lg border p-3">
+        <div className="space-y-1">
+          <Label htmlFor="chamada_ativa_switch">Chamada de garçom pelo cardápio</Label>
+          <p className="text-xs text-muted-foreground">
+            Ligada: o cliente vê o botão &ldquo;Chamar garçom&rdquo; no cardápio da mesa.
+            Desligada: o botão some e novos chamados deixam de ser aceitos (mesmo em
+            telas já abertas). O que já está na fila continua normal.
+          </p>
+        </div>
+        <Switch
+          id="chamada_ativa_switch"
+          checked={chamadaAtiva}
+          onCheckedChange={setChamadaAtiva}
+        />
+      </div>
+
       <div className="space-y-2">
         <Label>Tempo limite antes do destaque</Label>
         <div className="flex items-end gap-3">

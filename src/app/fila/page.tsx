@@ -48,7 +48,7 @@ export default async function FilaPage() {
       carregarLogoSistema(),
       supabase
         .from("fila_config")
-        .select("alerta_atraso_segundos")
+        .select("alerta_atraso_segundos, chamada_garcom_ativa")
         .eq("id", 1)
         .single(),
       veTodos
@@ -57,6 +57,7 @@ export default async function FilaPage() {
     ]);
 
   const alertaAtrasoSegundos = filaConfig.data?.alerta_atraso_segundos ?? 300;
+  const chamadaAtiva = filaConfig.data?.chamada_garcom_ativa ?? true;
 
   const mesas: Record<string, string> = {};
   for (const m of mesasRes.data ?? []) mesas[m.id] = m.identificador;
@@ -114,6 +115,12 @@ export default async function FilaPage() {
 
       <div className="flex-1 p-4">
         <h1 className="mb-4 text-xl font-semibold">Fila de chamados</h1>
+        {!chamadaAtiva ? (
+          <p className="mb-4 rounded-lg border border-dashed px-3 py-2 text-sm text-muted-foreground">
+            A chamada de garçom pelo cardápio está <strong>desativada</strong> — novos
+            chamados não chegam. O que já está na fila segue normal.
+          </p>
+        ) : null}
         <FilaRealtime
           inicial={inicial}
           mesas={mesas}
