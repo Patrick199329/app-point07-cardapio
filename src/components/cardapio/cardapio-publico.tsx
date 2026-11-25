@@ -20,7 +20,7 @@ import {
   LOGO_ALTURA_PX,
   RAIO_PX,
 } from "@/lib/cardapio-tema";
-import { formatarPreco } from "@/lib/formato";
+import { formatarValor } from "@/lib/formato";
 import { urlImagemProduto } from "@/lib/imagem";
 
 // `text-[#5a5a5a]` em vez de `text-muted-foreground` (cinza padrão do tema,
@@ -75,18 +75,18 @@ function Precos({ produto }: { produto: ProdutoPublico }) {
       <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-sm tabular-nums">
         <span>
           <span className="text-[#5a5a5a]">{produto.preco_medio_label} </span>
-          <span className={preco}>{formatarPreco(produto.preco_medio)}</span>
+          <span className={preco}>{formatarValor(produto.preco_medio)}</span>
         </span>
         <span>
           <span className="text-[#5a5a5a]">{produto.preco_grande_label} </span>
-          <span className={preco}>{formatarPreco(produto.preco_grande)}</span>
+          <span className={preco}>{formatarValor(produto.preco_grande)}</span>
         </span>
       </div>
     );
   }
   return (
     <div className={`text-sm tabular-nums ${preco}`}>
-      {formatarPreco(produto.preco)}
+      {formatarValor(produto.preco)}
     </div>
   );
 }
@@ -253,7 +253,7 @@ export function CardapioPublico({
             ? formatarDescricao(p.descricao, config.descricao_caixa)
             : null,
           imagemUrl: urlImagemProduto(p.imagem_path),
-          precoTexto: formatarPreco(p.modelo === "tamanhos" ? p.preco_medio : p.preco),
+          precoTexto: formatarValor(p.modelo === "tamanhos" ? p.preco_medio : p.preco),
         }))}
       />
 

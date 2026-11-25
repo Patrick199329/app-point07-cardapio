@@ -11,6 +11,22 @@ export function formatarPreco(valor: number | string | null | undefined): string
   return BRL.format(n);
 }
 
+const VALOR = new Intl.NumberFormat("pt-BR", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+/**
+ * Só o valor, sem o símbolo da moeda: 8.5 -> "8,50". Usado no cardápio público
+ * (pedido do cliente); o painel segue mostrando "R$" via `formatarPreco`.
+ */
+export function formatarValor(valor: number | string | null | undefined): string {
+  if (valor === null || valor === undefined || valor === "") return "—";
+  const n = typeof valor === "string" ? Number(valor) : valor;
+  if (!Number.isFinite(n)) return "—";
+  return VALOR.format(n);
+}
+
 /**
  * Converte a entrada de um campo de preço em número.
  * Aceita "12,50" e "12.50". Retorna null se vazio; NaN se inválido.
