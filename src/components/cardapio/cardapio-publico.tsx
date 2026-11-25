@@ -20,7 +20,7 @@ import {
   LOGO_ALTURA_PX,
   RAIO_PX,
 } from "@/lib/cardapio-tema";
-import { formatarValor } from "@/lib/formato";
+import { formatarPreco, formatarValor } from "@/lib/formato";
 import { urlImagemProduto } from "@/lib/imagem";
 
 // `text-[#5a5a5a]` em vez de `text-muted-foreground` (cinza padrão do tema,
@@ -68,25 +68,32 @@ function GruposOpcoes({ grupos }: { grupos: GrupoOpcoesPublico[] }) {
   );
 }
 
-function Precos({ produto }: { produto: ProdutoPublico }) {
+function Precos({
+  produto,
+  mostrarSimbolo,
+}: {
+  produto: ProdutoPublico;
+  mostrarSimbolo: boolean;
+}) {
+  const formatar = mostrarSimbolo ? formatarPreco : formatarValor;
   const preco = "font-medium text-[var(--cardapio-destaque)]";
   if (produto.modelo === "tamanhos") {
     return (
       <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-sm tabular-nums">
         <span>
           <span className="text-[#5a5a5a]">{produto.preco_medio_label} </span>
-          <span className={preco}>{formatarValor(produto.preco_medio)}</span>
+          <span className={preco}>{formatar(produto.preco_medio)}</span>
         </span>
         <span>
           <span className="text-[#5a5a5a]">{produto.preco_grande_label} </span>
-          <span className={preco}>{formatarValor(produto.preco_grande)}</span>
+          <span className={preco}>{formatar(produto.preco_grande)}</span>
         </span>
       </div>
     );
   }
   return (
     <div className={`text-sm tabular-nums ${preco}`}>
-      {formatarValor(produto.preco)}
+      {formatar(produto.preco)}
     </div>
   );
 }
@@ -96,11 +103,13 @@ function ProdutoCard({
   sombra,
   descricaoCaixa,
   tamanhoImagem,
+  mostrarSimbolo,
 }: {
   produto: ProdutoPublico;
   sombra: boolean;
   descricaoCaixa: DescricaoCaixa;
   tamanhoImagem: "pequeno" | "medio" | "grande";
+  mostrarSimbolo: boolean;
 }) {
   const img = urlImagemProduto(produto.imagem_path);
   const descricao = produto.descricao
@@ -127,7 +136,7 @@ function ProdutoCard({
         ) : null}
         {serveAte}
         <div className="mt-1">
-          <Precos produto={produto} />
+          <Precos produto={produto} mostrarSimbolo={mostrarSimbolo} />
         </div>
       </div>
     ) : (
@@ -146,7 +155,7 @@ function ProdutoCard({
           ) : null}
           {serveAte}
           <div className="mt-1.5">
-            <Precos produto={produto} />
+            <Precos produto={produto} mostrarSimbolo={mostrarSimbolo} />
           </div>
         </div>
         {img && tamanhoImagem === "grande" ? (
@@ -253,7 +262,9 @@ export function CardapioPublico({
             ? formatarDescricao(p.descricao, config.descricao_caixa)
             : null,
           imagemUrl: urlImagemProduto(p.imagem_path),
-          precoTexto: formatarValor(p.modelo === "tamanhos" ? p.preco_medio : p.preco),
+          precoTexto: (config.mostrar_simbolo_moeda ? formatarPreco : formatarValor)(
+            p.modelo === "tamanhos" ? p.preco_medio : p.preco,
+          ),
         }))}
       />
 
@@ -282,6 +293,7 @@ export function CardapioPublico({
                             sombra={config.sombra}
                             descricaoCaixa={config.descricao_caixa}
                             tamanhoImagem={config.tamanho_imagem_produto}
+                            mostrarSimbolo={config.mostrar_simbolo_moeda}
                           />
                         </RevelarAoRolar>
                       </li>
@@ -312,6 +324,7 @@ export function CardapioPublico({
                             sombra={config.sombra}
                             descricaoCaixa={config.descricao_caixa}
                             tamanhoImagem={config.tamanho_imagem_produto}
+                            mostrarSimbolo={config.mostrar_simbolo_moeda}
                           />
                         </RevelarAoRolar>
                       </li>

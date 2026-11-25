@@ -44,6 +44,7 @@ export type AparenciaConfig = {
   arredondamento: Arredondamento;
   categorias_centralizadas: boolean;
   agrupar_categorias: boolean;
+  mostrar_simbolo_moeda: boolean;
   descricao_caixa: DescricaoCaixa;
   tamanho_imagem_produto: "pequeno" | "medio" | "grande";
   mesa_confirmar_apos_minutos: number;
@@ -310,6 +311,9 @@ export function AparenciaForm({ config }: { config: AparenciaConfig }) {
   const [agruparCategorias, setAgruparCategorias] = useState(
     config.agrupar_categorias,
   );
+  const [mostrarSimboloMoeda, setMostrarSimboloMoeda] = useState(
+    config.mostrar_simbolo_moeda,
+  );
   const [tamanhoImagem, setTamanhoImagem] = useState(config.tamanho_imagem_produto);
   const [descricaoCaixa, setDescricaoCaixa] = useState<DescricaoCaixa>(
     config.descricao_caixa,
@@ -349,6 +353,11 @@ export function AparenciaForm({ config }: { config: AparenciaConfig }) {
           type="hidden"
           name="agrupar_categorias"
           value={agruparCategorias ? "true" : "false"}
+        />
+        <input
+          type="hidden"
+          name="mostrar_simbolo_moeda"
+          value={mostrarSimboloMoeda ? "true" : "false"}
         />
         <input
           type="hidden"
@@ -535,6 +544,14 @@ export function AparenciaForm({ config }: { config: AparenciaConfig }) {
           hint="Exibe cada categoria como um bloco que abre e fecha ao tocar no nome."
           checked={agruparCategorias}
           onChange={setAgruparCategorias}
+        />
+
+        <ToggleField
+          id="mostrar_simbolo_moeda_switch"
+          label="Mostrar o símbolo R$ nos preços"
+          hint="Ligado: R$ 12,50. Desligado: só o valor, 12,50."
+          checked={mostrarSimboloMoeda}
+          onChange={setMostrarSimboloMoeda}
         />
 
         <div className="space-y-2">

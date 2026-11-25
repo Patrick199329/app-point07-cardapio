@@ -65,6 +65,14 @@ em tempo real). Documentação de escopo em `docs/`.
   `postgres_changes` com o cliente autenticado; a RLS de SELECT (`is_admin() or
   is_garcom()`) também vale para o que o Realtime entrega.
 
+## Preços no cardápio público
+
+- O "R$" é **só formatação** (nenhum preço é digitado com símbolo; o cadastro guarda o número).
+  `formatarPreco` (com "R$", usado no painel) e `formatarValor` (só `8,50`) em
+  `src/lib/formato.ts`. No cardápio público vale `cardapio_config.mostrar_simbolo_moeda`
+  (padrão **false**, ligado em Configurações → Aparência); snapshot publicado sem o campo conta
+  como false. Migration `20261125120000`.
+
 ## Exclusão no cardápio
 
 - Produto, categoria e aviso podem ser excluídos no painel (botão Excluir com confirmação,

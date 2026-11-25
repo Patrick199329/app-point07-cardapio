@@ -23,6 +23,7 @@ export type CardapioConfig = {
   arredondamento: Arredondamento;
   categorias_centralizadas: boolean;
   agrupar_categorias: boolean;
+  mostrar_simbolo_moeda: boolean;
   descricao_caixa: DescricaoCaixa;
   tamanho_imagem_produto: "pequeno" | "medio" | "grande";
   mesa_confirmar_apos_minutos: number;
@@ -85,6 +86,7 @@ const CONFIG_PADRAO: CardapioConfig = {
   arredondamento: "medio",
   categorias_centralizadas: false,
   agrupar_categorias: false,
+  mostrar_simbolo_moeda: false,
   descricao_caixa: "original",
   tamanho_imagem_produto: "pequeno",
   mesa_confirmar_apos_minutos: 15,

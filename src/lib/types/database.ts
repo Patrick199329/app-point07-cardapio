@@ -119,6 +119,7 @@ export type Database = {
           logo_tamanho: Database["public"]["Enums"]["cardapio_logo_tamanho"]
           mesa_confirmar_apos_minutos: number
           mostrar_nome_com_logo: boolean
+          mostrar_simbolo_moeda: boolean
           nome_estabelecimento: string
           sombra: boolean
           tamanho_imagem_produto: string
@@ -142,6 +143,7 @@ export type Database = {
           logo_tamanho?: Database["public"]["Enums"]["cardapio_logo_tamanho"]
           mesa_confirmar_apos_minutos?: number
           mostrar_nome_com_logo?: boolean
+          mostrar_simbolo_moeda?: boolean
           nome_estabelecimento?: string
           sombra?: boolean
           tamanho_imagem_produto?: string
@@ -165,6 +167,7 @@ export type Database = {
           logo_tamanho?: Database["public"]["Enums"]["cardapio_logo_tamanho"]
           mesa_confirmar_apos_minutos?: number
           mostrar_nome_com_logo?: boolean
+          mostrar_simbolo_moeda?: boolean
           nome_estabelecimento?: string
           sombra?: boolean
           tamanho_imagem_produto?: string

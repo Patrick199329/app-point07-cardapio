@@ -50,6 +50,7 @@ export async function salvarAparencia(
   const categorias_centralizadas =
     formData.get("categorias_centralizadas") === "true";
   const agrupar_categorias = formData.get("agrupar_categorias") === "true";
+  const mostrar_simbolo_moeda = formData.get("mostrar_simbolo_moeda") === "true";
   const mostrar_nome_com_logo = formData.get("mostrar_nome_com_logo") === "true";
   const arredondamento = String(
     formData.get("arredondamento") ?? "medio",
@@ -124,6 +125,7 @@ export async function salvarAparencia(
     sombra: boolean;
     categorias_centralizadas: boolean;
     agrupar_categorias: boolean;
+    mostrar_simbolo_moeda: boolean;
     mostrar_nome_com_logo: boolean;
     arredondamento: Arredondamento;
     logo_posicao: LogoPosicao;
@@ -144,6 +146,7 @@ export async function salvarAparencia(
     sombra,
     categorias_centralizadas,
     agrupar_categorias,
+    mostrar_simbolo_moeda,
     mostrar_nome_com_logo,
     arredondamento,
     logo_posicao,

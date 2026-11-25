@@ -50,6 +50,7 @@ export default async function AparenciaCardapioPage() {
           arredondamento: config?.arredondamento ?? "medio",
           categorias_centralizadas: config?.categorias_centralizadas ?? false,
           agrupar_categorias: config?.agrupar_categorias ?? false,
+          mostrar_simbolo_moeda: config?.mostrar_simbolo_moeda ?? false,
           descricao_caixa: config?.descricao_caixa ?? "original",
           tamanho_imagem_produto:
             (config?.tamanho_imagem_produto as "pequeno" | "medio" | "grande" | undefined) ??
