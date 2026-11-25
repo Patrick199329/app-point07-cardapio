@@ -4,6 +4,8 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 
+import { expandirCopias } from "./copias";
+
 export type CartaoMesa = {
   id: string;
   identificador: string;
@@ -12,6 +14,8 @@ export type CartaoMesa = {
   rotuloImpresso?: string;
   /** Começa fora da seleção (não entra num "Selecionar todas" automático). */
   iniciaDesmarcado?: boolean;
+  /** No formato A4, quantas vezes o cartão se repete (ex.: 4 = uma folha inteira dele). */
+  copiasNoA4?: number;
 };
 
 export function ImpressaoCliente({ cartoes }: { cartoes: CartaoMesa[] }) {
@@ -113,8 +117,8 @@ export function ImpressaoCliente({ cartoes }: { cartoes: CartaoMesa[] }) {
 
       {/* Folha de impressão — uma mesa por página, no modelo de arte do cliente */}
       <div className="area-impressao">
-        {paraImprimir.map((c) => (
-          <article key={c.id} className="cartao-mesa">
+        {expandirCopias(paraImprimir, formato).map(({ chave, cartao: c }) => (
+          <article key={chave} className="cartao-mesa">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/mesas/modelo-cartao.png" alt="" className="fundo" />
             <div className="qr-area" dangerouslySetInnerHTML={{ __html: c.svg }} />

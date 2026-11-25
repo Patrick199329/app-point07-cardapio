@@ -40,6 +40,7 @@ export default async function ImpressaoQrPage() {
         rotuloImpresso: "Cardápio",
         svg: await qrSvg(urlQrUniversal(universal.token)),
         iniciaDesmarcado: true,
+        copiasNoA4: 4,
       }
     : null;
   const cartoes = cartaoUniversal ? [cartaoUniversal, ...cartoesMesas] : cartoesMesas;
