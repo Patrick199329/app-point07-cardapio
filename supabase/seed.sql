@@ -169,3 +169,15 @@ begin
   insert into public.chamados (mesa_id, status, criado_em, cancelado_em)
   values (m_ext01, 'cancelado', now() - interval '1 hour', now() - interval '58 minutes');
 end $$;
+
+-- Publicação inicial (cardápio vazio, "publicada" um dia atrás): o botão Publicar do painel só
+-- acende quando existe uma publicação anterior pra comparar (ver temAlteracoesPendentes em
+-- src/app/painel/publicar-actions.ts). Em produção a linha já existe; num banco local recém-zerado
+-- não, e sem ela não dá pra publicar o rascunho de exemplo.
+insert into public.cardapio_publicado (id, dados, publicado_em)
+select 1,
+       jsonb_build_object('categorias', '[]'::jsonb, 'destaques', '[]'::jsonb, 'avisos', '[]'::jsonb, 'config', to_jsonb(c)),
+       now() - interval '1 day'
+from public.cardapio_config c
+where c.id = 1
+on conflict (id) do nothing;
