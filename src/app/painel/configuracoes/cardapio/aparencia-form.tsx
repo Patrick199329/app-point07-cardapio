@@ -45,6 +45,9 @@ export type AparenciaConfig = {
   categorias_centralizadas: boolean;
   agrupar_categorias: boolean;
   mostrar_simbolo_moeda: boolean;
+  preco_ocultar_centavos_zerados: boolean;
+  preco_cor_da_descricao: boolean;
+  preco_junto_da_descricao: boolean;
   descricao_caixa: DescricaoCaixa;
   tamanho_imagem_produto: "pequeno" | "medio" | "grande";
   mesa_confirmar_apos_minutos: number;
@@ -314,6 +317,13 @@ export function AparenciaForm({ config }: { config: AparenciaConfig }) {
   const [mostrarSimboloMoeda, setMostrarSimboloMoeda] = useState(
     config.mostrar_simbolo_moeda,
   );
+  const [ocultarCentavos, setOcultarCentavos] = useState(
+    config.preco_ocultar_centavos_zerados,
+  );
+  const [precoCorDescricao, setPrecoCorDescricao] = useState(
+    config.preco_cor_da_descricao,
+  );
+  const [precoJunto, setPrecoJunto] = useState(config.preco_junto_da_descricao);
   const [tamanhoImagem, setTamanhoImagem] = useState(config.tamanho_imagem_produto);
   const [descricaoCaixa, setDescricaoCaixa] = useState<DescricaoCaixa>(
     config.descricao_caixa,
@@ -358,6 +368,21 @@ export function AparenciaForm({ config }: { config: AparenciaConfig }) {
           type="hidden"
           name="mostrar_simbolo_moeda"
           value={mostrarSimboloMoeda ? "true" : "false"}
+        />
+        <input
+          type="hidden"
+          name="preco_ocultar_centavos_zerados"
+          value={ocultarCentavos ? "true" : "false"}
+        />
+        <input
+          type="hidden"
+          name="preco_cor_da_descricao"
+          value={precoCorDescricao ? "true" : "false"}
+        />
+        <input
+          type="hidden"
+          name="preco_junto_da_descricao"
+          value={precoJunto ? "true" : "false"}
         />
         <input
           type="hidden"
@@ -552,6 +577,30 @@ export function AparenciaForm({ config }: { config: AparenciaConfig }) {
           hint="Ligado: R$ 12,50. Desligado: só o valor, 12,50."
           checked={mostrarSimboloMoeda}
           onChange={setMostrarSimboloMoeda}
+        />
+
+        <ToggleField
+          id="preco_centavos_switch"
+          label="Valores redondos sem os centavos"
+          hint="Ligado: 12 em vez de 12,00. Valores com centavos, como 12,50, não mudam."
+          checked={ocultarCentavos}
+          onChange={setOcultarCentavos}
+        />
+
+        <ToggleField
+          id="preco_cor_descricao_switch"
+          label="Preço na mesma cor da descrição"
+          hint="O preço deixa de ter a cor de destaque e fica igual ao texto da descrição, sem chamar mais atenção."
+          checked={precoCorDescricao}
+          onChange={setPrecoCorDescricao}
+        />
+
+        <ToggleField
+          id="preco_junto_switch"
+          label="Preço junto da descrição"
+          hint="O preço vai no fim da descrição, depois de um traço (ex.: Pão, queijo e presunto — 12). Nos destaques o preço continua numa linha própria."
+          checked={precoJunto}
+          onChange={setPrecoJunto}
         />
 
         <div className="space-y-2">

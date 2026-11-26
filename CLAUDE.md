@@ -79,6 +79,15 @@ em tempo real). Documentação de escopo em `docs/`.
   (padrão **false**, ligado em Configurações → Aparência); snapshot publicado sem o campo conta
   como false. Migration `20261125120000`.
 
+- Como o preço aparece no cardápio público (Configurações → Aparência, três chaves em
+  `cardapio_config`, todas **false** por padrão = como era; valem após Publicar; snapshot sem
+  o campo conta false): `preco_ocultar_centavos_zerados` (12,00 → 12; 12,50 não muda —
+  `formatarPrecoPublico` em `src/lib/formato.ts`), `preco_cor_da_descricao` (preço na cor/peso
+  da descrição) e `preco_junto_da_descricao` (preço no fim da descrição após " — "; em
+  `tamanhos` vira "— Médio 18 · Grande 28"; "Serve até N" fica numa linha abaixo; sem
+  descrição o preço fica sozinho; no carrossel de **destaques** continua em linha própria,
+  porque a descrição é cortada em 2 linhas). Migration `20261127120000`.
+
 ## Link público do cardápio (redes sociais)
 
 - `/cardapio` (sem QR de mesa) é o link para divulgar: mostra o cardápio e **não chama garçom**

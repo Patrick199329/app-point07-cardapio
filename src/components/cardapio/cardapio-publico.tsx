@@ -20,7 +20,7 @@ import {
   LOGO_ALTURA_PX,
   RAIO_PX,
 } from "@/lib/cardapio-tema";
-import { formatarPreco, formatarValor } from "@/lib/formato";
+import { formatarPrecoPublico } from "@/lib/formato";
 import { urlImagemProduto } from "@/lib/imagem";
 
 // `text-[#5a5a5a]` em vez de `text-muted-foreground` (cinza padrão do tema,
@@ -68,33 +68,78 @@ function GruposOpcoes({ grupos }: { grupos: GrupoOpcoesPublico[] }) {
   );
 }
 
-function Precos({
-  produto,
-  mostrarSimbolo,
-}: {
-  produto: ProdutoPublico;
-  mostrarSimbolo: boolean;
-}) {
-  const formatar = mostrarSimbolo ? formatarPreco : formatarValor;
-  const preco = "font-medium text-[var(--cardapio-destaque)]";
+/** Opções de como o preço aparece (Configurações → Aparência). */
+type OpcoesPreco = {
+  simbolo: boolean;
+  semCentavosZerados: boolean;
+  /** Preço com a cor e o peso do texto da descrição (sem o destaque). */
+  corDescricao: boolean;
+  /** Preço no fim da descrição, depois de um traço. */
+  junto: boolean;
+};
+
+/** Itens do preço: 1 (simples/compartilhar) ou 2 com rótulo (tamanhos). */
+function itensPreco(
+  produto: ProdutoPublico,
+  opcoes: OpcoesPreco,
+): { rotulo?: string; valor: string }[] {
+  if (produto.modelo === "tamanhos") {
+    return [
+      { rotulo: produto.preco_medio_label ?? "", valor: formatarPrecoPublico(produto.preco_medio, opcoes) },
+      { rotulo: produto.preco_grande_label ?? "", valor: formatarPrecoPublico(produto.preco_grande, opcoes) },
+    ];
+  }
+  return [{ valor: formatarPrecoPublico(produto.preco, opcoes) }];
+}
+
+/** Preço numa linha própria (comportamento padrão). */
+function Precos({ produto, opcoes }: { produto: ProdutoPublico; opcoes: OpcoesPreco }) {
+  const preco = opcoes.corDescricao
+    ? "text-[#5a5a5a]"
+    : "font-medium text-[var(--cardapio-destaque)]";
+  const itens = itensPreco(produto, opcoes);
   if (produto.modelo === "tamanhos") {
     return (
       <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-sm tabular-nums">
-        <span>
-          <span className="text-[#5a5a5a]">{produto.preco_medio_label} </span>
-          <span className={preco}>{formatar(produto.preco_medio)}</span>
-        </span>
-        <span>
-          <span className="text-[#5a5a5a]">{produto.preco_grande_label} </span>
-          <span className={preco}>{formatar(produto.preco_grande)}</span>
-        </span>
+        {itens.map((item, i) => (
+          <span key={i}>
+            <span className="text-[#5a5a5a]">{item.rotulo} </span>
+            <span className={preco}>{item.valor}</span>
+          </span>
+        ))}
       </div>
     );
   }
+  return <div className={`text-sm tabular-nums ${preco}`}>{itens[0].valor}</div>;
+}
+
+/**
+ * Preço no fim da descrição, no mesmo parágrafo: "Descrição — 12,50" (ou
+ * "Descrição — Médio 18 · Grande 28"). Cada pedaço fica com `nowrap` pra o traço
+ * e o valor nunca se separarem numa quebra de linha.
+ */
+function PrecoJunto({
+  produto,
+  opcoes,
+  comTraco,
+}: {
+  produto: ProdutoPublico;
+  opcoes: OpcoesPreco;
+  comTraco: boolean;
+}) {
+  // Com `corDescricao` herda a cor/peso do parágrafo; senão mantém o destaque.
+  const estilo = opcoes.corDescricao ? "" : "font-medium text-[var(--cardapio-destaque)]";
   return (
-    <div className={`text-sm tabular-nums ${preco}`}>
-      {formatar(produto.preco)}
-    </div>
+    <>
+      {itensPreco(produto, opcoes).map((item, i) => (
+        <span key={i} className={`whitespace-nowrap tabular-nums ${estilo}`}>
+          {" "}
+          {i === 0 ? (comTraco ? "— " : "") : "· "}
+          {item.rotulo ? `${item.rotulo} ` : ""}
+          {item.valor}
+        </span>
+      ))}
+    </>
   );
 }
 
@@ -103,18 +148,29 @@ function ProdutoCard({
   sombra,
   descricaoCaixa,
   tamanhoImagem,
-  mostrarSimbolo,
+  opcoes,
 }: {
   produto: ProdutoPublico;
   sombra: boolean;
   descricaoCaixa: DescricaoCaixa;
   tamanhoImagem: "pequeno" | "medio" | "grande";
-  mostrarSimbolo: boolean;
+  opcoes: OpcoesPreco;
 }) {
   const img = urlImagemProduto(produto.imagem_path);
   const descricao = produto.descricao
     ? formatarDescricao(produto.descricao, descricaoCaixa)
     : null;
+  // Descrição; com "preço junto" o valor entra no fim do mesmo parágrafo (e, sem
+  // descrição, vira o próprio parágrafo, sem traço).
+  const linhaDescricao =
+    descricao || opcoes.junto ? (
+      <p className="text-sm text-[#5a5a5a]">
+        {descricao}
+        {opcoes.junto ? (
+          <PrecoJunto produto={produto} opcoes={opcoes} comTraco={Boolean(descricao)} />
+        ) : null}
+      </p>
+    ) : null;
   const serveAte =
     produto.modelo === "compartilhar" && produto.serve_ate ? (
       <p className="mt-0.5 text-xs text-[#5a5a5a]">
@@ -131,13 +187,13 @@ function ProdutoCard({
           className="mx-auto aspect-square w-full max-w-56 sm:max-w-64"
         />
         <p className="mt-3 font-medium">{produto.nome}</p>
-        {descricao ? (
-          <p className="text-sm text-[#5a5a5a]">{descricao}</p>
-        ) : null}
+        {linhaDescricao}
         {serveAte}
-        <div className="mt-1">
-          <Precos produto={produto} mostrarSimbolo={mostrarSimbolo} />
-        </div>
+        {opcoes.junto ? null : (
+          <div className="mt-1">
+            <Precos produto={produto} opcoes={opcoes} />
+          </div>
+        )}
       </div>
     ) : (
       <div className={`flex gap-3 ${tamanhoImagem === "grande" ? "min-h-36" : ""}`}>
@@ -150,13 +206,13 @@ function ProdutoCard({
         ) : null}
         <div className="min-w-0 flex-1">
           <p className="font-medium">{produto.nome}</p>
-          {descricao ? (
-            <p className="text-sm text-[#5a5a5a]">{descricao}</p>
-          ) : null}
+          {linhaDescricao}
           {serveAte}
-          <div className="mt-1.5">
-            <Precos produto={produto} mostrarSimbolo={mostrarSimbolo} />
-          </div>
+          {opcoes.junto ? null : (
+            <div className="mt-1.5">
+              <Precos produto={produto} opcoes={opcoes} />
+            </div>
+          )}
         </div>
         {img && tamanhoImagem === "grande" ? (
           <ImagemProduto src={img} alt={produto.nome} className="h-36 w-[42%] shrink-0" />
@@ -188,6 +244,13 @@ export function CardapioPublico({
   /** `fila_config.chamada_garcom_ativa`: desligada, some o botão e o selo da mesa. */
   chamadaAtiva?: boolean;
 }) {
+  const opcoesPreco: OpcoesPreco = {
+    simbolo: config.mostrar_simbolo_moeda,
+    // `!!`: cardápio publicado antes dessas opções existirem não tem os campos.
+    semCentavosZerados: !!config.preco_ocultar_centavos_zerados,
+    corDescricao: !!config.preco_cor_da_descricao,
+    junto: !!config.preco_junto_da_descricao,
+  };
   const raio = RAIO_PX[config.arredondamento];
   const vars = {
     "--cardapio-fundo": config.cor_fundo,
@@ -257,6 +320,7 @@ export function CardapioPublico({
 
       <DestaquesCarrossel
         corDestaque={config.cor_destaque}
+        precoCorDescricao={opcoesPreco.corDescricao}
         sombra={config.sombra}
         itens={destaques.map((p) => ({
           id: p.id,
@@ -265,8 +329,9 @@ export function CardapioPublico({
             ? formatarDescricao(p.descricao, config.descricao_caixa)
             : null,
           imagemUrl: urlImagemProduto(p.imagem_path),
-          precoTexto: (config.mostrar_simbolo_moeda ? formatarPreco : formatarValor)(
+          precoTexto: formatarPrecoPublico(
             p.modelo === "tamanhos" ? p.preco_medio : p.preco,
+            opcoesPreco,
           ),
         }))}
       />
@@ -296,7 +361,7 @@ export function CardapioPublico({
                             sombra={config.sombra}
                             descricaoCaixa={config.descricao_caixa}
                             tamanhoImagem={config.tamanho_imagem_produto}
-                            mostrarSimbolo={config.mostrar_simbolo_moeda}
+                            opcoes={opcoesPreco}
                           />
                         </RevelarAoRolar>
                       </li>
@@ -327,7 +392,7 @@ export function CardapioPublico({
                             sombra={config.sombra}
                             descricaoCaixa={config.descricao_caixa}
                             tamanhoImagem={config.tamanho_imagem_produto}
-                            mostrarSimbolo={config.mostrar_simbolo_moeda}
+                            opcoes={opcoesPreco}
                           />
                         </RevelarAoRolar>
                       </li>

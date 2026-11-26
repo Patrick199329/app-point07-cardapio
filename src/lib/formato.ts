@@ -27,6 +27,38 @@ export function formatarValor(valor: number | string | null | undefined): string
   return VALOR.format(n);
 }
 
+const BRL_INTEIRO = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+});
+const VALOR_INTEIRO = new Intl.NumberFormat("pt-BR", {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+});
+
+export type OpcoesFormatoPreco = {
+  /** Mostra o "R$" antes do valor. */
+  simbolo: boolean;
+  /** 12,00 vira 12; 12,50 continua 12,50. */
+  semCentavosZerados: boolean;
+};
+
+/** Preço do cardápio público conforme as opções de Configurações → Aparência. */
+export function formatarPrecoPublico(
+  valor: number | string | null | undefined,
+  { simbolo, semCentavosZerados }: OpcoesFormatoPreco,
+): string {
+  if (valor === null || valor === undefined || valor === "") return "—";
+  const n = typeof valor === "string" ? Number(valor) : valor;
+  if (!Number.isFinite(n)) return "—";
+  // Compara em centavos pra não depender de ponto flutuante (12.00, não 11.999…).
+  const redondo = semCentavosZerados && Math.round(n * 100) % 100 === 0;
+  if (simbolo) return (redondo ? BRL_INTEIRO : BRL).format(n);
+  return (redondo ? VALOR_INTEIRO : VALOR).format(n);
+}
+
 /**
  * Converte a entrada de um campo de preço em número.
  * Aceita "12,50" e "12.50". Retorna null se vazio; NaN se inválido.

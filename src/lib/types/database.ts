@@ -121,6 +121,9 @@ export type Database = {
           mostrar_nome_com_logo: boolean
           mostrar_simbolo_moeda: boolean
           nome_estabelecimento: string
+          preco_cor_da_descricao: boolean
+          preco_junto_da_descricao: boolean
+          preco_ocultar_centavos_zerados: boolean
           sombra: boolean
           tamanho_imagem_produto: string
           updated_at: string
@@ -145,6 +148,9 @@ export type Database = {
           mostrar_nome_com_logo?: boolean
           mostrar_simbolo_moeda?: boolean
           nome_estabelecimento?: string
+          preco_cor_da_descricao?: boolean
+          preco_junto_da_descricao?: boolean
+          preco_ocultar_centavos_zerados?: boolean
           sombra?: boolean
           tamanho_imagem_produto?: string
           updated_at?: string
@@ -169,6 +175,9 @@ export type Database = {
           mostrar_nome_com_logo?: boolean
           mostrar_simbolo_moeda?: boolean
           nome_estabelecimento?: string
+          preco_cor_da_descricao?: boolean
+          preco_junto_da_descricao?: boolean
+          preco_ocultar_centavos_zerados?: boolean
           sombra?: boolean
           tamanho_imagem_produto?: string
           updated_at?: string
@@ -702,11 +711,11 @@ export type Database = {
           ok: boolean
         }[]
       }
-      chamada_garcom_ativa: { Args: never; Returns: boolean }
       cancelar_chamado: {
         Args: { p_id: string; p_origem_token: string }
         Returns: boolean
       }
+      chamada_garcom_ativa: { Args: never; Returns: boolean }
       criar_chamado: {
         Args: { p_token: string }
         Returns: {

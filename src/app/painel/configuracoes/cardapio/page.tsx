@@ -51,6 +51,9 @@ export default async function AparenciaCardapioPage() {
           categorias_centralizadas: config?.categorias_centralizadas ?? false,
           agrupar_categorias: config?.agrupar_categorias ?? false,
           mostrar_simbolo_moeda: config?.mostrar_simbolo_moeda ?? false,
+          preco_ocultar_centavos_zerados: config?.preco_ocultar_centavos_zerados ?? false,
+          preco_cor_da_descricao: config?.preco_cor_da_descricao ?? false,
+          preco_junto_da_descricao: config?.preco_junto_da_descricao ?? false,
           descricao_caixa: config?.descricao_caixa ?? "original",
           tamanho_imagem_produto:
             (config?.tamanho_imagem_produto as "pequeno" | "medio" | "grande" | undefined) ??

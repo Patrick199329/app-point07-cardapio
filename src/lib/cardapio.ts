@@ -24,6 +24,9 @@ export type CardapioConfig = {
   categorias_centralizadas: boolean;
   agrupar_categorias: boolean;
   mostrar_simbolo_moeda: boolean;
+  preco_ocultar_centavos_zerados: boolean;
+  preco_cor_da_descricao: boolean;
+  preco_junto_da_descricao: boolean;
   descricao_caixa: DescricaoCaixa;
   tamanho_imagem_produto: "pequeno" | "medio" | "grande";
   mesa_confirmar_apos_minutos: number;
@@ -87,6 +90,9 @@ const CONFIG_PADRAO: CardapioConfig = {
   categorias_centralizadas: false,
   agrupar_categorias: false,
   mostrar_simbolo_moeda: false,
+  preco_ocultar_centavos_zerados: false,
+  preco_cor_da_descricao: false,
+  preco_junto_da_descricao: false,
   descricao_caixa: "original",
   tamanho_imagem_produto: "pequeno",
   mesa_confirmar_apos_minutos: 15,

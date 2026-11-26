@@ -20,10 +20,13 @@ export type ItemDestaque = {
 export function DestaquesCarrossel({
   itens,
   corDestaque,
+  precoCorDescricao = false,
   sombra,
 }: {
   itens: ItemDestaque[];
   corDestaque: string;
+  /** Preço na cor e peso da descrição (opção de Aparência). */
+  precoCorDescricao?: boolean;
   sombra: boolean;
 }) {
   const trilhaRef = useRef<HTMLDivElement>(null);
@@ -77,7 +80,13 @@ export function DestaquesCarrossel({
                 {p.descricao ? (
                   <p className="line-clamp-2 text-sm text-[#5a5a5a]">{p.descricao}</p>
                 ) : null}
-                <p className="pt-1 font-medium tabular-nums" style={{ color: corDestaque }}>
+                {/* O preço fica numa linha própria aqui (mesmo com "preço junto da
+                    descrição"): a descrição é cortada em 2 linhas e o valor no fim
+                    poderia sumir junto. */}
+                <p
+                  className={`pt-1 tabular-nums ${precoCorDescricao ? "text-[#5a5a5a]" : "font-medium"}`}
+                  style={precoCorDescricao ? undefined : { color: corDestaque }}
+                >
                   {p.precoTexto}
                 </p>
               </div>
