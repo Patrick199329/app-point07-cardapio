@@ -79,6 +79,17 @@ em tempo real). Documentação de escopo em `docs/`.
   (padrão **false**, ligado em Configurações → Aparência); snapshot publicado sem o campo conta
   como false. Migration `20261125120000`.
 
+## Link público do cardápio (redes sociais)
+
+- `/cardapio` (sem QR de mesa) é o link para divulgar: mostra o cardápio e **não chama garçom**
+  (a chamada exige o token de uma mesa; sem token nem a caixa "chamar" aparece, só os avisos
+  fixos). **Nunca divulgar `/mesa/<token>` nem `/mesa/escolher/<token>`** — esses chamam de
+  qualquer lugar. Botão "Copiar link" no cabeçalho do painel.
+- Pré-visualização ao compartilhar: `generateMetadata` em `src/app/cardapio/page.tsx` (Open
+  Graph) + `src/app/cardapio/opengraph-image.tsx` (PNG 1200x630 com logo/nome/cores do
+  cardápio publicado; a logo WebP é convertida com `sharp`). `metadataBase` no layout vem de
+  `NEXT_PUBLIC_SITE_URL` (domínio real em produção).
+
 ## Exclusão no cardápio
 
 - Produto, categoria e aviso podem ser excluídos no painel (botão Excluir com confirmação,

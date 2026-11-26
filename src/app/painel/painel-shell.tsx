@@ -2,7 +2,8 @@
 
 import { type ReactNode, useState } from "react";
 
-import { ExternalLink, Menu } from "lucide-react";
+import { Copy, ExternalLink, Menu } from "lucide-react";
+import { toast } from "sonner";
 
 import { SignOutButton } from "@/components/sign-out-button";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -41,6 +42,37 @@ function VerCardapioLink() {
       <ExternalLink className="size-4" />
       <span className="max-sm:sr-only">Ver cardápio</span>
     </a>
+  );
+}
+
+/**
+ * Copia o link público do cardápio (o mesmo que "Ver cardápio" abre) pra colar
+ * em redes sociais/WhatsApp. É o link SEM QR de mesa: quem entra por ele vê o
+ * cardápio mas não consegue chamar o garçom.
+ */
+function CopiarLinkCardapio() {
+  async function copiar() {
+    const link = `${window.location.origin}/cardapio`;
+    try {
+      await navigator.clipboard.writeText(link);
+      toast.success("Link do cardápio copiado.", { description: link });
+    } catch {
+      // Sem permissão de área de transferência: mostra o link pra copiar na mão.
+      toast.message("Copie o link do cardápio:", { description: link, duration: 15000 });
+    }
+  }
+
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      onClick={copiar}
+      title="Copiar o link do cardápio para divulgar (redes sociais, WhatsApp)"
+    >
+      <Copy className="size-4" />
+      <span className="max-sm:sr-only">Copiar link</span>
+    </Button>
   );
 }
 
@@ -94,6 +126,7 @@ export function PainelShell({
         <Marca logoUrl={logoUrl} className="h-7" />
         <div className="ml-auto flex items-center gap-2">
           <VerCardapioLink />
+          <CopiarLinkCardapio />
           <PublicarButton pendente={publicacaoPendente} />
           <SignOutButton />
         </div>
@@ -127,6 +160,7 @@ export function PainelShell({
           </div>
           <div className="flex items-center gap-2">
             <VerCardapioLink />
+          <CopiarLinkCardapio />
             <PublicarButton pendente={publicacaoPendente} />
             <SignOutButton />
           </div>

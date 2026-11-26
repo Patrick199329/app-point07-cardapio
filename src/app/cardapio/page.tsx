@@ -12,10 +12,27 @@ import { chamadaGarcomAtiva } from "@/lib/chamada-garcom";
 // rede de segurança.
 export const revalidate = 60;
 
-export const metadata: Metadata = {
-  title: "Cardápio",
-  description: "Cardápio do Point07",
-};
+/**
+ * Pré-visualização ao compartilhar o link (WhatsApp, Instagram, Facebook…):
+ * título e descrição do estabelecimento; a imagem vem de ./opengraph-image.tsx.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const { config } = await lerCardapioPublicado();
+  const nome = config.nome_estabelecimento;
+  const descricao = `Veja o cardápio do ${nome}: pratos, bebidas e preços.`;
+
+  return {
+    title: "Cardápio",
+    description: descricao,
+    openGraph: {
+      title: `Cardápio — ${nome}`,
+      description: descricao,
+      siteName: nome,
+      type: "website",
+      locale: "pt_BR",
+    },
+  };
+}
 
 export default async function CardapioPublicoPage() {
   const [data, chamadaAtiva] = await Promise.all([

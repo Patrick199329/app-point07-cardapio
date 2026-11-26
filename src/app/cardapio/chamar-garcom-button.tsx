@@ -172,9 +172,11 @@ export function ChamarGarcomButton({
     }
   }, [supabase]);
 
-  // Chamada desligada: some o quadro de chamar, mas os avisos fixos (que moram
-  // nesta mesma faixa) continuam aparecendo.
-  if (!ativa) {
+  // Sem o quadro de chamar, os avisos fixos (que moram nesta mesma faixa)
+  // continuam aparecendo. Vale pra chamada desligada e pro cardápio SEM QR de
+  // mesa (link externo, ex.: redes sociais), que não chama garçom — ali a dica
+  // "escaneie o QR da mesa" só atrapalharia quem está fora do local.
+  if (!ativa || !mesaToken) {
     if (!avisos || avisos.length === 0) return null;
     return (
       <div className="fixed inset-x-0 bottom-0 z-40 flex flex-col items-center">
@@ -189,11 +191,7 @@ export function ChamarGarcomButton({
     <div className="fixed inset-x-0 bottom-0 z-40 flex flex-col items-center">
       <div className="flex w-full justify-center p-4">
         <div className="pointer-events-auto w-full max-w-md rounded-2xl border bg-background/95 p-3 shadow-lg backdrop-blur">
-          {!mesaToken ? (
-            <p className="px-1 py-2 text-center text-sm text-muted-foreground">
-              Escaneie o QR code da sua mesa para chamar o garçom pelo app.
-            </p>
-          ) : estado === "pendente" ? (
+          {estado === "pendente" ? (
             <div className="flex items-center justify-between gap-3">
               <p className="flex items-center gap-2 text-sm font-medium">
                 <BellRing className="size-4" style={{ color: corDestaque }} />

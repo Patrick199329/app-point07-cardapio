@@ -22,6 +22,9 @@ export async function generateMetadata(): Promise<Metadata> {
   const faviconUrl = urlImagemProduto(faviconPath);
 
   return {
+    // Base das URLs absolutas dos metadados (og:image, etc.). É o mesmo domínio
+    // codificado nos QR (ver src/lib/qr.ts).
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
     // Páginas definem só a parte própria (ex.: title: "Cardápio") e o molde
     // completa com o nome do site — assim o nome fica num lugar só.
     title: { default: nome, template: `%s — ${nome}` },
