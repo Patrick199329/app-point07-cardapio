@@ -533,6 +533,7 @@ export type Database = {
           preco_grande_label: string | null
           preco_medio: number | null
           preco_medio_label: string | null
+          selo_id: string | null
           serve_ate: number | null
           updated_at: string
         }
@@ -553,6 +554,7 @@ export type Database = {
           preco_grande_label?: string | null
           preco_medio?: number | null
           preco_medio_label?: string | null
+          selo_id?: string | null
           serve_ate?: number | null
           updated_at?: string
         }
@@ -573,6 +575,7 @@ export type Database = {
           preco_grande_label?: string | null
           preco_medio?: number | null
           preco_medio_label?: string | null
+          selo_id?: string | null
           serve_ate?: number | null
           updated_at?: string
         }
@@ -582,6 +585,13 @@ export type Database = {
             columns: ["categoria_id"]
             isOneToOne: false
             referencedRelation: "categorias"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "produtos_selo_id_fkey"
+            columns: ["selo_id"]
+            isOneToOne: false
+            referencedRelation: "selos"
             referencedColumns: ["id"]
           },
         ]
@@ -674,6 +684,33 @@ export type Database = {
           ativo?: boolean
           id?: number
           token?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      selos: {
+        Row: {
+          ativo: boolean
+          cor: Database["public"]["Enums"]["selo_cor"]
+          created_at: string
+          id: string
+          texto: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          cor?: Database["public"]["Enums"]["selo_cor"]
+          created_at?: string
+          id?: string
+          texto: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          cor?: Database["public"]["Enums"]["selo_cor"]
+          created_at?: string
+          id?: string
+          texto?: string
           updated_at?: string
         }
         Relationships: []
@@ -783,6 +820,7 @@ export type Database = {
       mesa_area: "interna" | "externa"
       produto_imagem_layout: "miniatura" | "grande"
       produto_modelo: "simples" | "tamanhos" | "compartilhar"
+      selo_cor: "laranja" | "preto"
       user_role: "admin" | "garcom" | "gerente"
     }
     CompositeTypes: {
@@ -923,6 +961,7 @@ export const Constants = {
       mesa_area: ["interna", "externa"],
       produto_imagem_layout: ["miniatura", "grande"],
       produto_modelo: ["simples", "tamanhos", "compartilhar"],
+      selo_cor: ["laranja", "preto"],
       user_role: ["admin", "garcom", "gerente"],
     },
   },

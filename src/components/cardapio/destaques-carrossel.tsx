@@ -2,6 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { Selo } from "@/components/cardapio/selo";
+import type { SeloPublico } from "@/lib/cardapio";
+
 
 const INTERVALO_MS = 3500;
 
@@ -15,6 +18,7 @@ export type ItemDestaque = {
   descricao: string | null;
   imagemUrl: string | null;
   precoTexto: string;
+  selo?: SeloPublico | null;
 };
 
 export function DestaquesCarrossel({
@@ -69,13 +73,22 @@ export function DestaquesCarrossel({
           return (
             <article
               key={p.id}
-              className={`w-[80%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[var(--cardapio-bloco)] ${sombra ? "shadow-sm" : ""} ring-1 ring-black/5`}
+              className={`relative w-[80%] shrink-0 snap-center overflow-hidden rounded-2xl bg-[var(--cardapio-bloco)] ${sombra ? "shadow-sm" : ""} ring-1 ring-black/5`}
             >
               {p.imagemUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={p.imagemUrl} alt={p.nome} className="h-40 w-full object-cover" />
               ) : null}
-              <div className="space-y-1.5 p-4">
+              {p.selo ? (
+                <Selo
+                  texto={p.selo.texto}
+                  cor={p.selo.cor}
+                  estrelas
+                  className="absolute top-2 right-2 size-14 rotate-6 drop-shadow-md"
+                />
+              ) : null}
+              {/* Sem foto o selo cai sobre o texto: reserva espaço à direita do título. */}
+              <div className={`space-y-1.5 p-4 ${p.selo && !p.imagemUrl ? "pr-20" : ""}`}>
                 <p className="line-clamp-2 font-semibold leading-snug">{p.nome}</p>
                 {p.descricao ? (
                   <p className="line-clamp-2 text-sm text-[#5a5a5a]">{p.descricao}</p>

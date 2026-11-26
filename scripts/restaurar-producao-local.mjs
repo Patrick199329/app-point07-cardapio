@@ -178,7 +178,8 @@ const arquivos = [];
 (function varrer(dir) {
   for (const nome of readdirSync(dir)) {
     const p = join(dir, nome);
-    statSync(p).isDirectory() ? varrer(p) : arquivos.push(p);
+    if (statSync(p).isDirectory()) varrer(p);
+    else arquivos.push(p);
   }
 })(raizArquivos);
 const TIPOS = { ".webp": "image/webp", ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".svg": "image/svg+xml", ".gif": "image/gif" };

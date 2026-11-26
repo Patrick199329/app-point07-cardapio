@@ -35,6 +35,7 @@ export const AREA_LABEL: Record<string, string> = {
   cardapio_config: "Configurações — aparência do cardápio",
   sistema_config: "Configurações — identidade do sistema",
   fila_config: "Configurações — fila",
+  selos: "Configurações — selos",
 };
 
 /** Agrupamento mais grosso, usado no filtro "Área" da tela (dropdown menor que a lista de tabelas). */
@@ -49,7 +50,7 @@ export const AREA_GRUPOS: { key: string; label: string; tabelas: string[] }[] = 
   {
     key: "configuracoes",
     label: "Configurações",
-    tabelas: ["cardapio_config", "sistema_config", "fila_config"],
+    tabelas: ["cardapio_config", "sistema_config", "fila_config", "selos"],
   },
   { key: "sessao", label: "Sessão", tabelas: [] }, // entrada/saída — tabela é null
 ];

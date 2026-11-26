@@ -17,6 +17,12 @@ const SECOES = [
     href: "/painel/configuracoes/cardapio",
   },
   {
+    titulo: "Selos dos Produtos",
+    descricao:
+      "Selos de destaque (ex.: Indicação da casa, Novidade) para usar nos produtos do cardápio.",
+    href: "/painel/configuracoes/selos",
+  },
+  {
     titulo: "Identidade do Sistema",
     descricao:
       "Logo da tela de login, do menu do painel e do cabeçalho da fila do garçom.",

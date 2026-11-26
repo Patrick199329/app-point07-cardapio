@@ -48,7 +48,11 @@ export type ProdutoForm = {
   imagemUrl: string | null;
   imagemLayout: "miniatura" | "grande";
   destaque: boolean;
+  seloId: string | null;
 };
+
+/** Selo cadastrado em Configurações → Selos, escolhível no produto. */
+export type SeloOpcao = { id: string; texto: string; ativo: boolean };
 
 const INITIAL: CardapioState = { error: null, ok: false };
 const INPUT = "h-10 md:h-9";
@@ -59,10 +63,12 @@ const money = (n: number | null) =>
 export function ProdutoDialog({
   categoriaId,
   produto,
+  selos,
   trigger,
 }: {
   categoriaId: string;
   produto?: ProdutoForm;
+  selos: SeloOpcao[];
   trigger: ReactElement;
 }) {
   const router = useRouter();
@@ -305,6 +311,31 @@ export function ProdutoDialog({
               <option value="miniatura">Pequena, à esquerda</option>
               <option value="grande">Grande, centralizada</option>
             </NativeSelect>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="selo_id">Selo (opcional)</Label>
+            <NativeSelect
+              id="selo_id"
+              name="selo_id"
+              defaultValue={produto?.seloId ?? ""}
+              className={INPUT}
+            >
+              <option value="">Sem selo</option>
+              {selos
+                // desativados só aparecem se for o selo que o produto já usa
+                .filter((s) => s.ativo || s.id === produto?.seloId)
+                .map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.texto}
+                    {s.ativo ? "" : " (desativado)"}
+                  </option>
+                ))}
+            </NativeSelect>
+            <p className="text-xs text-muted-foreground">
+              Selo redondo exibido sobre o produto no cardápio. Cadastre os selos em Configurações →
+              Selos dos produtos.
+            </p>
           </div>
 
           <label className="flex cursor-pointer items-start gap-3 rounded-md border p-3 text-sm">

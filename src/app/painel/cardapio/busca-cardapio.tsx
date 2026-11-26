@@ -11,7 +11,11 @@ import { Input } from "@/components/ui/input";
 
 import { definirStatusProduto, excluirProduto } from "./actions";
 import { ExcluirButton } from "./excluir-button";
-import { ProdutoDialog, type ProdutoForm } from "./[categoriaId]/produto-dialog";
+import {
+  ProdutoDialog,
+  type ProdutoForm,
+  type SeloOpcao,
+} from "./[categoriaId]/produto-dialog";
 import {
   type Filtro,
   filtrarProdutos,
@@ -25,6 +29,8 @@ export type ProdutoBusca = {
   categoriaNome: string;
   categoriaAtiva: boolean;
   ativo: boolean;
+  /** Texto do selo aplicado (só pra mostrar na linha), se houver. */
+  seloTexto: string | null;
   resumoPreco: string;
   opcoes: number;
 };
@@ -44,9 +50,11 @@ const FILTROS: { valor: Filtro; label: string }[] = [
  */
 export function BuscaCardapio({
   produtos,
+  selos,
   children,
 }: {
   produtos: ProdutoBusca[];
+  selos: SeloOpcao[];
   children: ReactNode;
 }) {
   const [consulta, setConsulta] = useState("");
@@ -128,6 +136,7 @@ export function BuscaCardapio({
                     <span className="font-medium">{p.form.nome}</span>
                     <Badge variant="outline">{MODELO_LABEL[p.form.modelo]}</Badge>
                     {p.form.destaque ? <Badge>Destaque</Badge> : null}
+                    {p.seloTexto ? <Badge>Selo: {p.seloTexto}</Badge> : null}
                     {!p.ativo ? <Badge variant="secondary">Inativo</Badge> : null}
                   </div>
                   <p className="text-sm text-muted-foreground">
@@ -151,6 +160,7 @@ export function BuscaCardapio({
                     <ProdutoDialog
                       categoriaId={p.categoriaId}
                       produto={p.form}
+                      selos={selos}
                       trigger={
                         <Button variant="outline" size="sm">
                           Editar

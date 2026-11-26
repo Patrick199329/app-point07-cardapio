@@ -147,9 +147,19 @@ type ProdutoData = {
   serve_ate: number | null;
   imagem_layout: ProdutoImagemLayout;
   destaque: boolean;
+  /** Selo do produto (Configurações → Selos); null = sem selo. */
+  selo_id: string | null;
 };
 
 type Parse<T> = { ok: false; error: string } | { ok: true; data: T };
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** "" (Sem selo) ou valor inválido = null. O banco ainda barra um id que não existe (FK). */
+function seloIdDoFormulario(formData: FormData): string | null {
+  const v = String(formData.get("selo_id") ?? "");
+  return UUID_RE.test(v) ? v : null;
+}
 
 function precoValido(n: number | null): n is number {
   return n !== null && Number.isFinite(n) && n >= 0;
@@ -185,6 +195,7 @@ function parseProdutoForm(formData: FormData): Parse<ProdutoData> {
     serve_ate: null,
     imagem_layout,
     destaque: formData.get("destaque") === "true",
+    selo_id: seloIdDoFormulario(formData),
   };
 
   if (modelo === "simples" || modelo === "compartilhar") {

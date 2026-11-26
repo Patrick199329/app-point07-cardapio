@@ -50,7 +50,7 @@ export default async function CategoriaProdutosPage({
   const { data: produtos } = await supabase
     .from("produtos")
     .select(
-      "id, nome, descricao, modelo, preco, preco_medio, preco_grande, preco_medio_label, preco_grande_label, serve_ate, imagem_path, imagem_layout, destaque, ativo, ordem, updated_at, produto_grupos_opcoes(count)",
+      "id, nome, descricao, modelo, preco, preco_medio, preco_grande, preco_medio_label, preco_grande_label, serve_ate, imagem_path, imagem_layout, destaque, selo_id, ativo, ordem, updated_at, produto_grupos_opcoes(count)",
     )
     .eq("categoria_id", categoriaId)
     .order("ordem", { ascending: true });
@@ -62,6 +62,14 @@ export default async function CategoriaProdutosPage({
     .order("ordem", { ascending: true });
 
   const lista = produtos ?? [];
+
+  // Selos cadastrados (Configurações → Selos): alimentam o campo "Selo" do formulário.
+  const { data: selosRaw } = await supabase
+    .from("selos")
+    .select("id, texto, ativo")
+    .order("created_at", { ascending: true });
+  const selos = selosRaw ?? [];
+  const seloPorId = new Map(selos.map((s) => [s.id, s]));
 
   return (
     <div className="space-y-6">
@@ -79,6 +87,7 @@ export default async function CategoriaProdutosPage({
           </div>
           <ProdutoDialog
             categoriaId={categoriaId}
+            selos={selos}
             trigger={<Button>Novo produto</Button>}
           />
         </div>
@@ -115,6 +124,7 @@ export default async function CategoriaProdutosPage({
               imagemUrl: urlImagemProduto(produto.imagem_path),
               imagemLayout: produto.imagem_layout,
               destaque: produto.destaque,
+              seloId: produto.selo_id,
             };
             return {
               id: produto.id,
@@ -143,6 +153,9 @@ export default async function CategoriaProdutosPage({
                       <Badge variant="outline">
                         {MODELO_LABEL[produto.modelo]}
                       </Badge>
+                      {produto.selo_id && seloPorId.get(produto.selo_id) ? (
+                        <Badge>Selo: {seloPorId.get(produto.selo_id)!.texto}</Badge>
+                      ) : null}
                       {!produto.ativo ? (
                         <Badge variant="secondary">Inativo</Badge>
                       ) : null}
@@ -160,6 +173,7 @@ export default async function CategoriaProdutosPage({
                       <ProdutoDialog
                         categoriaId={categoriaId}
                         produto={form}
+                        selos={selos}
                         trigger={
                           <Button variant="outline" size="sm">
                             Editar

@@ -33,6 +33,9 @@ export type CardapioConfig = {
   updated_at: string;
 };
 
+/** Selo do produto (Configurações → Selos): texto curto + cor da paleta. */
+export type SeloPublico = { texto: string; cor: "laranja" | "preto" };
+
 export type OpcaoPublica = { id: string; nome: string };
 
 export type GrupoOpcoesPublico = {
@@ -56,6 +59,8 @@ export type ProdutoPublico = {
   imagem_path: string | null;
   imagem_layout: "miniatura" | "grande";
   destaque: boolean;
+  /** Ausente em cardápio publicado antes dos selos existirem (conta como sem selo). */
+  selo?: SeloPublico | null;
   grupos: GrupoOpcoesPublico[];
 };
 
@@ -114,7 +119,7 @@ export async function carregarCardapioPublico(): Promise<CardapioPublicoData> {
       supabase
         .from("categorias")
         .select(
-          "id, nome, produtos(id, nome, descricao, modelo, preco, preco_medio, preco_grande, preco_medio_label, preco_grande_label, serve_ate, imagem_path, imagem_layout, destaque, produto_grupos_opcoes(id, titulo, observacao, produto_opcoes(id, nome)))",
+          "id, nome, produtos(id, nome, descricao, modelo, preco, preco_medio, preco_grande, preco_medio_label, preco_grande_label, serve_ate, imagem_path, imagem_layout, destaque, selo:selos(texto, cor), produto_grupos_opcoes(id, titulo, observacao, produto_opcoes(id, nome)))",
         )
         .order("ordem", { ascending: true })
         .order("ordem", { ascending: true, referencedTable: "produtos" })

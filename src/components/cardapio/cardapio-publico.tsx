@@ -7,6 +7,7 @@ import { CategoriaNav } from "@/components/cardapio/categoria-nav";
 import { ConfirmarMesa } from "@/components/cardapio/confirmar-mesa";
 import { DestaquesCarrossel } from "@/components/cardapio/destaques-carrossel";
 import { ImagemProduto } from "@/components/cardapio/imagem-produto";
+import { Selo } from "@/components/cardapio/selo";
 import { RevelarAoRolar } from "@/components/cardapio/revelar-ao-rolar";
 import { VoltarAoTopo } from "@/components/cardapio/voltar-ao-topo";
 import type {
@@ -181,11 +182,17 @@ function ProdutoCard({
   const conteudo =
     img && produto.imagem_layout === "grande" ? (
       <div className="flex flex-col items-center text-center">
-        <ImagemProduto
-          src={img}
-          alt={produto.nome}
-          className="mx-auto aspect-square w-full max-w-56 sm:max-w-64"
-        />
+        <div className="relative mx-auto w-full max-w-56 sm:max-w-64">
+          <ImagemProduto src={img} alt={produto.nome} className="aspect-square w-full" />
+          {produto.selo ? (
+            <Selo
+              texto={produto.selo.texto}
+              cor={produto.selo.cor}
+              estrelas
+              className="absolute -top-2 -right-2 size-14 rotate-6 drop-shadow-md"
+            />
+          ) : null}
+        </div>
         <p className="mt-3 font-medium">{produto.nome}</p>
         {linhaDescricao}
         {serveAte}
@@ -204,7 +211,15 @@ function ProdutoCard({
             className={tamanhoImagem === "medio" ? "size-24" : "size-16"}
           />
         ) : null}
-        <div className="min-w-0 flex-1">
+        {/* flow-root: contém o selo flutuante, e o texto contorna ele sem perder largura à toa. */}
+        <div className="min-w-0 flex-1 flow-root">
+          {produto.selo ? (
+            <Selo
+              texto={produto.selo.texto}
+              cor={produto.selo.cor}
+              className="float-right mb-1 ml-2 size-12 -rotate-6 drop-shadow-sm"
+            />
+          ) : null}
           <p className="font-medium">{produto.nome}</p>
           {linhaDescricao}
           {serveAte}
@@ -329,6 +344,7 @@ export function CardapioPublico({
             ? formatarDescricao(p.descricao, config.descricao_caixa)
             : null,
           imagemUrl: urlImagemProduto(p.imagem_path),
+          selo: p.selo ?? null,
           precoTexto: formatarPrecoPublico(
             p.modelo === "tamanhos" ? p.preco_medio : p.preco,
             opcoesPreco,

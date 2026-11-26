@@ -29,9 +29,16 @@ export default async function CardapioPage() {
   const { data: todosProdutos } = await supabase
     .from("produtos")
     .select(
-      "id, categoria_id, nome, descricao, modelo, preco, preco_medio, preco_grande, preco_medio_label, preco_grande_label, serve_ate, imagem_path, imagem_layout, destaque, ativo, ordem, produto_grupos_opcoes(count)",
+      "id, categoria_id, nome, descricao, modelo, preco, preco_medio, preco_grande, preco_medio_label, preco_grande_label, serve_ate, imagem_path, imagem_layout, destaque, selo_id, ativo, ordem, produto_grupos_opcoes(count)",
     )
     .order("ordem", { ascending: true });
+
+  const { data: selosRaw } = await supabase
+    .from("selos")
+    .select("id, texto, ativo")
+    .order("created_at", { ascending: true });
+  const selos = selosRaw ?? [];
+  const seloPorId = new Map(selos.map((s) => [s.id, s.texto]));
 
   const categoriaPorId = new Map(lista.map((c, i) => [c.id, { ...c, posicao: i }]));
   const produtosBusca: ProdutoBusca[] = (todosProdutos ?? [])
@@ -56,11 +63,13 @@ export default async function CardapioPage() {
               imagemUrl: urlImagemProduto(p.imagem_path),
               imagemLayout: p.imagem_layout,
               destaque: p.destaque,
+              seloId: p.selo_id,
             },
             categoriaId: categoria.id,
             categoriaNome: categoria.nome,
             categoriaAtiva: categoria.ativo,
             ativo: p.ativo,
+            seloTexto: p.selo_id ? (seloPorId.get(p.selo_id) ?? null) : null,
             resumoPreco: precoResumo(p),
             opcoes: p.produto_grupos_opcoes?.[0]?.count ?? 0,
           } satisfies ProdutoBusca,
@@ -92,7 +101,7 @@ export default async function CardapioPage() {
         </div>
       </div>
 
-      <BuscaCardapio produtos={produtosBusca}>
+      <BuscaCardapio produtos={produtosBusca} selos={selos}>
         {lista.length === 0 ? (
           <p className="rounded-lg border py-10 text-center text-sm text-muted-foreground">
             Nenhuma categoria ainda. Crie a primeira para começar o cardápio.

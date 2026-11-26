@@ -104,6 +104,21 @@ em tempo real). Documentação de escopo em `docs/`.
   descrição o preço fica sozinho; no carrossel de **destaques** continua em linha própria,
   porque a descrição é cortada em 2 linhas). Migration `20261127120000`.
 
+## Selos dos produtos
+
+- Selo redondo (borda ondulada, anéis, texto em até 3 linhas) sobre o produto: "Indicação da
+  casa", "Novidade"… Cadastro em **Configurações → Selos dos Produtos** (`/painel/configuracoes/selos`):
+  tabela `selos` (`texto` ≤ 24 caracteres, único ignorando caixa/espaços; `cor` laranja|preto;
+  `ativo`) e `produtos.selo_id` (um selo por produto; `on delete set null`). Laranja acompanha
+  `--cardapio-destaque`; preto é fixo. Escolha no campo "Selo" do cadastro do produto.
+- O cardápio público lê só selos **ativos** (RLS anon `using (ativo)`); o selo viaja no
+  snapshot publicado dentro de cada produto (`selo: {texto, cor}`) — vale após Publicar.
+- Componente `src/components/cardapio/selo.tsx` (SVG, sem hooks). Tamanhos: 48px na lista (flutua à
+  direita do título, o texto contorna), 56px sobre a foto no layout "grande" e nos destaques.
+  Letra pequena nesses tamanhos — aumentar o selo se a leitura reclamar. Migration `20261127130000`.
+- Texto do selo é responsabilidade do cliente: "Mais vendido" só deve ir em item que realmente
+  vende mais (o sistema não registra vendas e não valida isso).
+
 ## Link público do cardápio (redes sociais)
 
 - `/cardapio` (sem QR de mesa) é o link para divulgar: mostra o cardápio e **não chama garçom**
