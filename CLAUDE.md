@@ -71,6 +71,22 @@ em tempo real). Documentação de escopo em `docs/`.
   `postgres_changes` com o cliente autenticado; a RLS de SELECT (`is_admin() or
   is_garcom()`) também vale para o que o Realtime entrega.
 
+## Réplica local dos dados de produção
+
+- `node scripts/restaurar-producao-local.mjs "<pasta-do-backup>" --sim` recarrega o Supabase
+  **local** (Docker) com um backup diário baixado do Google Drive. Não toca na produção (só lê os
+  arquivos da pasta) e **se recusa a rodar** se `NEXT_PUBLIC_SUPABASE_URL` não for localhost.
+  Zera o banco local (`db:reset`), copia as 15 tabelas de negócio, as imagens do storage e recria
+  os usuários a partir de `profiles` (mesmos e-mails, **senha `point07dev` para todos**).
+- **Não** copia de propósito: token do Google Drive, `push_inscricoes` (senão o local poderia
+  notificar garçom real), `backup_logs` e senhas/sessões reais.
+- A pasta do backup tem dados reais: fica em `/Local/` (no `.gitignore`) — **nunca versionar**.
+- O storage-api local (v1.72) apaga o índice único que ele mesmo exige pra gravar (erro 42P10 em
+  qualquer upload); o script recria `bucketid_objname` (como `supabase_storage_admin`). Sem isso,
+  nem upload de foto de produto funciona no ambiente local.
+- Depois de um `db:reset` o `admin@point07.local` do seed deixa de existir (os usuários passam a
+  ser os reais do backup).
+
 ## Preços no cardápio público
 
 - O "R$" é **só formatação** (nenhum preço é digitado com símbolo; o cadastro guarda o número).

@@ -48,3 +48,6 @@ next-env.d.ts
 
 .vercel
 .env*
+
+# Dados reais baixados da produção (backups, restaurações locais) — NUNCA versionar
+/Local/
