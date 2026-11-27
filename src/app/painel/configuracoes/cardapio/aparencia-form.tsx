@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useRef, useState } from "react";
+import { type CSSProperties, useActionState, useRef, useState } from "react";
 
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -15,7 +15,6 @@ import {
   type Arredondamento,
   DESCRICAO_CAIXA_LABEL,
   type DescricaoCaixa,
-  formatarDescricao,
   LOGO_ALTURA_PX,
   LOGO_POSICAO_LABEL,
   LOGO_TAMANHO_LABEL,
@@ -23,6 +22,8 @@ import {
   type LogoTamanho,
   RAIO_PX,
 } from "@/lib/cardapio-tema";
+import { type OpcoesPreco, ProdutoCard } from "@/components/cardapio/produto-card";
+import type { ProdutoPublico } from "@/lib/cardapio";
 import { prepararArquivoDoInput } from "@/lib/imagem-cliente";
 
 import { type AparenciaState, salvarAparencia } from "./actions";
@@ -109,6 +110,47 @@ function ToggleField({
   );
 }
 
+// Produtos ilustrativos do simulador (não existem no banco). Usam o MESMO cartão do cardápio real,
+// então preço, selo e opções aparecem exatamente como vão aparecer pros clientes.
+const EXEMPLO_BASE = {
+  preco_medio: null, preco_grande: null, preco_medio_label: null, preco_grande_label: null,
+  serve_ate: null, imagem_path: null, imagem_layout: "miniatura", destaque: false,
+} as const;
+const EXEMPLO_SIMPLES: ProdutoPublico = {
+  ...EXEMPLO_BASE,
+  id: "exemplo-1",
+  nome: "Produto de Exemplo",
+  descricao: "CONTRA FILE suculento, Macio com TEMPERO especial da casa",
+  modelo: "simples",
+  preco: 29,
+  selo: { texto: "Indicação da casa", cor: "laranja" },
+  grupos: [
+    {
+      id: "exemplo-g1",
+      titulo: "Escolha 1 Opção",
+      observacao: null,
+      opcoes: [
+        { id: "exemplo-o1", nome: "Opção A" },
+        { id: "exemplo-o2", nome: "Opção B" },
+      ],
+    },
+  ],
+};
+const EXEMPLO_TAMANHOS: ProdutoPublico = {
+  ...EXEMPLO_BASE,
+  id: "exemplo-2",
+  nome: "Porção de Exemplo",
+  descricao: "Servida com molho da casa e torradas",
+  modelo: "tamanhos",
+  preco: null,
+  preco_medio: 18,
+  preco_grande: 28.9,
+  preco_medio_label: "Médio",
+  preco_grande_label: "Grande",
+  selo: { texto: "Novidade", cor: "preto" },
+  grupos: [],
+};
+
 function PreviaCardapio({
   nome,
   logoPreview,
@@ -127,6 +169,8 @@ function PreviaCardapio({
   categoriasCentralizadas,
   agruparCategorias,
   descricaoCaixa,
+  opcoesPreco,
+  tamanhoImagem,
 }: {
   nome: string;
   logoPreview: string | null;
@@ -145,6 +189,8 @@ function PreviaCardapio({
   categoriasCentralizadas: boolean;
   agruparCategorias: boolean;
   descricaoCaixa: DescricaoCaixa;
+  opcoesPreco: OpcoesPreco;
+  tamanhoImagem: "pequeno" | "medio" | "grande";
 }) {
   const raio = RAIO_PX[arredondamento];
   const mostrarNome = !logoPreview || mostrarNomeComLogo;
@@ -168,42 +214,35 @@ function PreviaCardapio({
     </span>
   );
   const produtoExemplo = (
-    <div
-      style={{ backgroundColor: corBloco, borderRadius: raio }}
-      className={`p-3 ${sombra ? "shadow-md" : ""}`}
-    >
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <p className="font-medium">Produto de Exemplo</p>
-          <p className="text-sm text-muted-foreground">
-            {formatarDescricao(
-              "CONTRA FILE suculento, Macio com TEMPERO especial da casa",
-              descricaoCaixa,
-            )}
-          </p>
-        </div>
-        <p className="text-sm font-medium" style={{ color: corDestaque }}>
-          R$ 29,90
-        </p>
-      </div>
-      <div className="mt-2 space-y-1 border-t pt-2">
-        <p className="text-xs font-semibold" style={{ color: corDestaque }}>
-          Escolha 1 Opção
-        </p>
-        <div className="mt-1 flex gap-1.5">
-          <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs">
-            Opção A
-          </span>
-          <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs">
-            Opção B
-          </span>
-        </div>
-      </div>
+    <div className="space-y-3">
+      {[EXEMPLO_SIMPLES, EXEMPLO_TAMANHOS].map((produto) => (
+        <ProdutoCard
+          key={produto.id}
+          produto={produto}
+          imagemUrl={null}
+          sombra={sombra}
+          descricaoCaixa={descricaoCaixa}
+          tamanhoImagem={tamanhoImagem}
+          opcoes={opcoesPreco}
+        />
+      ))}
+      <p className="text-center text-[11px] text-[#5a5a5a]">
+        Produtos, preços e selos de exemplo.
+      </p>
     </div>
   );
 
   return (
-    <div className="overflow-hidden rounded-lg border">
+    <div
+      className="overflow-hidden rounded-lg border"
+      style={
+        {
+          "--cardapio-destaque": corDestaque,
+          "--cardapio-bloco": corBloco,
+          "--cardapio-raio": `${raio}px`,
+        } as CSSProperties
+      }
+    >
       <div
         style={{ backgroundColor: corCabecalho, color: corTextoCabecalho }}
         className={`flex items-center gap-2 border-b px-3 py-2 ${alinhamento}`}
@@ -705,6 +744,13 @@ export function AparenciaForm({ config }: { config: AparenciaConfig }) {
           categoriasCentralizadas={categoriasCentralizadas}
           agruparCategorias={agruparCategorias}
           descricaoCaixa={descricaoCaixa}
+          opcoesPreco={{
+            simbolo: mostrarSimboloMoeda,
+            semCentavosZerados: ocultarCentavos,
+            corDescricao: precoCorDescricao,
+            junto: precoJunto,
+          }}
+          tamanhoImagem={tamanhoImagem}
         />
       </div>
     </div>

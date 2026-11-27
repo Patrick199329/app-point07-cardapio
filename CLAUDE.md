@@ -104,6 +104,15 @@ em tempo real). Documentação de escopo em `docs/`.
   descrição o preço fica sozinho; no carrossel de **destaques** continua em linha própria,
   porque a descrição é cortada em 2 linhas). Migration `20261127120000`.
 
+## Simulador de Aparência
+
+- A "Prévia ao vivo" de **Configurações → Aparência** usa o **mesmo cartão do cardápio real**
+  (`src/components/cardapio/produto-card.tsx`: `ProdutoCard`, preço, selo, opções) com 2 produtos de
+  exemplo (um com selo laranja e preço redondo, outro com tamanhos e selo preto), ligado às chaves
+  da própria tela (R$, sem centavos, cor da descrição, preço junto). Assim a prévia nunca diverge do
+  resultado. `ProdutoCard` recebe `imagemUrl` de fora (o helper `urlImagemProduto` é server-only e o
+  simulador roda no navegador). Mudou o jeito de desenhar produto/preço/selo? Mexa no `produto-card.tsx`.
+
 ## Selos dos produtos
 
 - Selo redondo (borda ondulada, anéis, texto em até 3 linhas) sobre o produto: "Indicação da
